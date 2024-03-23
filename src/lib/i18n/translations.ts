@@ -1,0 +1,28 @@
+export default {
+    en: {
+        "yes_label": "Yes",
+        "no_label": "No",
+        "settings.menu.general_label": "General",
+        "settings.menu.advanced": "Advanced",
+        "settings.theme.theme_label": "Theme",
+        "settings.theme.change_theme": "Change theme",
+        "settings.advanced.installation_dir": "Installation directory",
+        "settings.advanced.desktop_entry_title": "Create desktop entry",
+        "settings.advanced.desktop_entry_des": "Create a desktop entry for the application you will install?",
+        "settings.save_button": "Save",
+        "example": "Hi <strong>{{name}}</strong>, how are you?",
+    },
+    it: {
+        "yes_label": "Si",
+        "no_label": "No",
+        "settings.menu.general_label": "Generale",
+        "settings.menu.advanced": "Avanzate",
+        "settings.theme.theme_label": "Tema",
+        "settings.theme.change_theme": "Cambia tema",
+        "settings.advanced.installation_dir": "Cartella di installazione",
+        "settings.advanced.desktop_entry_title": "Crea voce desktop",
+        "settings.advanced.desktop_entry_des": "Creare una voce desktop per l'applicazione che installerai?",
+        "settings.save_button": "Salva",
+        "example": "Hola, <strong>{{name}}</strong>, ¿cómo estás?",
+    },
+};

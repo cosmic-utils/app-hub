@@ -1,12 +1,24 @@
 <script lang="ts">
 
     import {t, locales, locale} from "$lib/i18n/i18n";
+    import {themes} from "$lib/themes";
 
 
     let activeMenuIndex = 0;
 
     let createDesktopEntry = true;
 
+    function set_theme(event: Event) {
+        const select = event.target as HTMLSelectElement
+        const theme = select.value
+        if (themes.includes(theme)) {
+            const one_year = 60 * 60 * 24 * 365
+            window.localStorage.setItem('theme', theme)
+            document.cookie = `theme=${theme}; max-age=${one_year}; path=/;`
+            document.documentElement.setAttribute('data-theme', theme)
+            current_theme = theme
+        }
+    }
 
 </script>
 
@@ -22,37 +34,28 @@
         {#if activeMenuIndex === 0}
             <div>
                 <p class="font-bold text-xl">{$t("settings.theme.theme_label")}</p>
-                <div class="dropdown mb-72">
-                    <div tabindex="0" role="button" class="btn m-1">
-                        {$t("settings.theme.change_theme")}
-                        <svg width="12px" height="12px" class="h-2 w-2 fill-current opacity-60 inline-block"
-                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048">
-                            <path d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"></path>
-                        </svg>
-                    </div>
-                    <ul class="dropdown-content z-[1] p-2 shadow-2xl bg-base-300 rounded-box w-52">
-                        <li>
-                            <input type="radio"
-                                   name="theme-dropdown"
-                                   class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
-                                   aria-label="Light"
-                                   value="light"/>
-                        </li>
-                        <li>
-                            <input type="radio"
-                                   name="theme-dropdown"
-                                   class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
-                                   aria-label="Dark"
-                                   value="dark"/>
-                        </li>
-                        <li>
-                            <input type="radio"
-                                   name="theme-dropdown"
-                                   class="theme-controller btn btn-sm btn-block btn-ghost justify-start"
-                                   aria-label="Cupcake"
-                                   value="cupcake"/>
-                        </li>
-                    </ul>
+                <div class="my-3">
+                    <select
+                            data-choose-theme
+                            class="select select-bordered max-w-3xl text-xl capitalize"
+                            on:change={set_theme}
+                    >
+                        <option disabled selected>{$t("settings.theme.choose_theme")}</option>
+                        {#each themes as theme}
+                            <option value={theme} class="capitalize">{theme}</option>
+                        {/each}
+                    </select>
+                </div>
+
+                <div class="mt-3">
+                    <p class="font-bold text-xl">{$t("settings.language.language_label")}</p>
+                    <p class="mt-3">{$t("settings.language.app_lang")}:</p>
+                    <select class="select select-bordered w-full max-w-xs mt-1" bind:value={$locale}>
+                        {#each locales as l}
+                            <option value={l}>{l}</option>
+                        {/each}
+                    </select>
+                    <p class="mt-3">{$t("settings.language.workspace_default_lang")}</p>
                 </div>
             </div>
         {/if}

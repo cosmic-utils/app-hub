@@ -37,6 +37,8 @@ export default {
         "install_file.advanced_options.app_type_des": "Specifies the type of desktop entry. Usually it is Application.",
         "install_file.advanced_options.app_terminal": "Terminal",
         "install_file.advanced_options.app_terminal_des": "Indicates whether the application should be run in a terminal.",
+        "install_file.advanced_options.no_sandbox": "No sandbox",
+        "install_file.advanced_options.no_sandbox_des": "Check to add the --no-sandbox option",
 
         "example": "Hi <strong>{{name}}</strong>, how are you?",
     },
@@ -78,6 +80,8 @@ export default {
         "install_file.advanced_options.app_type_des": "Specifica il tipo di entry desktop. Di solito è Application.",
         "install_file.advanced_options.app_terminal": "Terminale",
         "install_file.advanced_options.app_terminal_des": "Indica se l'applicazione deve essere eseguita in un terminale.",
+        "install_file.advanced_options.no_sandbox": "No sandbox",
+        "install_file.advanced_options.no_sandbox_des": "Spunta per aggiungire l'opzione --no-sandbox",
 
         "example": "Hola, <strong>{{name}}</strong>, ¿cómo estás?",
     },

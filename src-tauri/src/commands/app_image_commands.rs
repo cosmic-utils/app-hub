@@ -1,7 +1,8 @@
 use std::fs;
+use std::os::unix::fs::PermissionsExt;
 use crate::models::request_installation::RequestInstallation;
 use dirs;
-use crate::models::desktop_entry::DesktopEntry;
+use crate::helpers::desktop_file_creator::DesktopFileBuilder;
 
 #[tauri::command]
 pub async fn install_app(request_installation: RequestInstallation) -> Result<String, String> {
@@ -38,19 +39,40 @@ pub async fn install_app(request_installation: RequestInstallation) -> Result<St
         }
     };
 
-    let desktop_entry = DesktopEntry::new(
-        "Application".to_string(),
-        "1.0".to_string(),
-        request_installation.app_name.unwrap_or(file_name.to_string_lossy().to_string()),
-        request_installation.app_description.unwrap_or("".to_string()),
-        "/".to_string(),
-        format!("{}/AppImages/{}", dirs::home_dir().unwrap().to_string_lossy(), file_name.to_string_lossy()),
-        icon_path,
-        request_installation.terminal.unwrap_or(false),
-        vec!["Utility".to_string()],
-    );
+    let mut desktop_builder = DesktopFileBuilder::new();
 
-    match create_desktop_entry(desktop_entry) {
+    // Set mandatory fields
+    if request_installation.app_type.is_some() {
+        desktop_builder.set_type(request_installation.app_type.unwrap());
+    }
+    else {
+        desktop_builder.set_type("Application".to_string());
+    }
+    desktop_builder.set_version("1.0".to_string()); //TODO: make this settable by the user as advanced setting
+    desktop_builder.set_name(request_installation.app_name);
+    desktop_builder.set_exec(format!("{}/AppImages/{}", dirs::home_dir().unwrap().to_string_lossy(), file_name.to_string_lossy()));
+
+    // Set optional fields
+    //TODO check params from frontend and set them here
+    desktop_builder.set_icon(icon_path);
+    desktop_builder.set_terminal(request_installation.terminal.unwrap_or(false));
+    //desktop_builder.set_categories("Utility".to_string());
+    if request_installation.app_description.is_some() {
+        desktop_builder.set_comment(request_installation.app_description.unwrap());
+    }
+
+    // Create destingation path
+    let home_dir = dirs::home_dir().expect("Failed to get home directory");
+    let desktop_entry_path = home_dir.join(".local").join("share").join("applications").join("desktop_entry.desktop");
+
+    // Set no sandbox
+    if request_installation.no_sandbox.is_some() && request_installation.no_sandbox.unwrap() {
+        println!("Setting no sandbox");
+        desktop_builder.set_no_sandbox(true);
+    }
+
+    // Create the desktop entry
+    match desktop_builder.write_to_file(desktop_entry_path.to_string_lossy().to_string()) {
         Ok(_) => {
             println!("Desktop entry created successfully");
         }
@@ -86,6 +108,12 @@ fn install_app_image(file_path: &String) -> Result<String, String> {
 
     let res = fs::copy(file_path, &dest_path).expect("Failed to copy file");
 
+    // Set the executable permission to the file
+    let mut perms = fs::metadata(&dest_path).expect("Failed to get metadata").permissions();
+    // Set the executable permission to the file
+    perms.set_mode(0o755);
+    fs::set_permissions(&dest_path, perms).expect("Failed to set permissions");
+
     println!("Check file exist result: {:?}", res);
     println!("Cp result: {:?}", res);
 
@@ -115,43 +143,4 @@ fn copy_icon_file(icon_path: &String) -> Result<String, String> {
     println!("Cp result: {:?}", res);
 
     Ok(dest_path.to_string_lossy().to_string())
-}
-
-fn create_desktop_entry(desktop_entry: DesktopEntry) -> Result<String, String> {
-    let home_dir = dirs::home_dir().expect("Failed to get home directory");
-
-    let desktop_entry_path = home_dir.join(".local").join("share").join("applications").join("desktop_entry.desktop");
-
-    let content = format!(
-        "[Desktop Entry]\n\
-        Type={}\n\
-        Version={}\n\
-        Name={}\n\
-        Comment={}\n\
-        Path={}\n\
-        Exec={}\n\
-        Icon={}\n\
-        Terminal={}\n\
-        Categories={}",
-        desktop_entry.type_,
-        desktop_entry.version,
-        desktop_entry.name,
-        desktop_entry.comment,
-        desktop_entry.path,
-        desktop_entry.exec,
-        desktop_entry.icon,
-        desktop_entry.terminal,
-        desktop_entry.categories
-    );
-
-    match fs::write(desktop_entry_path, content) {
-        Ok(_) => {
-            println!("Desktop entry created successfully");
-        }
-        Err(_) => {
-            return Err("Failed to create desktop entry".to_string());
-        }
-    }
-
-    Ok("Installation successful".to_string())
 }

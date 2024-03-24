@@ -9,6 +9,7 @@
     let appDescription: string;
     let appType: string = "Application"
     let appTerminal: boolean = false;
+    let noSandbox: boolean = false;
 
     const chooseFile = () => {
         invoke<string>('pick_app_image', {})
@@ -30,10 +31,16 @@
 
     const installApp = async () => {
         try {
+            console.log("description:", appDescription)
             const res = await invoke<string>('install_app', {
                 requestInstallation: {
                     filePath: appPath,
                     iconPath: iconPath,
+                    appName: appName,
+                    appType: appType,
+                    terminal: appTerminal,
+                    appDescription: appDescription,
+                    noSandbox: noSandbox
                 }
             })
             console.log("Result:", res);
@@ -42,6 +49,7 @@
             console.error(e);
         }
     }
+
 </script>
 
 
@@ -59,6 +67,14 @@
                 <button on:click={chooseIcon} class="btn btn-neutral mt-5">{$t("install_choose_icon_button")}</button>
             {/if}
 
+            <div class="flex flex-col justify-start items-start mt-4">
+                <div class="tooltip tooltip-right"
+                     data-tip={$t("install_file.advanced_options.app_name_des")}>
+                    <p class="text-xl">{$t("install_file.advanced_options.app_name")}</p>
+                </div>
+                <input bind:value={appName} type="text" class="input input-bordered mt-2" placeholder={$t("install_file.advanced_options.app_name")}/>
+            </div>
+
             <div class="mt-4 form-control w-1/5">
                 <label class="label cursor-pointer">
                     <span class="label-text">Advanced options</span>
@@ -69,33 +85,34 @@
 
             {#if enableAdvancedOptions}
                 <div class="mt-5">
-                    <div class="flex flex-col justify-start items-start">
-                        <div class="tooltip tooltip-right"
-                             data-tip={$t("install_file.advanced_options.app_name_des")}>
-                            <p class="text-xl">{$t("install_file.advanced_options.app_name")}</p>
-                        </div>
-                        <input type="text" class="input input-bordered mt-2" placeholder={$t("install_file.advanced_options.app_name")}/>
-                    </div>
                     <div class="flex flex-col justify-start items-start mt-4">
                         <div class="tooltip tooltip-right"
                              data-tip={$t("install_file.advanced_options.app_des_des")}>
                             <p class="text-xl">{$t("install_file.advanced_options.app_des")}</p>
                         </div>
-                        <textarea class="textarea textarea-bordered" placeholder={$t("install_file.advanced_options.app_des")}></textarea>
+                        <textarea class="textarea textarea-bordered" bind:value={appDescription} placeholder={$t("install_file.advanced_options.app_des")}></textarea>
                     </div>
                     <div class="flex flex-col justify-start items-start mt-4">
                         <div class="tooltip tooltip-right"
                              data-tip={$t("install_file.advanced_options.app_type_des")}>
                             <p class="text-xl">{$t("install_file.advanced_options.app_type")}</p>
                         </div>
-                        <input type="text" class="input input-bordered mt-2" placeholder={$t("install_file.advanced_options.app_type")}/>
+                        <input type="text" bind:value={appType} class="input input-bordered mt-2" placeholder={$t("install_file.advanced_options.app_type")}/>
                     </div>
                     <div class="flex flex-col justify-start items-start mt-4">
                         <div class="tooltip tooltip-right"
                              data-tip={$t("install_file.advanced_options.app_terminal_des")}>
                             <p class="text-xl">{$t("install_file.advanced_options.app_terminal")}</p>
                         </div>
-                        <input type="checkbox" class="checkbox"/>
+                        <input bind:checked={appTerminal} type="checkbox" class="checkbox"/>
+                    </div>
+
+                    <div class="flex flex-col justify-start items-start mt-4">
+                        <div class="tooltip tooltip-right"
+                             data-tip={$t("install_file.advanced_options.no_sandbox_des")}>
+                            <p class="text-xl">{$t("install_file.advanced_options.no_sandbox")}</p>
+                        </div>
+                        <input bind:checked={noSandbox} type="checkbox" class="checkbox"/>
                     </div>
                 </div>
             {/if}
@@ -110,5 +127,10 @@
 
 </div>
 <div class="my-5 mx-10">
-    <button on:click={installApp} class="btn btn-success w-full" disabled="{!appPath}">{$t("install_file_install_button")}</button>
+    <button
+            on:click={installApp}
+            class="btn btn-success w-full"
+            disabled="{!appPath || !iconPath || !appName}">
+        {$t("install_file_install_button")}
+    </button>
 </div>

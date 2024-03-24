@@ -19,7 +19,7 @@ pub async fn pick_app_image(app: AppHandle) -> Result<String, String> {
 #[tauri::command]
 pub async fn pick_app_icon(app: AppHandle) -> Result<String, String> {
     info!("Opening file dialog");
-    let file_path = app.dialog().file().add_filter("Icon", &["png", "jpeg"]).blocking_pick_file();
+    let file_path = app.dialog().file().add_filter("Icon", &["png", "jpeg", "jpg"]).blocking_pick_file();
 
     match file_path {
         Some(path) => {

@@ -5,6 +5,7 @@ use crate::models::app_state::AppState;
 
 mod commands;
 mod models;
+mod helpers;
 
 fn main() {
     tauri::Builder::default()

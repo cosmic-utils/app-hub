@@ -2,6 +2,7 @@
     import { invoke } from "@tauri-apps/api/core";
     import type {AppList} from "$lib/models/Applist";
     import {onMount} from "svelte";
+    import {t} from "$lib/i18n/i18n";
 
     let appList: AppList = {
         apps: []
@@ -25,8 +26,8 @@
 
 <div class="flex flex-col bg-base-200 rounded-box mx-10 mt-10 p-5">
     <div class="mb-5 flex flex-row justify-between">
-        <p class="font-bold text-2xl">App list</p>
-        <input type="text" class="input input-bordered" placeholder="Search">
+        <p class="font-bold text-2xl">{$t("applist.title")}</p>
+        <input type="text" class="input input-bordered" placeholder={$t("applist.search")}>
     </div>
 
     {#each appList.apps as app}
@@ -36,7 +37,7 @@
                 <p class="font-bold ml-3">{app.name}</p>
             </div>
             <div>
-                <button class="btn btn-error">Delete</button>
+                <button class="btn btn-error">{$t("applist.uninstall")}</button>
             </div>
         </div>
         <div class="divider"></div>

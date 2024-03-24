@@ -40,6 +40,10 @@ export default {
         "install_file.advanced_options.no_sandbox": "No sandbox",
         "install_file.advanced_options.no_sandbox_des": "Check to add the --no-sandbox option",
 
+        "applist.title": "App list",
+        "applist.search": "Search app",
+        "applist.uninstall": "Uninstall",
+
         "example": "Hi <strong>{{name}}</strong>, how are you?",
     },
     it: {
@@ -82,6 +86,10 @@ export default {
         "install_file.advanced_options.app_terminal_des": "Indica se l'applicazione deve essere eseguita in un terminale.",
         "install_file.advanced_options.no_sandbox": "No sandbox",
         "install_file.advanced_options.no_sandbox_des": "Spunta per aggiungire l'opzione --no-sandbox",
+
+        "applist.title": "Lista delle app",
+        "applist.search": "Cerca app",
+        "applist.uninstall": "Disinstalla",
 
         "example": "Hola, <strong>{{name}}</strong>, ¿cómo estás?",
     },

@@ -7,7 +7,7 @@
     let enableAdvancedOptions: boolean = false;
 
     const chooseFile = () => {
-        invoke<string>('choose_file', {})
+        invoke<string>('pick_app_image', {})
             .then((res: string) => {
                 console.log("File:", res);
                 fileSelected = res;
@@ -16,7 +16,7 @@
     }
 
     const chooseIcon = () => {
-        invoke<string>('choose_file', {})
+        invoke<string>('pick_app_icon', {})
             .then((res: string) => {
                 console.log("File:", res);
                 iconPath = res;
@@ -90,6 +90,6 @@
     {/if}
 
 </div>
-<div class="mt-5 mx-10">
+<div class="my-5 mx-10">
     <button class="btn btn-success w-full" disabled="{!fileSelected}">{$t("install_file_install_button")}</button>
 </div>

@@ -24,7 +24,7 @@
             <!-- Sidebar content here -->
             <li><a href="/">{$t("header.install_app")}</a></li>
             <li><a href="/settings">{$t("header.settings")}</a></li>
-            <li><a href="">{$t("header.installed")}</a></li>
+            <li><a href="/installedApps">{$t("header.installed")}</a></li>
             <li><a>{$t("header.app_info")}</a></li>
         </ul>
     </div>

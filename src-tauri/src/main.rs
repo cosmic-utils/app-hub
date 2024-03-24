@@ -18,6 +18,7 @@ fn main() {
             commands::dialog_commands::pick_app_image,
             commands::dialog_commands::pick_app_icon,
             commands::app_image_commands::install_app,
+            commands::app_image_commands::read_app_list,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

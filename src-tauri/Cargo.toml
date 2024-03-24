@@ -20,6 +20,7 @@ serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "2.0.0-beta.13", features = [] }
 tauri-plugin-dialog = "2.0.0-beta.3"
 log = "0.4.21"
+dirs = "5.0.1"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

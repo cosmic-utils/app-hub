@@ -2,15 +2,19 @@
     import {t} from "$lib/i18n/i18n";
     import { invoke } from "@tauri-apps/api/core";
 
-    let fileSelected: string;
+    let appPath: string;
     let iconPath: string;
     let enableAdvancedOptions: boolean = false;
+    let appName: string;
+    let appDescription: string;
+    let appType: string = "Application"
+    let appTerminal: boolean = false;
 
     const chooseFile = () => {
         invoke<string>('pick_app_image', {})
             .then((res: string) => {
                 console.log("File:", res);
-                fileSelected = res;
+                appPath = res;
             })
             .catch(console.error)
     }
@@ -23,15 +27,30 @@
             })
             .catch(console.error)
     }
+
+    const installApp = async () => {
+        try {
+            const res = await invoke<string>('install_app', {
+                requestInstallation: {
+                    filePath: appPath,
+                    iconPath: iconPath,
+                }
+            })
+            console.log("Result:", res);
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
 </script>
 
 
 <div class="flex flex-col bg-base-200 rounded-box mx-10 mt-10 p-5">
 
-    {#if !!fileSelected}
+    {#if !!appPath}
         <p class="font-bold text-2xl">{$t("install_file_selected_title")}</p>
         <div class="mt-3">
-            <p>{$t("install_file_selected_des")} {fileSelected}</p>
+            <p>{$t("install_file_selected_des")} {appPath}</p>
 
             <p class="mt-3 font-bold text-2xl">Select icon</p>
             {#if !!iconPath}
@@ -91,5 +110,5 @@
 
 </div>
 <div class="my-5 mx-10">
-    <button class="btn btn-success w-full" disabled="{!fileSelected}">{$t("install_file_install_button")}</button>
+    <button on:click={installApp} class="btn btn-success w-full" disabled="{!appPath}">{$t("install_file_install_button")}</button>
 </div>

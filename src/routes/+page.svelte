@@ -1,8 +1,8 @@
 <script lang="ts">
     import {t} from "$lib/i18n/i18n";
-    import {invoke} from "@tauri-apps/api";
+    import { invoke } from "@tauri-apps/api/core";
 
-    let fileSelected: string = "sdklafòl";
+    let fileSelected: string;
     let iconPath: string;
     let enableAdvancedOptions: boolean = false;
 

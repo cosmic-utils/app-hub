@@ -1,4 +1,5 @@
 <script lang="ts">
+    import {t, locales, locale} from "$lib/i18n/i18n";
 
 </script>
 
@@ -21,9 +22,10 @@
         <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label>
         <ul class="menu p-4 w-80 min-h-full bg-base-200">
             <!-- Sidebar content here -->
-            <li><a href="/">Install app</a></li>
-            <li><a href="/settings">Settings</a></li>
-            <li><a>App Info</a></li>
+            <li><a href="/">{$t("header.install_app")}</a></li>
+            <li><a href="/settings">{$t("header.settings")}</a></li>
+            <li><a href="">{$t("header.installed")}</a></li>
+            <li><a>{$t("header.app_info")}</a></li>
         </ul>
     </div>
 </div>

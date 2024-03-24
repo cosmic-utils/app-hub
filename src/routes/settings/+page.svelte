@@ -16,7 +16,7 @@
             window.localStorage.setItem('theme', theme)
             document.cookie = `theme=${theme}; max-age=${one_year}; path=/;`
             document.documentElement.setAttribute('data-theme', theme)
-            current_theme = theme
+            const current_theme = theme
         }
     }
 
@@ -69,7 +69,7 @@
                 <div class="grid grid-cols-2 gap-4">
                     <p class="mt-3">{$t("settings.advanced.desktop_entry_des")}</p>
                     <div class="flex items-center">
-                        <input bind:value={createDesktopEntry} type="checkbox" name="radio-1" class="checkbox"/>
+                        <input bind:value={createDesktopEntry} checked="{createDesktopEntry}" type="checkbox" name="radio-1" class="checkbox"/>
                     </div>
                 </div>
             </div>

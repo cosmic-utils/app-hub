@@ -1,38 +1,35 @@
-# create-svelte
+# 🚀 AppHub
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+AppHub is a Linux desktop application that simplifies the installation and management of .appImage packages through an intuitive graphical interface. Additionally, it provides the ability to easily uninstall applications installed via AppImage.
 
-## Creating a project
+## 💻 System Requirements
+- **Operating System:** Linux
 
-If you're seeing this, you've probably already done this step. Congrats!
+## 💿 Installation Modes
+The project supports two installation modes:
+1. **.appImage**: Download the .appImage file from the GitHub repository and execute it directly.
+2. **.deb**: Download the .deb package from the GitHub repository and install it using your system's package manager.
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+## 🌟 Key Features
+- Simplified installation of .appImage packages.
+- Management of applications installed via AppImage.
+- Intuitive graphical interface for easy navigation.
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+## 📖 Usage
+Currently, the usage of the application is not documented. However, detailed guides will be provided once the project is more stable and structured.
 
-## Developing
+## 📝 License
+The project is currently without a license, but it will be released under an MIT license before official use.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## 🤝 Contributing
+AppHub is a project developed in spare time, and contributions are welcome! However, there are currently no specific contribution guidelines. They will be defined once the project is more stable and structured.
 
-```bash
-npm run dev
+## ⚠️ Project Status
+The project is currently in its initial development phase. There are still many bugs to be fixed and many features to be implemented. Please be patient as we work to improve and refine the application.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+## 📌 Additional Notes
+Please note that this project is developed in spare time and is not a full-time job. Contributions are appreciated and help grow the project.
 
-## Building
+---
 
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+For further information, please contact the [maintainer of the project](mailto:francesco.gaglione.p@gmail.com).

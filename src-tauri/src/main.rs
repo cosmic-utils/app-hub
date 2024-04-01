@@ -20,6 +20,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             commands::dialog_commands::pick_app_image,
             commands::dialog_commands::pick_app_icon,
+            commands::dialog_commands::pick_dir,
             commands::app_image_commands::install_app,
             commands::app_image_commands::read_app_list,
             read_settings,

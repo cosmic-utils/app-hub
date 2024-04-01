@@ -14,7 +14,6 @@
 
     const saveSettings = async () => {
         try {
-            
             await invoke("save_settings", {
                 settings: {
                     theme: settings.theme,
@@ -24,6 +23,17 @@
                 }
             });
             console.log(settings);
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
+
+    const selectInstalaltionDir = async () => {
+        try {
+            const dir: string = await invoke("pick_dir");
+            console.log("picked dir: ", dir);
+            settings.installPath = dir;
         }
         catch (e) {
             console.error(e);
@@ -91,7 +101,10 @@
             {#if activeMenuIndex === 1}
                 <div class="">
                     <p class="font-bold text-2xl mb-4">{$t("settings.advanced.installation_dir")}</p>
-                    <input type="text" placeholder={settings.installPath} bind:value={settings.installPath} class="input input-bordered w-full max-w-xs mt-3 mb-6"/>
+
+
+                    <p>{$t("settings.installation_path")}: {settings.installPath}</p>
+                    <button on:click={selectInstalaltionDir} class="btn btn-success mt-1">{$t("settings.change_dir")}</button>
 
                     <p class="font-bold text-2xl mt-5 mb-4">{$t("settings.advanced.desktop_entry_title")}</p>
                     <div class="grid grid-cols-2 gap-4">

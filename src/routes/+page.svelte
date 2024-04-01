@@ -1,6 +1,7 @@
 <script lang="ts">
     import {t} from "$lib/i18n/i18n";
-    import { invoke } from "@tauri-apps/api/core";
+    import {pickAppIcon, pickAppImage} from "$lib/helpers/tauriCommands/dialogCommands";
+    import {installAppImage} from "$lib/helpers/tauriCommands/appImageCommands";
 
     let appPath: string;
     let iconPath: string;
@@ -11,42 +12,39 @@
     let appTerminal: boolean = false;
     let noSandbox: boolean = false;
 
-    const chooseFile = () => {
-        invoke<string>('pick_app_image', {})
-            .then((res: string) => {
-                console.log("File:", res);
-                appPath = res;
-            })
-            .catch(console.error)
+    const chooseFile = async () => {
+        try {
+            appPath = await pickAppImage();
+        } catch (e) {
+            console.error(e);
+            //TODO show error
+        }
     }
 
-    const chooseIcon = () => {
-        invoke<string>('pick_app_icon', {})
-            .then((res: string) => {
-                console.log("File:", res);
-                iconPath = res;
-            })
-            .catch(console.error)
+    const chooseIcon = async () => {
+        try {
+            iconPath = await pickAppIcon();
+        } catch (e) {
+            console.error(e);
+            //TODO show error
+        }
     }
 
     const installApp = async () => {
         try {
-            console.log("description:", appDescription)
-            const res = await invoke<string>('install_app', {
-                requestInstallation: {
-                    filePath: appPath,
-                    iconPath: iconPath,
-                    appName: appName,
-                    appType: appType,
-                    terminal: appTerminal,
-                    appDescription: appDescription,
-                    noSandbox: noSandbox
-                }
-            })
-            console.log("Result:", res);
-        }
-        catch (e) {
+            const res = installAppImage(
+                appPath,
+                iconPath,
+                appName,
+                appType,
+                appTerminal,
+                appDescription,
+                noSandbox
+            )
+            console.log("Installation result", res);
+        } catch (e) {
             console.error(e);
+            //TODO show error
         }
     }
 
@@ -72,7 +70,8 @@
                      data-tip={$t("install_file.advanced_options.app_name_des")}>
                     <p class="text-xl">{$t("install_file.advanced_options.app_name")}</p>
                 </div>
-                <input bind:value={appName} type="text" class="input input-bordered mt-2" placeholder={$t("install_file.advanced_options.app_name")}/>
+                <input bind:value={appName} type="text" class="input input-bordered mt-2"
+                       placeholder={$t("install_file.advanced_options.app_name")}/>
             </div>
 
             <div class="mt-4 form-control w-1/5">
@@ -90,14 +89,16 @@
                              data-tip={$t("install_file.advanced_options.app_des_des")}>
                             <p class="text-xl">{$t("install_file.advanced_options.app_des")}</p>
                         </div>
-                        <textarea class="textarea textarea-bordered" bind:value={appDescription} placeholder={$t("install_file.advanced_options.app_des")}></textarea>
+                        <textarea class="textarea textarea-bordered" bind:value={appDescription}
+                                  placeholder={$t("install_file.advanced_options.app_des")}></textarea>
                     </div>
                     <div class="flex flex-col justify-start items-start mt-4">
                         <div class="tooltip tooltip-right"
                              data-tip={$t("install_file.advanced_options.app_type_des")}>
                             <p class="text-xl">{$t("install_file.advanced_options.app_type")}</p>
                         </div>
-                        <input type="text" bind:value={appType} class="input input-bordered mt-2" placeholder={$t("install_file.advanced_options.app_type")}/>
+                        <input type="text" bind:value={appType} class="input input-bordered mt-2"
+                               placeholder={$t("install_file.advanced_options.app_type")}/>
                     </div>
                     <div class="flex flex-col justify-start items-start mt-4">
                         <div class="tooltip tooltip-right"

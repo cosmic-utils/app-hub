@@ -19,6 +19,8 @@ export default {
         "settings.advanced.desktop_entry_title": "Create desktop entry",
         "settings.advanced.desktop_entry_des": "Create a desktop entry for the application you will install?",
         "settings.save_button": "Save",
+        "settings.installation_path": "Installation directory",
+        "settings.change_dir": "Change directory",
 
         "install_choose_file": "Choose a file to install",
         "install_choose_button": "Choose file",
@@ -66,6 +68,8 @@ export default {
         "settings.advanced.desktop_entry_title": "Crea voce desktop",
         "settings.advanced.desktop_entry_des": "Creare una voce desktop per l'applicazione che installerai?",
         "settings.save_button": "Salva",
+        "settings.installation_path": "Cartella di installazione",
+        "settings.change_dir": "Cambia directory",
 
         "install_choose_file": "Scegli un file da installare",
         "install_choose_button": "Scegli file",

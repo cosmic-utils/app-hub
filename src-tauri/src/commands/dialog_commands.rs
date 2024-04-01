@@ -29,3 +29,17 @@ pub async fn pick_app_icon(app: AppHandle) -> Result<String, String> {
         None => Err("No file selected".to_string())
     }
 }
+
+#[tauri::command]
+pub async fn pick_dir(app: AppHandle) -> Result<String, String> {
+    info!("Opening directory dialog");
+    let dir_path = app.dialog().file().add_filter("Icon", &["png", "jpeg", "jpg"]).blocking_pick_folder();
+
+    match dir_path {
+        Some(path) => {
+            println!("Selected directory: {:?}", path.to_string_lossy());
+            Ok(path.into_os_string().into_string().unwrap_or_else(|_| "Invalid path".to_string()))
+        },
+        None => Err("No directory selected".to_string())
+    }
+}

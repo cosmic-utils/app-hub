@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { invoke } from "@tauri-apps/api/core";
     import type {AppList} from "$lib/models/Applist";
     import {onMount} from "svelte";
     import {t} from "$lib/i18n/i18n";
+    import {installedAppsList} from "$lib/helpers/tauriCommands/appImageCommands";
 
     let appList: AppList = {
         apps: []
@@ -10,7 +10,7 @@
 
     const readApplist = async () => {
         try {
-            appList = await invoke("read_app_list");
+            appList = await installedAppsList();
             console.log(appList);
         }
         catch (e) {

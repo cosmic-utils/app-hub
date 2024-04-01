@@ -2,26 +2,25 @@
 
     import {t, locales, locale} from "$lib/i18n/i18n";
     import {themes} from "$lib/themes";
-    import {invoke} from "@tauri-apps/api/core";
     import {onMount} from "svelte";
     import {settingsState} from "../../stores/settingsState.js";
     import type {AppSettings} from "$lib/models/Settings";
     import {set_theme} from "$lib/helpers/themeController";
+    import {saveSettings} from "$lib/helpers/tauriCommands/appSettingsCommands";
+    import {pickDirectory} from "$lib/helpers/tauriCommands/dialogCommands";
 
     let activeMenuIndex = 0;
 
     let settings: AppSettings;
 
-    const saveSettings = async () => {
+    const save = async () => {
         try {
-            await invoke("save_settings", {
-                settings: {
-                    theme: settings.theme,
-                    language: $locale,
-                    installPath: settings.installPath,
-                    createDesktopEntry: settings.createDesktopEntry
-                }
-            });
+            await saveSettings(
+                settings.theme,
+                $locale,
+                settings.installPath,
+                settings.createDesktopEntry
+            );
             console.log(settings);
         }
         catch (e) {
@@ -31,7 +30,7 @@
 
     const selectInstalaltionDir = async () => {
         try {
-            const dir: string = await invoke("pick_dir");
+            const dir: string = await pickDirectory();
             console.log("picked dir: ", dir);
             settings.installPath = dir;
         }
@@ -120,7 +119,7 @@
         </div>
     </div>
     <div class="flex flex-row-reverse mx-10 mt-3">
-        <button on:click={saveSettings} class="btn btn-success">{$t("settings.save_button")}</button>
+        <button on:click={save} class="btn btn-success">{$t("settings.save_button")}</button>
     </div>
 {:else}
     <!--TODO Loading spinner -->

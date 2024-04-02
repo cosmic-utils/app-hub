@@ -1,3 +1,6 @@
+use log::{error, info, warn};
+use regex::Regex;
+
 pub struct DesktopFileBuilder {
     /// The `type_` field represents the type of the application. It's usually "Application" for desktop applications.
     type_: Option<String>,
@@ -44,6 +47,79 @@ impl DesktopFileBuilder {
             categories: None,
             no_sanbox: None,
         }
+    }
+
+
+    pub fn from_desktop_entry_path(path: String) -> Result<Self, String> {
+        log::info!("Reading .desktop file from path: {}", path);
+
+        // Read the file content
+        let file_content = match std::fs::read_to_string(&path) {
+            Ok(content) => content,
+            Err(e) => {
+                log::error!("Failed to read file: {}", e);
+                return Err("Failed to read .desktop file".to_string());
+            }
+        };
+
+        // Check if the file content contains [Desktop Entry]
+        if !file_content.contains("X-AppHub=true") {
+            log::error!("Invalid .desktop file: does not contain 'X-AppHub=true'");
+            return Err("Invalid .desktop file".to_string());
+        }
+
+        // Parse the file content
+        let mut desktop_file_builder = DesktopFileBuilder::new();
+
+        let re_type = Regex::new(r"(?m)Type=(.*)$").unwrap();
+        let re_version = Regex::new(r"(?m)Version=(.*)$").unwrap();
+        let re_name = Regex::new(r"(?m)Name=(.*)$").unwrap();
+        let re_comment = Regex::new(r"(?m)Comment=(.*)$").unwrap();
+        let re_path = Regex::new(r"(?m)Path=(.*)$").unwrap();
+        let re_exec = Regex::new(r"(?m)Exec=(.*)$").unwrap();
+        let re_icon = Regex::new(r"(?m)Icon=(.*)$").unwrap();
+        let re_terminal = Regex::new(r"(?m)Terminal=(.*)$").unwrap();
+        let re_categories = Regex::new(r"(?m)Categories=(.*)$").unwrap();
+
+        if let Some(cap) = re_type.captures(&file_content) {
+            info!("Setting 'Type' to '{}'", &cap[1]);
+            desktop_file_builder.set_type(cap[1].to_string());
+        }
+        if let Some(cap) = re_version.captures(&file_content) {
+            info!("Setting 'Version' to '{}'", &cap[1]);
+            desktop_file_builder.set_version(cap[1].to_string());
+        }
+        if let Some(cap) = re_name.captures(&file_content) {
+            info!("Setting 'Name' to '{}'", &cap[1]);
+            desktop_file_builder.set_name(cap[1].to_string());
+        }
+        if let Some(cap) = re_comment.captures(&file_content) {
+            info!("Setting 'Comment' to '{}'", &cap[1]);
+            desktop_file_builder.set_comment(cap[1].to_string());
+        }
+        if let Some(cap) = re_path.captures(&file_content) {
+            info!("Setting 'Path' to '{}'", &cap[1]);
+            desktop_file_builder.set_path(cap[1].to_string());
+        }
+        if let Some(cap) = re_exec.captures(&file_content) {
+            info!("Setting 'Exec' to '{}'", &cap[1]);
+            desktop_file_builder.set_exec(cap[1].to_string());
+        }
+        if let Some(cap) = re_icon.captures(&file_content) {
+            info!("Setting 'Icon' to '{}'", &cap[1]);
+            desktop_file_builder.set_icon(cap[1].to_string());
+        }
+        if let Some(cap) = re_terminal.captures(&file_content) {
+            info!("Setting 'Terminal' to '{}'", &cap[1]);
+            desktop_file_builder.set_terminal(cap[1].eq("true"));
+        }
+        if let Some(cap) = re_categories.captures(&file_content) {
+            info!("Setting 'Categories' to '{}'", &cap[1]);
+            desktop_file_builder.set_categories(cap[1].split(";").map(|s| s.to_string()).collect());
+        }
+
+        info!("Successfully parsed .desktop file from path: {}", path);
+        Ok(desktop_file_builder)
     }
 
     // Mandatory fields
@@ -100,6 +176,7 @@ impl DesktopFileBuilder {
         self.no_sanbox = Some(no_sandbox);
         self
     }
+
 
     pub fn write_to_file(self, path: String) -> Result<String, String> {
         // Check mandatory fields
@@ -159,13 +236,56 @@ impl DesktopFileBuilder {
             file_content.push_str(&format!("Categories={}\n", categories));
         }
 
+        // AppHub specific fields
+        file_content.push_str("X-AppHub=true\n");
+
         // Write the file
         match std::fs::write(path, file_content) {
             Ok(_) => Ok("Desktop file written successfully".to_string()),
             Err(e) => {
-                eprintln!("Failed to write to file: {}", e);
+                error!("Failed to write file content to file: {}", e);
                 return Err("Failed to write .desktop file".to_string());
             }
         }
+    }
+
+    pub fn type_(&self) -> Option<String> {
+        self.type_.clone()
+    }
+
+    pub fn version(&self) -> Option<String> {
+        self.version.clone()
+    }
+
+    pub fn name(&self) -> Option<String> {
+        self.name.clone()
+    }
+
+    pub fn path(&self) -> Option<String> {
+        self.path.clone()
+    }
+
+    pub fn exec(&self) -> Option<String> {
+        self.exec.clone()
+    }
+
+    pub fn comment(&self) -> Option<String> {
+        self.comment.clone()
+    }
+
+    pub fn icon(&self) -> Option<String> {
+        self.icon.clone()
+    }
+
+    pub fn terminal(&self) -> Option<bool> {
+        self.terminal
+    }
+
+    pub fn categories(&self) -> Option<String> {
+        self.categories.clone()
+    }
+
+    pub fn no_sanbox(&self) -> Option<bool> {
+        self.no_sanbox
     }
 }

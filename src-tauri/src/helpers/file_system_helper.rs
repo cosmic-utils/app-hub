@@ -1,9 +1,10 @@
-use std::fs;
+use std::{fs, io};
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
 use mime_guess::from_path;
 use std::fs::File;
 use std::io::Read;
+use std::path::Path;
 use log::info;
 
 /// This function is used to convert an image file to a Base64 string
@@ -42,4 +43,19 @@ pub fn rm_file(file_path: &String) -> Result<bool, String> {
         },
         Err(e) => Err(format!("Failed to remove file: {}", e)),
     }
+}
+
+/// This function is used to copy a directory and all its contents to a new location
+pub fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
+    fs::create_dir_all(&dst)?;
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let ty = entry.file_type()?;
+        if ty.is_dir() {
+            copy_dir_all(entry.path(), dst.as_ref().join(entry.file_name()))?;
+        } else {
+            fs::copy(entry.path(), dst.as_ref().join(entry.file_name()))?;
+        }
+    }
+    Ok(())
 }

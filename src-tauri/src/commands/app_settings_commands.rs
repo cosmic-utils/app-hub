@@ -3,9 +3,12 @@
 // plugin is in beta, so the API may change
 
 use std::path::PathBuf;
+use log::{error, info};
 
 use tauri::{AppHandle, Manager, Wry};
 use tauri_plugin_store::{with_store, StoreCollection};
+use crate::helpers::desktop_file_helpers::parse_desktop_entry;
+use crate::helpers::file_system_helper::copy_dir_all;
 
 use crate::models::app_settings::AppSettings;
 
@@ -66,10 +69,35 @@ pub async fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
 
 #[tauri::command]
 pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), String> {
+
     // Check if the install path is empty
     if let Some(install_path) = &settings.install_path {
         if install_path.is_empty() {
             return Err("Install path cannot be empty".into());
+        }
+        else {
+            // Check if the install path is valid
+            let path = PathBuf::from(install_path);
+            if !path.exists() {
+                return Err("Install path does not exist".into());
+            }
+            // Check if the new path is different from the old path
+            let old_settings = read_settings(app.clone()).await?;
+            if let Some(old_install_path) = old_settings.install_path {
+                //TODO: it is needed to update .desktop files with the new path (exec and icon at least)
+                if !old_install_path.eq(install_path) {
+                    info!("Install path changed from {} to {}", old_install_path, install_path);
+                    // Move all AppImages and icons to the new path
+                    let moved = copy_dir_all(
+                        old_install_path,
+                        install_path
+                    );
+                    if let Err(e) = moved {
+                        error!("Error moving AppImages and icons: {:?}", e);
+                    }
+                    info!("AppImages and icons moved successfully");
+                }
+            }
         }
     }
 

@@ -10,23 +10,23 @@ use crate::models::request_installation::RequestInstallation;
 
 #[tauri::command]
 pub async fn install_app(request_installation: RequestInstallation) -> Result<String, String> {
-    println!("Installing file: {:?}", request_installation);
+    info!("Installing file: {:?}", request_installation);
 
-    println!("### REQUESTED TO INSTALL APP ###");
-    println!("File path: {:?}", request_installation.file_path);
-    println!("Icon path: {:?}", request_installation.icon_path);
-    println!("App name: {:?}", request_installation.app_name);
-    println!(
+    info!("### REQUESTED TO INSTALL APP ###");
+    info!("File path: {:?}", request_installation.file_path);
+    info!("Icon path: {:?}", request_installation.icon_path);
+    info!("App name: {:?}", request_installation.app_name);
+    info!(
         "App description: {:?}",
         request_installation.app_description
     );
-    println!("App type: {:?}", request_installation.app_type);
-    println!("Terminal: {:?}", request_installation.terminal);
-    println!("#################################");
+    info!("App type: {:?}", request_installation.app_type);
+    info!("Terminal: {:?}", request_installation.terminal);
+    info!("#################################");
 
     match install_app_image(&request_installation.file_path) {
         Ok(_) => {
-            println!("AppImage installation successful");
+            info!("AppImage installation successful");
         }
         Err(err) => {
             return Err(err);
@@ -38,7 +38,7 @@ pub async fn install_app(request_installation: RequestInstallation) -> Result<St
 
     let icon_path = match copy_icon_file(&request_installation.icon_path) {
         Ok(path) => {
-            println!("Icon file copied to: {:?}", path);
+            info!("Icon file copied to: {:?}", path);
             path
         }
         Err(err) => {
@@ -81,14 +81,14 @@ pub async fn install_app(request_installation: RequestInstallation) -> Result<St
 
     // Set no sandbox
     if request_installation.no_sandbox.is_some() && request_installation.no_sandbox.unwrap() {
-        println!("Setting no sandbox");
+        info!("Setting no sandbox");
         desktop_builder.set_no_sandbox(true);
     }
 
     // Create the desktop entry
     match desktop_builder.write_to_file(desktop_entry_path.to_string_lossy().to_string()) {
         Ok(_) => {
-            println!("Desktop entry created successfully");
+            info!("Desktop entry created successfully");
         }
         Err(err) => {
             return Err(err);

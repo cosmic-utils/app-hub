@@ -3,12 +3,22 @@
 AppHub is a Linux desktop application that simplifies the installation and management of .appImage packages through an intuitive graphical interface. Additionally, it provides the ability to easily uninstall applications installed via AppImage.
 
 ## 💻 System Requirements
-- **Operating System:** Linux
+- **Operating System:** Linux*
+
+Note*: The application is currently tested only on Fedora workstation. 
+However, it should work on any Linux distribution that supports the AppImage format.
+Distribution-specific packages will be provided in the future.
 
 ## 💿 Installation Modes
 The project supports two installation modes:
 1. **.appImage**: Download the .appImage file from the GitHub repository and execute it directly.
 2. **.deb**: Download the .deb package from the GitHub repository and install it using your system's package manager.
+
+Note: The .deb and .appImage packages are currently not available. They will be provided in the future. Refer to the installation from source section for the current installation method.
+
+### Installation from Source
+To install the application from source, follow these steps:
+[WIP]
 
 ## 🌟 Key Features
 - Simplified installation of .appImage packages.

@@ -1,8 +1,8 @@
-use std::fs::File;
-use std::io::Read;
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
 use mime_guess::from_path;
+use std::fs::File;
+use std::io::Read;
 
 pub fn image_to_base64(path: &str) -> Result<String, std::io::Error> {
     // Open the file in read mode

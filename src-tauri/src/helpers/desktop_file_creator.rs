@@ -1,4 +1,3 @@
-
 pub struct DesktopFileBuilder {
     /// The `type_` field represents the type of the application. It's usually "Application" for desktop applications.
     type_: Option<String>,
@@ -32,7 +31,6 @@ pub struct DesktopFileBuilder {
 }
 
 impl DesktopFileBuilder {
-
     pub fn new() -> Self {
         Self {
             type_: None,
@@ -144,8 +142,7 @@ impl DesktopFileBuilder {
         if let Some(exec) = self.exec {
             if self.no_sanbox.is_some() && self.no_sanbox.unwrap() {
                 file_content.push_str(&format!("Exec={} --no-sandbox\n", exec));
-            }
-            else {
+            } else {
                 file_content.push_str(&format!("Exec={}\n", exec));
             }
         }
@@ -164,15 +161,11 @@ impl DesktopFileBuilder {
 
         // Write the file
         match std::fs::write(path, file_content) {
-            Ok(_) => {
-                Ok("Desktop file written successfully".to_string())
-            },
+            Ok(_) => Ok("Desktop file written successfully".to_string()),
             Err(e) => {
                 eprintln!("Failed to write to file: {}", e);
                 return Err("Failed to write .desktop file".to_string());
             }
         }
-
     }
-
 }

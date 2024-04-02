@@ -1,4 +1,3 @@
-
 // Documentation available at:
 // https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/store#usage-from-rust
 // plugin is in beta, so the API may change
@@ -6,13 +5,12 @@
 use std::path::PathBuf;
 
 use tauri::{AppHandle, Manager, Wry};
-use tauri_plugin_store::{StoreCollection, with_store};
+use tauri_plugin_store::{with_store, StoreCollection};
 
 use crate::models::app_settings::AppSettings;
 
 #[tauri::command]
 pub async fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
-
     // Clone the app handle to avoid borrowing issues
     let app_clone = app.clone();
 
@@ -30,7 +28,8 @@ pub async fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
             // If the settings are not found, return None
             None => Ok(None),
         }
-    }).map_err(|e| e.to_string())?;
+    })
+    .map_err(|e| e.to_string())?;
 
     // If the settings were not found, create and save default settings
     let res = match res {
@@ -39,11 +38,18 @@ pub async fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
             let default_settings = AppSettings {
                 theme: "dark".to_string(),
                 language: "en".to_string(),
-                install_path: Some(format!("{}/AppImages/", dirs::home_dir().unwrap().to_string_lossy())),
+                install_path: Some(format!(
+                    "{}/AppImages/",
+                    dirs::home_dir().unwrap().to_string_lossy()
+                )),
                 create_desktop_entry: true,
             };
-            let serialized_settings = serde_json::to_value(default_settings.clone()).map_err(|e| e.to_string())?;
-            with_store(app_clone, stores, path, |store| store.insert("app_settings".to_string(), serialized_settings)).expect("error saving default settings");
+            let serialized_settings =
+                serde_json::to_value(default_settings.clone()).map_err(|e| e.to_string())?;
+            with_store(app_clone, stores, path, |store| {
+                store.insert("app_settings".to_string(), serialized_settings)
+            })
+            .expect("error saving default settings");
             serde_json::to_value(default_settings).map_err(|e| e.to_string())?
         }
     };
@@ -60,7 +66,6 @@ pub async fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
 
 #[tauri::command]
 pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), String> {
-
     // Check if the install path is empty
     if let Some(install_path) = &settings.install_path {
         if install_path.is_empty() {
@@ -73,7 +78,6 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
         return Err("Theme and language cannot be empty".into());
     }
 
-
     // Get the store collection from the app state
     let stores = app.state::<StoreCollection<Wry>>();
     // Define the path to the settings file
@@ -83,7 +87,9 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
     let serialized_settings = serde_json::to_value(settings).map_err(|e| e.to_string())?;
 
     // Use the cloned app handle to save the settings to the store
-    let res = with_store(app.clone(), stores, path, |store| store.insert("app_settings".to_string(), serialized_settings));
+    let res = with_store(app.clone(), stores, path, |store| {
+        store.insert("app_settings".to_string(), serialized_settings)
+    });
 
     // Check the result of the save operation
     match res {

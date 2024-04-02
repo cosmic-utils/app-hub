@@ -1,5 +1,6 @@
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
+use log::info;
 
 pub fn install_app_image(file_path: &String) -> Result<String, String> {
     //TODO now move the file to the default directory but in the frontend in the advanced settings
@@ -13,7 +14,7 @@ pub fn install_app_image(file_path: &String) -> Result<String, String> {
     match fs::create_dir(&app_images_path) {
         Ok(_) => {}
         Err(ref e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
-            println!("Directory already exists");
+            info!("Directory already exists");
         }
         Err(e) => return Err(format!("Failed to create directory: {}", e)),
     }
@@ -25,16 +26,30 @@ pub fn install_app_image(file_path: &String) -> Result<String, String> {
     let res = fs::copy(file_path, &dest_path).expect("Failed to copy file");
 
     // Set the executable permission to the file
-    let mut perms = fs::metadata(&dest_path).expect("Failed to get metadata").permissions();
+    let mut perms = fs::metadata(&dest_path)
+        .expect("Failed to get metadata")
+        .permissions();
     // Set the executable permission to the file
     perms.set_mode(0o755);
     fs::set_permissions(&dest_path, perms).expect("Failed to set permissions");
 
-    println!("Check file exist result: {:?}", res);
-    println!("Cp result: {:?}", res);
+    info!("Check file exist result: {:?}", res);
+    info!("Cp result: {:?}", res);
 
     Ok("Installation successful".to_string())
 }
+
+// This function is used to remove a file from the filesystem (used to remove AppImages and icons)
+pub fn rm_file(file_path: String) -> Result<bool, String> {
+    match fs::remove_file(file_path) {
+        Ok(_) => {
+            info!("File removed successfully");
+            Ok(true)
+        },
+        Err(e) => Err(format!("Failed to remove file: {}", e)),
+    }
+}
+
 
 pub fn copy_icon_file(icon_path: &String) -> Result<String, String> {
     let home_dir = dirs::home_dir().expect("Failed to get home directory");
@@ -44,7 +59,7 @@ pub fn copy_icon_file(icon_path: &String) -> Result<String, String> {
     match fs::create_dir(&icons_path) {
         Ok(_) => {}
         Err(ref e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
-            println!("Directory already exists");
+            info!("Directory already exists");
         }
         Err(e) => return Err(format!("Failed to create directory: {}", e)),
     }
@@ -55,8 +70,8 @@ pub fn copy_icon_file(icon_path: &String) -> Result<String, String> {
 
     let res = fs::copy(icon_path, &dest_path).expect("Failed to copy file");
 
-    println!("Check file exist result: {:?}", res);
-    println!("Cp result: {:?}", res);
+    info!("Check file exist result: {:?}", res);
+    info!("Cp result: {:?}", res);
 
     Ok(dest_path.to_string_lossy().to_string())
 }

@@ -18,16 +18,12 @@ pub fn read_all_app() -> Result<Vec<App>, String> {
                 // read the .desktop file and get the path of the AppImage
                 let file_content: String =
                     std::fs::read_to_string(entry.unwrap().path()).expect("Failed to read file");
-
+                
                 // parse the desktop entry to get the path of the AppImage
                 match parse_desktop_entry(&file_content) {
                     Ok(desktop_entry) => {
-                        //TODO: in this case we are assuming that the AppImage is in /AppImages dir
-                        // since it is the default path used by AppHub,
-                        // but the user could have installed the AppImage in a different directory
-                        // using the advanced settings
                         debug!("Reading icon at: {:?}", &desktop_entry.icon_path);
-                        if desktop_entry.exec.contains("/AppImages") {
+                        if file_content.contains("X-AppHub=true") {
                             let base64_icon = match image_to_base64(&desktop_entry.icon_path) {
                                 Ok(base64) => Some(base64),
                                 Err(err) => {

@@ -2,6 +2,7 @@ use std::fs;
 use std::os::unix::fs::PermissionsExt;
 use log::info;
 
+/// Install an AppImage file using the given file path
 pub fn install_app_image(file_path: &String) -> Result<String, String> {
     //TODO now move the file to the default directory but in the frontend in the advanced settings
     // the user should be able to choose a custom directory, so this should be a parameter
@@ -39,18 +40,7 @@ pub fn install_app_image(file_path: &String) -> Result<String, String> {
     Ok("Installation successful".to_string())
 }
 
-// This function is used to remove a file from the filesystem (used to remove AppImages and icons)
-pub fn rm_file(file_path: &String) -> Result<bool, String> {
-    match fs::remove_file(file_path) {
-        Ok(_) => {
-            info!("File removed successfully");
-            Ok(true)
-        },
-        Err(e) => Err(format!("Failed to remove file: {}", e)),
-    }
-}
-
-
+/// Copy the icon file to the installation directory
 pub fn copy_icon_file(icon_path: &String) -> Result<String, String> {
     let home_dir = dirs::home_dir().expect("Failed to get home directory");
     let icons_path = home_dir.join("AppImages").join("icons");

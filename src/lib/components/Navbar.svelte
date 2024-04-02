@@ -1,6 +1,5 @@
 <script lang="ts">
-    import {t, locales, locale} from "$lib/i18n/i18n";
-
+    import {t} from "$lib/i18n/i18n";
 </script>
 
 <div class="drawer">
@@ -25,7 +24,7 @@
             <li><a href="/">{$t("header.install_app")}</a></li>
             <li><a href="/settings">{$t("header.settings")}</a></li>
             <li><a href="/installedApps">{$t("header.installed")}</a></li>
-            <li><a>{$t("header.app_info")}</a></li>
+            <li><a href="/appInfo">{$t("header.app_info")}</a></li>
         </ul>
     </div>
 </div>

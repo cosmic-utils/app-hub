@@ -13,7 +13,7 @@ pub async fn pick_app_image(app: AppHandle) -> Result<String, String> {
 
     match file_path {
         Some(path) => {
-            println!("Selected file: {:?}", path.path.to_string_lossy());
+            info!("Selected file: {:?}", path.path.to_string_lossy());
             Ok(path
                 .path
                 .into_os_string()
@@ -30,12 +30,12 @@ pub async fn pick_app_icon(app: AppHandle) -> Result<String, String> {
     let file_path = app
         .dialog()
         .file()
-        .add_filter("Icon", &["png", "jpeg", "jpg"])
+        .add_filter("Icon", &["png", "jpeg", "jpg", "ico", "svg", "icns"])
         .blocking_pick_file();
 
     match file_path {
         Some(path) => {
-            println!("Selected file: {:?}", path.path.to_string_lossy());
+            info!("Selected file: {:?}", path.path.to_string_lossy());
             Ok(path
                 .path
                 .into_os_string()
@@ -52,12 +52,11 @@ pub async fn pick_dir(app: AppHandle) -> Result<String, String> {
     let dir_path = app
         .dialog()
         .file()
-        .add_filter("Icon", &["png", "jpeg", "jpg"])
         .blocking_pick_folder();
 
     match dir_path {
         Some(path) => {
-            println!("Selected directory: {:?}", path.to_string_lossy());
+            info!("Selected directory: {:?}", path.to_string_lossy());
             Ok(path
                 .into_os_string()
                 .into_string()

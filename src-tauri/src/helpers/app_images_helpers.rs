@@ -40,7 +40,7 @@ pub fn install_app_image(file_path: &String) -> Result<String, String> {
 }
 
 // This function is used to remove a file from the filesystem (used to remove AppImages and icons)
-pub fn rm_file(file_path: String) -> Result<bool, String> {
+pub fn rm_file(file_path: &String) -> Result<bool, String> {
     match fs::remove_file(file_path) {
         Ok(_) => {
             info!("File removed successfully");

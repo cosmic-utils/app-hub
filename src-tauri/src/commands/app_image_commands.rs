@@ -1,9 +1,9 @@
 use dirs;
-use log::{error, info};
+use log::{error, info, warn};
 
 use crate::helpers::app_images_helpers::{copy_icon_file, install_app_image, rm_file};
 use crate::helpers::desktop_file_creator::DesktopFileBuilder;
-use crate::helpers::desktop_file_helpers::{find_app_path_by_name, read_all_app};
+use crate::helpers::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry, read_all_app};
 use crate::models::app_list::{App, AppList};
 use crate::models::request_installation::RequestInstallation;
 
@@ -105,17 +105,17 @@ pub async fn read_app_list() -> Result<AppList, String> {
 
 #[tauri::command]
 pub async fn uninstall_app(app: App) -> Result<bool, String> {
-    let app_path = match find_app_path_by_name(app.name.clone()) {
+    let desktop_entry = match find_desktop_entry(app.name.clone()) {
         Ok(path) => path,
         Err(err) => {
             return Err(err);
         }
     };
 
-    info!("Uninstalling app at: {:?}", app_path);
+    info!("Uninstalling app at: {:?}", &desktop_entry.exec);
 
     // Remove the AppImage
-    let app_removed: bool = match rm_file(app_path) {
+    let app_removed: bool = match rm_file(&desktop_entry.exec) {
         Ok(result) => {
             info!("AppImage removed successfully");
             result
@@ -127,8 +127,37 @@ pub async fn uninstall_app(app: App) -> Result<bool, String> {
     };
 
     // Remove the icon
+    let icon_removed: bool = match rm_file(&desktop_entry.icon_path) {
+        Ok(result) => {
+            info!("Icon removed successfully");
+            result
+        }
+        Err(err) => {
+            error!("{}", err);
+            return Err(err);
+        }
+    };
 
+    if !icon_removed {
+        warn!("Failed to remove icon");
+    }
 
+    // Remove the desktop entry
+    let desktop_removed: bool = match delete_desktop_file_by_name(&app.name) {
+        Ok(result) => {
+            info!("Desktop entry removed successfully");
+            result
+        }
+        Err(err) => {
+            error!("{}", err);
+            return Err(err);
+        }
+    };
 
-    Ok(true)
+    if app_removed && desktop_removed {
+        info!("App uninstalled successfully");
+        Ok(true)
+    } else {
+        Err("Failed to remove app".to_string())
+    }
 }

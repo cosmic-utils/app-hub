@@ -46,7 +46,10 @@ export default {
         "applist.search": "Search app",
         "applist.uninstall": "Uninstall",
 
-        "example": "Hi <strong>{{name}}</strong>, how are you?",
+        "appInfo.website": "Website",
+        "appInfo.open_issue": "Open an issue",
+        "appInfo.acknowledgment": "Acknowledgment",
+        "appInfo.legal_notes": "Legal notes",
     },
     it: {
         "yes_label": "Si",
@@ -95,6 +98,9 @@ export default {
         "applist.search": "Cerca app",
         "applist.uninstall": "Disinstalla",
 
-        "example": "Hola, <strong>{{name}}</strong>, ¿cómo estás?",
+        "appInfo.website": "Sito web",
+        "appInfo.open_issue": "Segnala un problema",
+        "appInfo.acknowledgment": "Riconoscimenti",
+        "appInfo.legal_notes": "Note legali",
     },
 };

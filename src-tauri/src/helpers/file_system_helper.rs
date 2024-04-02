@@ -1,9 +1,14 @@
+use std::fs;
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
 use mime_guess::from_path;
 use std::fs::File;
 use std::io::Read;
+use log::info;
 
+/// This function is used to convert an image file to a Base64 string
+/// It returns a Result containing the Base64 string or an error
+/// The function takes a path to the image file as an argument
 pub fn image_to_base64(path: &str) -> Result<String, std::io::Error> {
     // Open the file in read mode
     let mut file = File::open(path)?;
@@ -25,4 +30,16 @@ pub fn image_to_base64(path: &str) -> Result<String, std::io::Error> {
     let result = format!("data:{};base64,{}", mime_type, encoded);
 
     Ok(result)
+}
+
+/// This function is used to remove a file from the filesystem (used to remove AppImages and icons)
+/// It returns a boolean indicating if the file was removed successfully
+pub fn rm_file(file_path: &String) -> Result<bool, String> {
+    match fs::remove_file(file_path) {
+        Ok(_) => {
+            info!("File removed successfully");
+            Ok(true)
+        },
+        Err(e) => Err(format!("Failed to remove file: {}", e)),
+    }
 }

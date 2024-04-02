@@ -1,5 +1,5 @@
 use log::{debug, error, info};
-use crate::helpers::file_conversion_helper::image_to_base64;
+use crate::helpers::file_system_helper::image_to_base64;
 use crate::models::app_list::App;
 use regex::Regex;
 use crate::models::desktop_entry::DesktopEntry;
@@ -57,7 +57,11 @@ pub fn read_all_app() -> Result<Vec<App>, String> {
     Ok(apps)
 }
 
-// This function is used to parse a desktop entry string and extract the values of "Exec", "Name", and "Icon".
+/// Parse the desktop entry to get the values of "Exec", "Name", and "Icon".
+/// The "Exec" value is the path to the AppImage.
+/// The "Name" value is the name of the application.
+/// The "Icon" value is the path to the icon file.
+/// The function returns a DesktopEntry struct containing these values.
 pub fn parse_desktop_entry(desktop_entry: &str) -> Result<DesktopEntry, &'static str> {
     // Create a regular expression to match the lines starting with "Exec=", "Name=", and "Icon=".
     let re = Regex::new(r"(?m)^Exec=(.*)$|^Name=(.*)$|^Icon=(.*)$").unwrap();
@@ -93,7 +97,10 @@ pub fn parse_desktop_entry(desktop_entry: &str) -> Result<DesktopEntry, &'static
     Ok(DesktopEntry { exec, name, icon_path: icon })
 }
 
-pub fn find_desktop_entry(app_name: String) -> Result<(DesktopEntry), String> {
+/// Find the desktop entry of the application with the given name.
+/// The function reads all the .desktop files in the applications directory and compares the "Name" value
+/// of each file with the given app_name. If a match is found, the function returns the DesktopEntry struct
+pub fn find_desktop_entry(app_name: String) -> Result<DesktopEntry, String> {
     // read all .desktop files in the applications directory
     let home_dir = dirs::home_dir().expect("Failed to get home directory");
     let applications_dir = home_dir.join(".local").join("share").join("applications");
@@ -124,6 +131,11 @@ pub fn find_desktop_entry(app_name: String) -> Result<(DesktopEntry), String> {
     }
 }
 
+/// Delete the desktop file of the application with the given name.
+/// The function returns true if the file is successfully deleted, and false otherwise.
+/// If the file is not found, the function returns an error message.
+/// The function reads all the .desktop files in the applications directory and compares the "Name" value
+/// of each file with the given app_name. If a match is found, the file is deleted.
 pub fn delete_desktop_file_by_name(app_name: &String) -> Result<bool, String> {
     let home_dir = dirs::home_dir().expect("Failed to get home directory");
     let applications_dir = home_dir.join(".local").join("share").join("applications");

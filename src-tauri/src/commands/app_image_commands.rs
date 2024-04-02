@@ -1,9 +1,10 @@
 use dirs;
 use log::{error, info, warn};
 
-use crate::helpers::app_images_helpers::{copy_icon_file, install_app_image, rm_file};
-use crate::helpers::desktop_file_creator::DesktopFileBuilder;
+use crate::helpers::app_images_helpers::{copy_icon_file, install_app_image};
+use crate::helpers::desktop_file_builder::DesktopFileBuilder;
 use crate::helpers::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry, read_all_app};
+use crate::helpers::file_system_helper::rm_file;
 use crate::models::app_list::{App, AppList};
 use crate::models::request_installation::RequestInstallation;
 

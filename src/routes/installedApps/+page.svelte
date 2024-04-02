@@ -51,7 +51,7 @@
     {#each appList.apps as app}
         <div class="flex flex-row justify-between">
             <div class="flex flex-row">
-                <img height="40px" width="40px" alt="" src="{app.iconBase64}">
+                <img height="40px" width="50px" alt="" src="{app.iconBase64}">
                 <p class="font-bold ml-3">{app.name}</p>
             </div>
             <div>

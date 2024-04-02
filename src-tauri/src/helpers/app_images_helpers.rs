@@ -1,18 +1,12 @@
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
+use std::path::Path;
 use log::info;
 
 /// Install an AppImage file using the given file path
-pub fn install_app_image(file_path: &String) -> Result<String, String> {
-    //TODO now move the file to the default directory but in the frontend in the advanced settings
-    // the user should be able to choose a custom directory, so this should be a parameter
-    // in the request_installation struct and we should use that parameter here to move the file
-    // to the custom directory
-    let home_dir = dirs::home_dir().expect("Failed to get home directory");
-    let app_images_path = home_dir.join("AppImages");
-
+pub fn install_app_image(file_path: &String, installation_path: &String) -> Result<String, String> {
     // Try to create the directory and handle the error if it already exists
-    match fs::create_dir(&app_images_path) {
+    match fs::create_dir(&installation_path) {
         Ok(_) => {}
         Err(ref e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
             info!("Directory already exists");
@@ -22,7 +16,8 @@ pub fn install_app_image(file_path: &String) -> Result<String, String> {
 
     let path_buf = std::path::PathBuf::from(file_path);
     let file_name = path_buf.file_name().expect("Failed to get file name");
-    let dest_path = app_images_path.join(file_name);
+    // Define the destination path (installation path + file name)
+    let dest_path = std::path::PathBuf::from(installation_path).join(file_name);
 
     let res = fs::copy(file_path, &dest_path).expect("Failed to copy file");
 
@@ -41,27 +36,30 @@ pub fn install_app_image(file_path: &String) -> Result<String, String> {
 }
 
 /// Copy the icon file to the installation directory
-pub fn copy_icon_file(icon_path: &String) -> Result<String, String> {
-    let home_dir = dirs::home_dir().expect("Failed to get home directory");
-    let icons_path = home_dir.join("AppImages").join("icons");
+pub fn copy_icon_file(icon_path: &str, installation_path: &str) -> Result<String, String> {
+    let icons_path = Path::new(installation_path).join("icons");
 
     // Try to create the directory and handle the error if it already exists
-    match fs::create_dir(&icons_path) {
-        Ok(_) => {}
-        Err(ref e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
-            info!("Directory already exists");
+    if let Err(e) = fs::create_dir_all(&icons_path) {
+        if e.kind() != std::io::ErrorKind::AlreadyExists {
+            return Err(format!("Failed to create directory: {}", e));
         }
-        Err(e) => return Err(format!("Failed to create directory: {}", e)),
+        info!("Directory already exists");
     }
 
-    let path_buf = std::path::PathBuf::from(icon_path);
-    let file_name = path_buf.file_name().expect("Failed to get file name");
+    let path_buf = Path::new(icon_path);
+    let file_name = match path_buf.file_name() {
+        Some(name) => name,
+        None => return Err("Failed to get file name".to_string()),
+    };
     let dest_path = icons_path.join(file_name);
 
-    let res = fs::copy(icon_path, &dest_path).expect("Failed to copy file");
+    // Copy the file and handle potential errors
+    if let Err(e) = fs::copy(icon_path, &dest_path) {
+        return Err(format!("Failed to copy file: {}", e));
+    }
 
-    info!("Check file exist result: {:?}", res);
-    info!("Cp result: {:?}", res);
+    info!("File copied to: {:?}", dest_path);
 
     Ok(dest_path.to_string_lossy().to_string())
 }

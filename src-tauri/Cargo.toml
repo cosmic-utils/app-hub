@@ -21,11 +21,12 @@ tauri = { version = "2.0.0-beta.13", features = [] }
 tauri-plugin-dialog = "2.0.0-beta.3"
 tauri-plugin-store = "2.0.0-beta.4"
 log = "0.4.21"
+env_logger = "0.11.3"
 dirs = "5.0.1"
 regex = "1.10.4"
 base64 = "0.21.7"
 mime_guess = "2.0.4"
-tauri-plugin-log = "2.0.0-beta.3"
+tauri-plugin-log = { version = "2.0.0-beta.3", features = ["colored"] }
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

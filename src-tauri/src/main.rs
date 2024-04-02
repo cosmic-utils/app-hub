@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use tauri_plugin_log::{Target, TargetKind};
+use tauri_plugin_log::fern::colors::{Color, ColoredLevelConfig};
 use crate::commands::app_image_commands::{install_app, read_app_list, uninstall_app};
 
 use crate::commands::app_settings_commands::{read_settings, save_settings};
@@ -25,6 +26,14 @@ fn main() {
                 .targets([
                     Target::new(TargetKind::Stdout),
                 ])
+                .with_colors(
+                    ColoredLevelConfig::new()
+                        .info(Color::Green)
+                        .warn(Color::Yellow)
+                        .error(Color::Red)
+                        .debug(Color::Cyan)
+                        .trace(Color::White),
+                )
                 .build(),
         )
         .invoke_handler(tauri::generate_handler![

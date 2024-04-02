@@ -2,10 +2,15 @@
 // https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/store#usage-from-rust
 // plugin is in beta, so the API may change
 
+use std::fs;
 use std::path::PathBuf;
+use log::{debug, error, info, warn};
 
 use tauri::{AppHandle, Manager, Wry};
 use tauri_plugin_store::{with_store, StoreCollection};
+use crate::helpers::desktop_file_builder::DesktopFileBuilder;
+use crate::helpers::desktop_file_helpers::{find_desktop_entries_by_exec_contains, parse_desktop_entry};
+use crate::helpers::file_system_helper::copy_dir_all;
 
 use crate::models::app_settings::AppSettings;
 
@@ -66,10 +71,65 @@ pub async fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
 
 #[tauri::command]
 pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), String> {
+
     // Check if the install path is empty
     if let Some(install_path) = &settings.install_path {
         if install_path.is_empty() {
             return Err("Install path cannot be empty".into());
+        }
+        else {
+            // Check if the install path is valid
+            let path = PathBuf::from(install_path);
+            if !path.exists() {
+                return Err("Install path does not exist".into());
+            }
+            // Check if the new path is different from the old path
+            let old_settings = read_settings(app.clone()).await?;
+            if let Some(old_install_path) = old_settings.install_path {
+                if !old_install_path.eq(install_path) {
+                    info!("Install path changed from {} to {}", old_install_path, install_path);
+                    // Move all AppImages and icons to the new path
+                    let moved = copy_dir_all(
+                        &old_install_path,
+                        install_path
+                    );
+                    if let Err(e) = moved {
+                        error!("Error moving AppImages and icons: {:?}", e);
+                    }
+                    info!("AppImages and icons moved successfully");
+
+                    // Update the path in the .desktop files
+                    let desktop_entries = find_desktop_entries_by_exec_contains(&old_install_path);
+
+                    for desktop_entry_path in desktop_entries.unwrap() {
+                        
+                        match DesktopFileBuilder::from_desktop_entry_path(desktop_entry_path.clone()) {
+                            Ok(mut desktop_file_builder) => {
+
+                                // Check exec field
+                                if desktop_file_builder.exec().is_none() {
+                                    error!("Failed to parse desktop entry (exec missing): {}", desktop_entry_path);
+                                    continue;
+                                }
+
+                                let new_exec = desktop_file_builder.exec().unwrap().replace(old_install_path.as_str(), install_path.as_str());
+                                debug!("new exec: {}", new_exec);
+                                desktop_file_builder.set_exec(new_exec);
+                                if desktop_file_builder.path().is_some() {
+                                    desktop_file_builder.set_path(desktop_file_builder.path().unwrap().replace(old_install_path.as_str(), install_path.as_str()));
+                                }
+                                if desktop_file_builder.icon().is_some() {
+                                    desktop_file_builder.set_icon(desktop_file_builder.icon().unwrap().replace(old_install_path.as_str(), install_path.as_str()));
+                                }
+                                desktop_file_builder.write_to_file(desktop_entry_path).expect("Error updating .desktop file");
+                            }
+                            Err(error) => {
+                                warn!("Error updating .desktop file: {}", error);
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -93,13 +153,11 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
 
     // Check the result of the save operation
     match res {
-        // If the save was successful, print a success message
         Ok(_) => {
-            println!("Settings saved successfully");
+            info!("Settings saved successfully");
         }
-        // If the save failed, print the error and return it
         Err(err) => {
-            println!("{:?}", err);
+            info!("{:?}", err);
             return Err("Error saving settings".to_string());
         }
     }

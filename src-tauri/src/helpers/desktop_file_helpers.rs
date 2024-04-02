@@ -18,16 +18,12 @@ pub fn read_all_app() -> Result<Vec<App>, String> {
                 // read the .desktop file and get the path of the AppImage
                 let file_content: String =
                     std::fs::read_to_string(entry.unwrap().path()).expect("Failed to read file");
-
+                
                 // parse the desktop entry to get the path of the AppImage
                 match parse_desktop_entry(&file_content) {
                     Ok(desktop_entry) => {
-                        //TODO: in this case we are assuming that the AppImage is in /AppImages dir
-                        // since it is the default path used by AppHub,
-                        // but the user could have installed the AppImage in a different directory
-                        // using the advanced settings
                         debug!("Reading icon at: {:?}", &desktop_entry.icon_path);
-                        if desktop_entry.exec.contains("/AppImages") {
+                        if file_content.contains("X-AppHub=true") {
                             let base64_icon = match image_to_base64(&desktop_entry.icon_path) {
                                 Ok(base64) => Some(base64),
                                 Err(err) => {
@@ -89,7 +85,7 @@ pub fn parse_desktop_entry(desktop_entry: &str) -> Result<DesktopEntry, &'static
 
     // If any of the "Exec", "Name", or "Icon" values are still empty after parsing, return an error.
     if exec.is_empty() || name.is_empty() || icon.is_empty() {
-        error!("Failed to parse desktop entry {}", desktop_entry);
+        error!("Failed to parse desktop entry: {}", desktop_entry);
         return Err("Failed to parse desktop entry");
     }
 
@@ -129,6 +125,44 @@ pub fn find_desktop_entry(app_name: String) -> Result<DesktopEntry, String> {
             return Err(format!("Failed to read directory: {}", err));
         }
     }
+}
+
+/// Find the desktop entries containing the given string in the "Exec" value.
+/// The function reads all the .desktop files in the applications directory and compares the "Exec" value
+/// of each file with the given contains_exec. If a match is found, the function returns a vector of paths
+/// to the .desktop files.
+pub fn find_desktop_entries_by_exec_contains(contains_exec: &String) -> Result<Vec<String>, String> {
+    let mut desktop_entries_paths: Vec<String> = Vec::new();
+
+    // read all .desktop files in the applications directory
+    let home_dir = dirs::home_dir().expect("Failed to get home directory");
+    let applications_dir = home_dir.join(".local").join("share").join("applications");
+    match std::fs::read_dir(applications_dir) {
+        Ok(entries) => {
+            for entry in entries {
+                // read the .desktop file and get the path of the AppImage
+                let file_content: String =
+                    std::fs::read_to_string(entry.as_ref().unwrap().path()).expect("Failed to read file");
+
+                // parse the desktop entry to get the path of the AppImage
+                match parse_desktop_entry(&file_content) {
+                    Ok(desktop_entry) => {
+                        if desktop_entry.exec.contains(&contains_exec.as_str()) {
+                            desktop_entries_paths.push(entry.unwrap().path().to_str().unwrap().to_string());
+                        }
+                    }
+                    Err(err) => {
+                        error!("{}", err)
+                    }
+                };
+            }
+        }
+        Err(err) => {
+            return Err(format!("Failed to read directory: {}", err));
+        }
+    }
+
+    Ok(desktop_entries_paths)
 }
 
 /// Delete the desktop file of the application with the given name.

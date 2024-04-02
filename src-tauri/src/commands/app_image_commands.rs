@@ -1,5 +1,7 @@
 use dirs;
 use log::{error, info, warn};
+use tauri::AppHandle;
+use crate::commands::app_settings_commands::read_settings;
 
 use crate::helpers::app_images_helpers::{copy_icon_file, install_app_image};
 use crate::helpers::desktop_file_builder::DesktopFileBuilder;
@@ -9,7 +11,7 @@ use crate::models::app_list::{App, AppList};
 use crate::models::request_installation::RequestInstallation;
 
 #[tauri::command]
-pub async fn install_app(request_installation: RequestInstallation) -> Result<String, String> {
+pub async fn install_app(app: AppHandle, request_installation: RequestInstallation) -> Result<String, String> {
     info!("Installing file: {:?}", request_installation);
 
     info!("### REQUESTED TO INSTALL APP ###");
@@ -24,7 +26,15 @@ pub async fn install_app(request_installation: RequestInstallation) -> Result<St
     info!("Terminal: {:?}", request_installation.terminal);
     info!("#################################");
 
-    match install_app_image(&request_installation.file_path) {
+    let settings = match read_settings(app).await {
+        Ok(settings) => settings,
+        Err(err) => {
+            error!("{}", err);
+            return Err(err);
+        }
+    };
+
+    match install_app_image(&request_installation.file_path, settings.install_path.as_ref().unwrap()) {
         Ok(_) => {
             info!("AppImage installation successful");
         }
@@ -57,15 +67,15 @@ pub async fn install_app(request_installation: RequestInstallation) -> Result<St
     desktop_builder.set_version("1.0".to_string()); //TODO: make this settable by the user as advanced setting
     desktop_builder.set_name(request_installation.app_name.clone());
     desktop_builder.set_exec(format!(
-        "{}/AppImages/{}",
-        dirs::home_dir().unwrap().to_string_lossy(),
+        "{}/{}",
+        settings.install_path.unwrap(),
         file_name.to_string_lossy()
     ));
 
     // Set optional fields
-    //TODO check params from frontend and set them here
     desktop_builder.set_icon(icon_path);
     desktop_builder.set_terminal(request_installation.terminal.unwrap_or(false));
+    //TODO: add categories to the settings
     //desktop_builder.set_categories("Utility".to_string());
     if request_installation.app_description.is_some() {
         desktop_builder.set_comment(request_installation.app_description.unwrap());

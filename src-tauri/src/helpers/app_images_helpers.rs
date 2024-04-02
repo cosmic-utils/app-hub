@@ -3,16 +3,9 @@ use std::os::unix::fs::PermissionsExt;
 use log::info;
 
 /// Install an AppImage file using the given file path
-pub fn install_app_image(file_path: &String) -> Result<String, String> {
-    //TODO now move the file to the default directory but in the frontend in the advanced settings
-    // the user should be able to choose a custom directory, so this should be a parameter
-    // in the request_installation struct and we should use that parameter here to move the file
-    // to the custom directory
-    let home_dir = dirs::home_dir().expect("Failed to get home directory");
-    let app_images_path = home_dir.join("AppImages");
-
+pub fn install_app_image(file_path: &String, installation_path: &String) -> Result<String, String> {
     // Try to create the directory and handle the error if it already exists
-    match fs::create_dir(&app_images_path) {
+    match fs::create_dir(&installation_path) {
         Ok(_) => {}
         Err(ref e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
             info!("Directory already exists");
@@ -22,7 +15,8 @@ pub fn install_app_image(file_path: &String) -> Result<String, String> {
 
     let path_buf = std::path::PathBuf::from(file_path);
     let file_name = path_buf.file_name().expect("Failed to get file name");
-    let dest_path = app_images_path.join(file_name);
+    // Define the destination path (installation path + file name)
+    let dest_path = std::path::PathBuf::from(installation_path).join(file_name);
 
     let res = fs::copy(file_path, &dest_path).expect("Failed to copy file");
 

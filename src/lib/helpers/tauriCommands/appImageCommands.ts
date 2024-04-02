@@ -1,5 +1,5 @@
 import {invoke} from "@tauri-apps/api/core";
-import type {AppList} from "$lib/models/Applist";
+import type {App, AppList} from "$lib/models/Applist";
 
 // Install an app image in the target directory
 async function installAppImage(
@@ -41,7 +41,19 @@ async function installedAppsList(): Promise<AppList> {
     }
 }
 
+// Uninstall an app
+async function uninstallApp(app: App): Promise<boolean> {
+    try {
+        return await invoke<boolean>("uninstall_app", {app: app});
+    }
+    catch (e) {
+        console.error(e);
+        throw new Error('Failed to read app list');
+    }
+}
+
 export {
     installAppImage,
-    installedAppsList
+    installedAppsList,
+    uninstallApp
 }

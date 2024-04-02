@@ -1,8 +1,9 @@
 use dirs;
+use log::{error, info, warn};
 
-use crate::helpers::app_images_helpers::{copy_icon_file, install_app_image};
+use crate::helpers::app_images_helpers::{copy_icon_file, install_app_image, rm_file};
 use crate::helpers::desktop_file_creator::DesktopFileBuilder;
-use crate::helpers::desktop_file_helpers::read_all_app;
+use crate::helpers::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry, read_all_app};
 use crate::models::app_list::{App, AppList};
 use crate::models::request_installation::RequestInstallation;
 
@@ -14,7 +15,10 @@ pub async fn install_app(request_installation: RequestInstallation) -> Result<St
     println!("File path: {:?}", request_installation.file_path);
     println!("Icon path: {:?}", request_installation.icon_path);
     println!("App name: {:?}", request_installation.app_name);
-    println!("App description: {:?}", request_installation.app_description);
+    println!(
+        "App description: {:?}",
+        request_installation.app_description
+    );
     println!("App type: {:?}", request_installation.app_type);
     println!("Terminal: {:?}", request_installation.terminal);
     println!("#################################");
@@ -46,13 +50,16 @@ pub async fn install_app(request_installation: RequestInstallation) -> Result<St
     // Set mandatory fields
     if request_installation.app_type.is_some() {
         desktop_builder.set_type(request_installation.app_type.unwrap());
-    }
-    else {
+    } else {
         desktop_builder.set_type("Application".to_string());
     }
     desktop_builder.set_version("1.0".to_string()); //TODO: make this settable by the user as advanced setting
     desktop_builder.set_name(request_installation.app_name.clone());
-    desktop_builder.set_exec(format!("{}/AppImages/{}", dirs::home_dir().unwrap().to_string_lossy(), file_name.to_string_lossy()));
+    desktop_builder.set_exec(format!(
+        "{}/AppImages/{}",
+        dirs::home_dir().unwrap().to_string_lossy(),
+        file_name.to_string_lossy()
+    ));
 
     // Set optional fields
     //TODO check params from frontend and set them here
@@ -65,7 +72,11 @@ pub async fn install_app(request_installation: RequestInstallation) -> Result<St
 
     // Create destingation path
     let home_dir = dirs::home_dir().expect("Failed to get home directory");
-    let desktop_entry_path = home_dir.join(".local").join("share").join("applications").join(format!("{}.desktop", request_installation.app_name));
+    let desktop_entry_path = home_dir
+        .join(".local")
+        .join("share")
+        .join("applications")
+        .join(format!("{}.desktop", request_installation.app_name));
 
     // Set no sandbox
     if request_installation.no_sandbox.is_some() && request_installation.no_sandbox.unwrap() {
@@ -90,4 +101,63 @@ pub async fn install_app(request_installation: RequestInstallation) -> Result<St
 pub async fn read_app_list() -> Result<AppList, String> {
     let apps: Vec<App> = read_all_app()?;
     Ok(AppList { apps })
+}
+
+#[tauri::command]
+pub async fn uninstall_app(app: App) -> Result<bool, String> {
+    let desktop_entry = match find_desktop_entry(app.name.clone()) {
+        Ok(path) => path,
+        Err(err) => {
+            return Err(err);
+        }
+    };
+
+    info!("Uninstalling app at: {:?}", &desktop_entry.exec);
+
+    // Remove the AppImage
+    let app_removed: bool = match rm_file(&desktop_entry.exec) {
+        Ok(result) => {
+            info!("AppImage removed successfully");
+            result
+        }
+        Err(err) => {
+            error!("{}", err);
+            return Err(err);
+        }
+    };
+
+    // Remove the icon
+    let icon_removed: bool = match rm_file(&desktop_entry.icon_path) {
+        Ok(result) => {
+            info!("Icon removed successfully");
+            result
+        }
+        Err(err) => {
+            error!("{}", err);
+            return Err(err);
+        }
+    };
+
+    if !icon_removed {
+        warn!("Failed to remove icon");
+    }
+
+    // Remove the desktop entry
+    let desktop_removed: bool = match delete_desktop_file_by_name(&app.name) {
+        Ok(result) => {
+            info!("Desktop entry removed successfully");
+            result
+        }
+        Err(err) => {
+            error!("{}", err);
+            return Err(err);
+        }
+    };
+
+    if app_removed && desktop_removed {
+        info!("App uninstalled successfully");
+        Ok(true)
+    } else {
+        Err("Failed to remove app".to_string())
+    }
 }

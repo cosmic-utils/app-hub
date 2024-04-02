@@ -1,8 +1,9 @@
 <script lang="ts">
-    import type {AppList} from "$lib/models/Applist";
+    import type {App, AppList} from "$lib/models/Applist";
     import {onMount} from "svelte";
     import {t} from "$lib/i18n/i18n";
-    import {installedAppsList} from "$lib/helpers/tauriCommands/appImageCommands";
+    import {installedAppsList, uninstallApp} from "$lib/helpers/tauriCommands/appImageCommands";
+    import {error, info} from "@tauri-apps/plugin-log";
 
     let appList: AppList = {
         apps: []
@@ -11,7 +12,24 @@
     const readApplist = async () => {
         try {
             appList = await installedAppsList();
-            console.log(appList);
+            info("App list read successfully");
+        }
+        catch (e) {
+            error(e + "");
+        }
+    }
+
+    const uninstall = async (app: App) => {
+        try {
+            info("Uninstalling app: " + app);
+            const uninstalled: boolean = await uninstallApp(app);
+            if (uninstalled) {
+                console.log("App uninstalled successfully");
+                readApplist();
+            }
+            else {
+                error("App could not be uninstalled");
+            }
         }
         catch (e) {
             console.error(e);
@@ -37,7 +55,7 @@
                 <p class="font-bold ml-3">{app.name}</p>
             </div>
             <div>
-                <button class="btn btn-error">{$t("applist.uninstall")}</button>
+                <button on:click={()=>{uninstall(app)}} class="btn btn-error">{$t("applist.uninstall")}</button>
             </div>
         </div>
         <div class="divider"></div>

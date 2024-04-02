@@ -46,7 +46,7 @@ pub async fn install_app(app: AppHandle, request_installation: RequestInstallati
     let path_buf = std::path::PathBuf::from(&request_installation.file_path);
     let file_name = path_buf.file_name().expect("Failed to get file name");
 
-    let icon_path = match copy_icon_file(&request_installation.icon_path) {
+    let icon_path = match copy_icon_file(&request_installation.icon_path, settings.install_path.as_ref().unwrap()) {
         Ok(path) => {
             info!("Icon file copied to: {:?}", path);
             path

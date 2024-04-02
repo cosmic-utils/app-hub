@@ -2,6 +2,7 @@ use log::{error, info};
 use crate::helpers::file_conversion_helper::image_to_base64;
 use crate::models::app_list::App;
 use regex::Regex;
+use crate::models::desktop_entry::DesktopEntry;
 
 /// Read all desktop files in the applications directory
 /// This retrieved list contains only files installed by AppHub
@@ -20,13 +21,13 @@ pub fn read_all_app() -> Result<Vec<App>, String> {
 
                 // parse the desktop entry to get the path of the AppImage
                 match parse_desktop_entry(&file_content) {
-                    Ok((exec, name, icon)) => {
+                    Ok(desktop_entry) => {
                         //TODO: in this case we are assuming that the AppImage is in /AppImages dir
                         // since it is the default path used by AppHub,
                         // but the user could have installed the AppImage in a different directory
                         // using the advanced settings
-                        if exec.contains("/AppImages") {
-                            let base64_icon = match image_to_base64(&icon) {
+                        if desktop_entry.exec.contains("/AppImages") {
+                            let base64_icon = match image_to_base64(&desktop_entry.icon_path) {
                                 Ok(base64) => Some(base64),
                                 Err(err) => {
                                     info!("Failed to convert image to base64: {}", err);
@@ -35,9 +36,9 @@ pub fn read_all_app() -> Result<Vec<App>, String> {
                             };
 
                             apps.push(App {
-                                name,
+                                name: desktop_entry.name,
                                 icon_base64: base64_icon,
-                                app_path: exec,
+                                app_path: desktop_entry.exec,
                             });
                         }
                     }
@@ -56,7 +57,7 @@ pub fn read_all_app() -> Result<Vec<App>, String> {
 }
 
 // This function is used to parse a desktop entry string and extract the values of "Exec", "Name", and "Icon".
-pub fn parse_desktop_entry(desktop_entry: &str) -> Result<(String, String, String), &'static str> {
+pub fn parse_desktop_entry(desktop_entry: &str) -> Result<DesktopEntry, &'static str> {
     // Create a regular expression to match the lines starting with "Exec=", "Name=", and "Icon=".
     let re = Regex::new(r"(?m)^Exec=(.*)$|^Name=(.*)$|^Icon=(.*)$").unwrap();
 
@@ -88,7 +89,7 @@ pub fn parse_desktop_entry(desktop_entry: &str) -> Result<(String, String, Strin
     }
 
     // If all values are successfully extracted, return them as a tuple.
-    Ok((exec, name, icon))
+    Ok(DesktopEntry { exec, name, icon_path: icon })
 }
 
 pub fn find_app_path_by_name(app_name: String) -> Result<String, String> {
@@ -104,9 +105,9 @@ pub fn find_app_path_by_name(app_name: String) -> Result<String, String> {
 
                 // parse the desktop entry to get the path of the AppImage
                 match parse_desktop_entry(&file_content) {
-                    Ok((exec, name, _)) => {
-                        if name == app_name {
-                            return Ok(exec);
+                    Ok(desktop_entry) => {
+                        if desktop_entry.name == app_name {
+                            return Ok(desktop_entry.exec);
                         }
                     }
                     Err(err) => {

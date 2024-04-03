@@ -9,6 +9,7 @@
     import {saveSettings} from "$lib/helpers/tauriCommands/appSettingsCommands";
     import {pickDirectory} from "$lib/helpers/tauriCommands/dialogCommands";
     import Modal from "$lib/components/Modal.svelte";
+    import LoadingOverlay from "$lib/components/LoadingOverlay.svelte";
 
     let activeMenuIndex = 0;
     let settings: AppSettings;
@@ -134,8 +135,7 @@
         <button on:click={save} class="btn btn-success">{$t("settings.save_button")}</button>
     </div>
 {:else}
-    <!--TODO Loading spinner -->
-    <div>Loading...</div>
+    <LoadingOverlay loading={!settings}/>
 {/if}
 
 <Modal modalOpen={modalOpen} closeCallback={()=>{modalOpen = false}}>

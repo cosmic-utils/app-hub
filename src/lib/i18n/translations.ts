@@ -23,6 +23,11 @@ export default {
         "settings.change_dir": "Change directory",
         "settings.read_settings_error_title": "Settings read error",
         "settings.read_settings_error_des": "An error occurred while reading the settings file. The default settings will be used.",
+        "settings.error_modal_title": "Error",
+        "settings.error_modal_choose_dir": "An error occurred while selecting the directory.",
+        "settings.save_error": "An error occurred while saving the settings.",
+        "settings.success_modal_title": "Success",
+        "settings.success_modal_save": "Settings saved successfully",
 
         "install_choose_file": "Choose a file to install",
         "install_choose_button": "Choose file",
@@ -82,6 +87,11 @@ export default {
         "settings.change_dir": "Cambia directory",
         "settings.read_settings_error_title": "Errore di lettura delle impostazioni",
         "settings.read_settings_error_des": "Si è verificato un errore durante la lettura del file delle impostazioni. Verranno utilizzate le impostazioni predefinite.",
+        "settings.error_modal_title": "Errore",
+        "settings.error_modal_choose_dir": "Si è verificato un errore durante la selezione della directory.",
+        "settings.save_error": "Si è verificato un errore durante il salvataggio delle impostazioni.",
+        "settings.success_modal_title": "Successo",
+        "settings.success_modal_save": "Impostazioni salvate con successo",
 
         "install_choose_file": "Scegli un file da installare",
         "install_choose_button": "Scegli file",

@@ -8,10 +8,13 @@
     import {set_theme} from "$lib/helpers/themeController";
     import {saveSettings} from "$lib/helpers/tauriCommands/appSettingsCommands";
     import {pickDirectory} from "$lib/helpers/tauriCommands/dialogCommands";
+    import Modal from "$lib/components/Modal.svelte";
 
     let activeMenuIndex = 0;
-
     let settings: AppSettings;
+    let modalOpen: boolean = false;
+    let modalTitle: string;
+    let modalMessage: string;
 
     const save = async () => {
         try {
@@ -22,9 +25,15 @@
                 settings.createDesktopEntry
             );
             console.log(settings);
+            modalOpen = true;
+            modalTitle = $t("settings.success_modal_title");
+            modalMessage = $t("settings.success_modal_save");
         }
         catch (e) {
             console.error(e);
+            modalOpen = true;
+            modalTitle = $t("settings.error_modal_title");
+            modalMessage = $t("settings.save_error");
         }
     }
 
@@ -36,6 +45,9 @@
         }
         catch (e) {
             console.error(e);
+            modalOpen = true;
+            modalTitle = $t("settings.error_modal_title");
+            modalMessage = $t("settings.error_modal_choose_dir");
         }
     }
 
@@ -125,4 +137,11 @@
     <!--TODO Loading spinner -->
     <div>Loading...</div>
 {/if}
+
+<Modal modalOpen={modalOpen} closeCallback={()=>{modalOpen = false}}>
+    <div class="flex flex-col">
+        <p class="text-2xl font-bold">{modalTitle}</p>
+        <p class="mt-3">{modalMessage}</p>
+    </div>
+</Modal>
 

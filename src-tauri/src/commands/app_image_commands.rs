@@ -64,7 +64,11 @@ pub async fn install_app(app: AppHandle, request_installation: RequestInstallati
     } else {
         desktop_builder.set_type("Application".to_string());
     }
-    desktop_builder.set_version("1.0".to_string()); //TODO: make this settable by the user as advanced setting
+    if request_installation.app_version.is_some() {
+        desktop_builder.set_version(request_installation.app_version.unwrap());
+    } else {
+        desktop_builder.set_version("1.0".to_string());
+    }
     desktop_builder.set_name(request_installation.app_name.clone());
     desktop_builder.set_exec(format!(
         "{}/{}",

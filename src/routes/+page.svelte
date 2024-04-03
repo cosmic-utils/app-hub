@@ -7,11 +7,14 @@
     let appPath: string;
     let iconPath: string;
     let enableAdvancedOptions: boolean = false;
+
     let appName: string;
     let appDescription: string;
     let appType: string = "Application"
     let appTerminal: boolean = false;
     let noSandbox: boolean = false;
+    let appVersion: string = "1.0.0";
+
     let modalOpen: boolean = false;
     let modalTitle: string;
     let modalMessage: string;
@@ -112,6 +115,14 @@
                         </div>
                         <input type="text" bind:value={appType} class="input input-bordered mt-2"
                                placeholder={$t("install_file.advanced_options.app_type")}/>
+                    </div>
+                    <div class="flex flex-col justify-start items-start mt-4">
+                        <div class="tooltip tooltip-right"
+                             data-tip={$t("install_file.advanced_options.app_version_des")}>
+                            <p class="text-xl">{$t("install_file.advanced_options.app_version")}</p>
+                        </div>
+                        <input type="text" bind:value={appVersion} class="input input-bordered mt-2"
+                               placeholder={$t("install_file.advanced_options.app_version")}/>
                     </div>
                     <div class="flex flex-col justify-start items-start mt-4">
                         <div class="tooltip tooltip-right"

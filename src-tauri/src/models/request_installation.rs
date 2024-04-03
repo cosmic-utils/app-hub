@@ -9,5 +9,6 @@ pub struct RequestInstallation {
     pub app_description: Option<String>,
     pub app_type: Option<String>,
     pub terminal: Option<bool>,
+    pub app_version: Option<String>,
     pub no_sandbox: Option<bool>,
 }

@@ -9,6 +9,7 @@ async function installAppImage(
     appType: string,
     terminal: boolean,
     appDescription: string,
+    appVersion: string,
     noSandBox: boolean,
 ): Promise<string> {
     try {
@@ -20,6 +21,7 @@ async function installAppImage(
                 appType: appType,
                 terminal: terminal,
                 appDescription: appDescription,
+                appVersion: appVersion,
                 noSandbox: noSandBox
             }
         })

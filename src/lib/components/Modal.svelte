@@ -1,6 +1,7 @@
 <script lang="ts">
     import {afterUpdate, onMount} from "svelte";
 
+    export let modalOpen: boolean = false;
     export let closeCallback: (modalState: boolean) => void;
 
     let modal: HTMLDialogElement;
@@ -27,7 +28,7 @@
     });
 
     function checkModalState() {
-        if (modal) {
+        if (modalOpen) {
             openModal();
         } else {
             closeModal();

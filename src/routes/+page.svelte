@@ -2,6 +2,7 @@
     import {t} from "$lib/i18n/i18n";
     import {pickAppIcon, pickAppImage} from "$lib/helpers/tauriCommands/dialogCommands";
     import {installAppImage} from "$lib/helpers/tauriCommands/appImageCommands";
+    import Modal from "$lib/components/Modal.svelte";
 
     let appPath: string;
     let iconPath: string;
@@ -11,13 +12,18 @@
     let appType: string = "Application"
     let appTerminal: boolean = false;
     let noSandbox: boolean = false;
+    let errorModalOpen: boolean = false;
+    let errorModalTitle: string;
+    let errorModalMessage: string;
 
     const chooseFile = async () => {
         try {
             appPath = await pickAppImage();
         } catch (e) {
             console.error(e);
-            //TODO show error
+            errorModalOpen = true;
+            errorModalTitle = $t("install_file.error_modal_title");
+            errorModalMessage = $t("install_file.error_modal_choose_file");
         }
     }
 
@@ -26,7 +32,9 @@
             iconPath = await pickAppIcon();
         } catch (e) {
             console.error(e);
-            //TODO show error
+            errorModalOpen = true;
+            errorModalTitle = $t("install_file.error_modal_title");
+            errorModalMessage = $t("install_file.error_modal_choose_file");
         }
     }
 
@@ -44,7 +52,9 @@
             console.log("Installation result", res);
         } catch (e) {
             console.error(e);
-            //TODO show error
+            errorModalOpen = true;
+            errorModalTitle = $t("install_file.error_modal_title");
+            errorModalMessage = $t("install_file.error_modal_install");
         }
     }
 
@@ -135,3 +145,10 @@
         {$t("install_file_install_button")}
     </button>
 </div>
+
+<Modal modalOpen={errorModalOpen} closeCallback={()=>{errorModalOpen = false}}>
+    <div class="flex flex-col">
+        <p class="text-2xl font-bold">{errorModalTitle}</p>
+        <p class="mt-3">{errorModalMessage}</p>
+    </div>
+</Modal>

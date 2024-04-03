@@ -21,6 +21,8 @@ export default {
         "settings.save_button": "Save",
         "settings.installation_path": "Installation directory",
         "settings.change_dir": "Change directory",
+        "settings.read_settings_error_title": "Settings read error",
+        "settings.read_settings_error_des": "An error occurred while reading the settings file. The default settings will be used.",
 
         "install_choose_file": "Choose a file to install",
         "install_choose_button": "Choose file",
@@ -41,6 +43,9 @@ export default {
         "install_file.advanced_options.app_terminal_des": "Indicates whether the application should be run in a terminal.",
         "install_file.advanced_options.no_sandbox": "No sandbox",
         "install_file.advanced_options.no_sandbox_des": "Check to add the --no-sandbox option",
+        "install_file.error_modal_title": "Error",
+        "install_file.error_modal_choose_file": "An error occurred while selecting the file.",
+        "install_file.error_modal_install": "An error occurred while installing the application",
 
         "applist.title": "App list",
         "applist.search": "Search app",
@@ -73,6 +78,8 @@ export default {
         "settings.save_button": "Salva",
         "settings.installation_path": "Cartella di installazione",
         "settings.change_dir": "Cambia directory",
+        "settings.read_settings_error_title": "Errore di lettura delle impostazioni",
+        "settings.read_settings_error_des": "Si è verificato un errore durante la lettura del file delle impostazioni. Verranno utilizzate le impostazioni predefinite.",
 
         "install_choose_file": "Scegli un file da installare",
         "install_choose_button": "Scegli file",
@@ -93,6 +100,9 @@ export default {
         "install_file.advanced_options.app_terminal_des": "Indica se l'applicazione deve essere eseguita in un terminale.",
         "install_file.advanced_options.no_sandbox": "No sandbox",
         "install_file.advanced_options.no_sandbox_des": "Spunta per aggiungire l'opzione --no-sandbox",
+        "install_file.error_modal_title": "Errore",
+        "install_file.error_modal_choose_file": "Si è verificato un errore durante la selezione del file.",
+        "install_file.error_modal_install": "Si è verificato un errore durante l'installazione dell'applicazione",
 
         "applist.title": "Lista delle app",
         "applist.search": "Cerca app",

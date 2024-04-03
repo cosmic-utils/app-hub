@@ -12,18 +12,18 @@
     let appType: string = "Application"
     let appTerminal: boolean = false;
     let noSandbox: boolean = false;
-    let errorModalOpen: boolean = false;
-    let errorModalTitle: string;
-    let errorModalMessage: string;
+    let modalOpen: boolean = false;
+    let modalTitle: string;
+    let modalMessage: string;
 
     const chooseFile = async () => {
         try {
             appPath = await pickAppImage();
         } catch (e) {
             console.error(e);
-            errorModalOpen = true;
-            errorModalTitle = $t("install_file.error_modal_title");
-            errorModalMessage = $t("install_file.error_modal_choose_file");
+            modalOpen = true;
+            modalTitle = $t("install_file.error_modal_title");
+            modalMessage = $t("install_file.error_modal_choose_file");
         }
     }
 
@@ -32,9 +32,9 @@
             iconPath = await pickAppIcon();
         } catch (e) {
             console.error(e);
-            errorModalOpen = true;
-            errorModalTitle = $t("install_file.error_modal_title");
-            errorModalMessage = $t("install_file.error_modal_choose_file");
+            modalOpen = true;
+            modalTitle = $t("install_file.error_modal_title");
+            modalMessage = $t("install_file.error_modal_choose_file");
         }
     }
 
@@ -50,11 +50,14 @@
                 noSandbox
             )
             console.log("Installation result", res);
+            modalOpen = true;
+            modalTitle = $t("install_file.success_modal_title");
+            modalMessage = $t("install_file.installation_successful");
         } catch (e) {
             console.error(e);
-            errorModalOpen = true;
-            errorModalTitle = $t("install_file.error_modal_title");
-            errorModalMessage = $t("install_file.error_modal_install");
+            modalOpen = true;
+            modalTitle = $t("install_file.error_modal_title");
+            modalMessage = $t("install_file.error_modal_install");
         }
     }
 
@@ -146,9 +149,9 @@
     </button>
 </div>
 
-<Modal modalOpen={errorModalOpen} closeCallback={()=>{errorModalOpen = false}}>
+<Modal modalOpen={modalOpen} closeCallback={()=>{modalOpen = false}}>
     <div class="flex flex-col">
-        <p class="text-2xl font-bold">{errorModalTitle}</p>
-        <p class="mt-3">{errorModalMessage}</p>
+        <p class="text-2xl font-bold">{modalTitle}</p>
+        <p class="mt-3">{modalMessage}</p>
     </div>
 </Modal>

@@ -46,6 +46,8 @@ export default {
         "install_file.error_modal_title": "Error",
         "install_file.error_modal_choose_file": "An error occurred while selecting the file.",
         "install_file.error_modal_install": "An error occurred while installing the application",
+        "install_file.success_modal_title": "Success",
+        "install_file.installation_successful": "The application was installed successfully",
 
         "applist.title": "App list",
         "applist.search": "Search app",
@@ -103,6 +105,8 @@ export default {
         "install_file.error_modal_title": "Errore",
         "install_file.error_modal_choose_file": "Si è verificato un errore durante la selezione del file.",
         "install_file.error_modal_install": "Si è verificato un errore durante l'installazione dell'applicazione",
+        "install_file.success_modal_title": "Successo",
+        "install_file.installation_successful": "L'applicazione è stata installata con successo",
 
         "applist.title": "Lista delle app",
         "applist.search": "Cerca app",

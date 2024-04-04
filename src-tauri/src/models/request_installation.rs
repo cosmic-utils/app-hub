@@ -8,6 +8,8 @@ pub struct RequestInstallation {
     pub app_name: String,
     pub app_description: Option<String>,
     pub app_type: Option<String>,
+    pub categories: Option<Vec<String>>,
     pub terminal: Option<bool>,
+    pub app_version: Option<String>,
     pub no_sandbox: Option<bool>,
 }

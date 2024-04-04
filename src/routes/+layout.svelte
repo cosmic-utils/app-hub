@@ -6,7 +6,10 @@
     import type {AppSettings} from "$lib/models/Settings";
     import {onMount} from "svelte";
     import {set_theme} from "$lib/helpers/themeController";
+    import Modal from "$lib/components/Modal.svelte";
+    import {t} from "$lib/i18n/i18n";
 
+    let errorModalOpen = false;
 
     let readSettings = async () => {
         try {
@@ -18,7 +21,7 @@
 
         } catch (error) {
             console.error('Error reading settings', error);
-            //TODO: show error message
+            errorModalOpen = true;
         }
     }
 
@@ -31,3 +34,10 @@
 <Navbar>
     <slot/>
 </Navbar>
+
+<Modal modalOpen={errorModalOpen} closeCallback={()=>{errorModalOpen = false}}>
+    <div class="flex flex-col">
+        <p class="font-bold text-2xl">{$t("settings.read_settings_error_title")}</p>
+        <p>{$t("settings.read_settings_error_des")}</p>
+    </div>
+</Modal>

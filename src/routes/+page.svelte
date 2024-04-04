@@ -2,22 +2,32 @@
     import {t} from "$lib/i18n/i18n";
     import {pickAppIcon, pickAppImage} from "$lib/helpers/tauriCommands/dialogCommands";
     import {installAppImage} from "$lib/helpers/tauriCommands/appImageCommands";
+    import Modal from "$lib/components/Modal.svelte";
 
     let appPath: string;
     let iconPath: string;
     let enableAdvancedOptions: boolean = false;
+
     let appName: string;
     let appDescription: string;
-    let appType: string = "Application"
+    let appType: string = "Application";
+    let appCategory: string = "Utility";
     let appTerminal: boolean = false;
     let noSandbox: boolean = false;
+    let appVersion: string = "1.0.0";
+
+    let modalOpen: boolean = false;
+    let modalTitle: string;
+    let modalMessage: string;
 
     const chooseFile = async () => {
         try {
             appPath = await pickAppImage();
         } catch (e) {
             console.error(e);
-            //TODO show error
+            modalOpen = true;
+            modalTitle = $t("install_file.error_modal_title");
+            modalMessage = $t("install_file.error_modal_choose_file");
         }
     }
 
@@ -26,7 +36,9 @@
             iconPath = await pickAppIcon();
         } catch (e) {
             console.error(e);
-            //TODO show error
+            modalOpen = true;
+            modalTitle = $t("install_file.error_modal_title");
+            modalMessage = $t("install_file.error_modal_choose_file");
         }
     }
 
@@ -42,9 +54,14 @@
                 noSandbox
             )
             console.log("Installation result", res);
+            modalOpen = true;
+            modalTitle = $t("install_file.success_modal_title");
+            modalMessage = $t("install_file.installation_successful");
         } catch (e) {
             console.error(e);
-            //TODO show error
+            modalOpen = true;
+            modalTitle = $t("install_file.error_modal_title");
+            modalMessage = $t("install_file.error_modal_install");
         }
     }
 
@@ -102,6 +119,22 @@
                     </div>
                     <div class="flex flex-col justify-start items-start mt-4">
                         <div class="tooltip tooltip-right"
+                             data-tip={$t("install_file.advanced_options.app_category_des")}>
+                            <p class="text-xl">{$t("install_file.advanced_options.app_category")}</p>
+                        </div>
+                        <input type="text" bind:value={appCategory} class="input input-bordered mt-2"
+                               placeholder={$t("install_file.advanced_options.app_category")}/>
+                    </div>
+                    <div class="flex flex-col justify-start items-start mt-4">
+                        <div class="tooltip tooltip-right"
+                             data-tip={$t("install_file.advanced_options.app_version_des")}>
+                            <p class="text-xl">{$t("install_file.advanced_options.app_version")}</p>
+                        </div>
+                        <input type="text" bind:value={appVersion} class="input input-bordered mt-2"
+                               placeholder={$t("install_file.advanced_options.app_version")}/>
+                    </div>
+                    <div class="flex flex-col justify-start items-start mt-4">
+                        <div class="tooltip tooltip-right"
                              data-tip={$t("install_file.advanced_options.app_terminal_des")}>
                             <p class="text-xl">{$t("install_file.advanced_options.app_terminal")}</p>
                         </div>
@@ -135,3 +168,10 @@
         {$t("install_file_install_button")}
     </button>
 </div>
+
+<Modal modalOpen={modalOpen} closeCallback={()=>{modalOpen = false}}>
+    <div class="flex flex-col">
+        <p class="text-2xl font-bold">{modalTitle}</p>
+        <p class="mt-3">{modalMessage}</p>
+    </div>
+</Modal>

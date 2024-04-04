@@ -4,18 +4,28 @@
     import {t} from "$lib/i18n/i18n";
     import {installedAppsList, uninstallApp} from "$lib/helpers/tauriCommands/appImageCommands";
     import {error, info} from "@tauri-apps/plugin-log";
+    import Modal from "$lib/components/Modal.svelte";
 
     let appList: AppList = {
         apps: []
     };
+    let modalOpen: boolean = false;
+    let modalTitle: string;
+    let modalMessage: string;
 
     const readApplist = async () => {
         try {
             appList = await installedAppsList();
             info("App list read successfully");
+            modalOpen = true;
+            modalTitle = $t("applist.success_modal_title");
+            modalMessage = $t("applist.uninstallation_successful");
         }
         catch (e) {
             error(e + "");
+            modalOpen = true;
+            modalTitle = $t("applist.error_modal_title");
+            modalMessage = $t("applist.read_app_list_error");
         }
     }
 
@@ -29,10 +39,16 @@
             }
             else {
                 error("App could not be uninstalled");
+                modalOpen = true;
+                modalTitle = $t("applist.error_modal_title");
+                modalMessage = $t("applist.error_modal_uninstall");
             }
         }
         catch (e) {
             console.error(e);
+            modalOpen = true;
+            modalTitle = $t("applist.error_modal_title");
+            modalMessage = $t("applist.error_modal_uninstall");
         }
     }
 
@@ -59,8 +75,12 @@
             </div>
         </div>
         <div class="divider"></div>
-
     {/each}
-
-
 </div>
+
+<Modal modalOpen={modalOpen} closeCallback={()=>{modalOpen = false}}>
+    <div class="flex flex-col">
+        <p class="text-2xl font-bold">{modalTitle}</p>
+        <p class="mt-3">{modalMessage}</p>
+    </div>
+</Modal>

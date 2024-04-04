@@ -10,15 +10,39 @@ However, it should work on any Linux distribution that supports the AppImage for
 Distribution-specific packages will be provided in the future.
 
 ## 💿 Installation Modes
-The project supports two installation modes:
+The project supports three installation modes:
 1. **.appImage**: Download the .appImage file from the GitHub repository and execute it directly.
 2. **.deb**: Download the .deb package from the GitHub repository and install it using your system's package manager.
-
-Note: The .deb and .appImage packages are currently not available. They will be provided in the future. Refer to the installation from source section for the current installation method.
+3. **.rpm**: Download the .rpm package from the GitHub repository and install it using your system's package manager.
 
 ### Installation from Source
+
+#### Prerequisites
+- **Node.js**: The project is built using Node.js, so you must have it installed on your system.
+- **pnpm**: The project uses pnpm as the package manager.
+- **Tauri**: The project uses Tauri as the framework for building the desktop application.
+
+#### Steps
+
 To install the application from source, follow these steps:
-[WIP]
+
+```bash
+# Clone the repository
+git clone https://github.com/francesco-gaglione/AppHub.git
+
+# Change directory to the project folder
+cd AppHub
+
+# Install the required dependencies
+pnpm install
+
+# Build the project
+pnpm tauri build
+
+# Install the application
+sudo dkpg -i ./target/release/bundle/apphub_<version>_amd64.deb
+```
+Note: Replace `<version>` with the version number of the application.
 
 ## 🌟 Key Features
 - Simplified installation of .appImage packages.

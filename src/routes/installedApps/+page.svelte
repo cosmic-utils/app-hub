@@ -5,8 +5,12 @@
     import {installedAppsList, uninstallApp} from "$lib/helpers/tauriCommands/appImageCommands";
     import {error, info} from "@tauri-apps/plugin-log";
     import Modal from "$lib/components/Modal.svelte";
+    import {cloneDeep} from "lodash";
 
     let appList: AppList = {
+        apps: []
+    };
+    let filteredAppList: AppList = {
         apps: []
     };
     let modalOpen: boolean = false;
@@ -16,6 +20,7 @@
     const readApplist = async () => {
         try {
             appList = await installedAppsList();
+            filteredAppList = cloneDeep(appList);
             info("App list read successfully");
         }
         catch (e) {
@@ -49,6 +54,16 @@
         }
     }
 
+    const filterApps = (search: string) => {
+        console.log("Filtering apps with search: " + search.length);
+        if (search.length > 0){
+            filteredAppList.apps = appList.apps.filter(app => app.name.toLowerCase().includes(search.toLowerCase()));
+        }
+        else {
+            filteredAppList = cloneDeep(appList);
+        }
+    }
+
     onMount(() => {
         readApplist();
     });
@@ -58,10 +73,13 @@
 <div class="flex flex-col bg-base-200 rounded-box mx-10 mt-10 p-5">
     <div class="mb-5 flex flex-row justify-between items-center">
         <p class="font-bold text-3xl">{$t("applist.title")}</p>
-        <input type="text" class="input input-bordered w-1/3" placeholder={$t("applist.search")}>
+        <input on:input={(e)=>{ filterApps(e.target.value) }}
+               type="text"
+               class="input input-bordered w-1/3"
+               placeholder={$t("applist.search")}>
     </div>
 
-    {#each appList.apps as app}
+    {#each filteredAppList.apps as app}
         <div class="flex flex-row justify-between items-center mb-4">
             <div class="flex flex-row items-center">
                 <img height="40px" width="50px" alt="" src="{app.iconBase64}" class="rounded-lg mr-3">

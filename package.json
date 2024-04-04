@@ -16,6 +16,7 @@
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@tauri-apps/cli": "2.0.0-beta.11",
+		"@types/lodash": "^4.17.0",
 		"autoprefixer": "^10.4.19",
 		"daisyui": "^4.7.3",
 		"postcss": "^8.4.38",
@@ -29,6 +30,7 @@
 	"type": "module",
 	"dependencies": {
 		"@tauri-apps/api": "2.0.0-beta.6",
-		"@tauri-apps/plugin-log": "2.0.0-beta.2"
+		"@tauri-apps/plugin-log": "2.0.0-beta.2",
+		"lodash": "^4.17.21"
 	}
 }

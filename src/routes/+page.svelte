@@ -10,7 +10,8 @@
 
     let appName: string;
     let appDescription: string;
-    let appType: string = "Application"
+    let appType: string = "Application";
+    let appCategory: string = "Utility";
     let appTerminal: boolean = false;
     let noSandbox: boolean = false;
     let appVersion: string = "1.0.0";
@@ -115,6 +116,14 @@
                         </div>
                         <input type="text" bind:value={appType} class="input input-bordered mt-2"
                                placeholder={$t("install_file.advanced_options.app_type")}/>
+                    </div>
+                    <div class="flex flex-col justify-start items-start mt-4">
+                        <div class="tooltip tooltip-right"
+                             data-tip={$t("install_file.advanced_options.app_category_des")}>
+                            <p class="text-xl">{$t("install_file.advanced_options.app_category")}</p>
+                        </div>
+                        <input type="text" bind:value={appCategory} class="input input-bordered mt-2"
+                               placeholder={$t("install_file.advanced_options.app_category")}/>
                     </div>
                     <div class="flex flex-col justify-start items-start mt-4">
                         <div class="tooltip tooltip-right"

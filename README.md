@@ -53,13 +53,20 @@ Note: Replace `<version>` with the version number of the application.
 Currently, the usage of the application is not documented. However, detailed guides will be provided once the project is more stable and structured.
 
 ## 📝 License
-The project is currently without a license, but it will be released under an MIT license before official use.
+The project is currently released under the MIT license. Please refer to the [LICENSE](LICENSE) file for more information.
+
+Note: The license may change in the future due to the use of third-party libraries and frameworks.
 
 ## 🤝 Contributing
 AppHub is a project developed in spare time, and contributions are welcome! However, there are currently no specific contribution guidelines. They will be defined once the project is more stable and structured.
 
 ## ⚠️ Project Status
 The project is currently in its initial development phase. There are still many bugs to be fixed and many features to be implemented. Please be patient as we work to improve and refine the application.
+
+## ⚠️ Experimental
+The project is in experimental mode and is not yet ready for production use. 
+We use Tauri 2.0, which is still in beta.
+Please use it at your own risk.
 
 ## 📌 Additional Notes
 Please note that this project is developed in spare time and is not a full-time job. Contributions are appreciated and help grow the project.

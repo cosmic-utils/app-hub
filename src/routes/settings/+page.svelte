@@ -72,24 +72,21 @@
 
 {#if !!settings}
     <div class="flex flex-row bg-base-200 rounded-box mx-10 mt-10 p-5">
-        <div class="flex flex-col w-[20%] p-3">
-            <button class={"btn " + (activeMenuIndex === 0 ? "font-bold text-xl" : " ")}
-                    on:click={()=>{activeMenuIndex = 0}}>{$t("settings.menu.general_label")}</button>
-            <button class={"btn " + (activeMenuIndex === 1 ? "font-bold text-xl" : " ")}
-                    on:click={()=>{activeMenuIndex = 1}}>{$t("settings.menu.advanced")}</button>
+        <div class="flex flex-col w-[20%] bg-white rounded-lg shadow-lg p-3 my-3">
+            <button class={"btn " + (activeMenuIndex === 0 ? "font-bold text-xl" : " ")} on:click={()=>{activeMenuIndex = 0}}>
+                {$t("settings.menu.general_label")}
+            </button>
+            <button class={"mt-2 btn " + (activeMenuIndex === 1 ? "font-bold text-xl" : " ")} on:click={()=>{activeMenuIndex = 1}}>
+                {$t("settings.menu.advanced")}
+            </button>
         </div>
         <div class="flex flex-col grow w-[80%] p-3">
 
             {#if activeMenuIndex === 0}
-                <div>
-                    <p class="font-bold text-xl">{$t("settings.theme.theme_label")}</p>
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <p class="font-bold text-xl mb-3">{$t("settings.theme.theme_label")}</p>
                     <div class="my-3">
-                        <select
-                                data-choose-theme
-                                class="select select-bordered max-w-3xl text-xl capitalize"
-                                bind:value={settings.theme}
-                                on:change={changeTheme}
-                        >
+                        <select data-choose-theme class="select select-bordered max-w-3xl text-xl capitalize" bind:value={settings.theme} on:change={changeTheme}>
                             <option disabled selected>{$t("settings.theme.choose_theme")}</option>
                             {#each themes as theme}
                                 <option value={theme} class="capitalize">{theme}</option>
@@ -97,28 +94,30 @@
                         </select>
                     </div>
 
-                    <div class="mt-3">
-                        <p class="font-bold text-xl">{$t("settings.language.language_label")}</p>
-                        <p class="mt-3">{$t("settings.language.app_lang")}:</p>
-                        <select class="select select-bordered w-full max-w-xs mt-1" bind:value={$locale}>
-                            {#each locales as l}
-                                <option value={l}>{l}</option>
-                            {/each}
-                        </select>
-                        <p class="mt-3">{$t("settings.language.workspace_default_lang")}</p>
+                    <div class="mt-6">
+                        <p class="font-bold text-xl mb-3">{$t("settings.language.language_label")}</p>
+                        <div class="flex flex-col">
+                            <p class="mt-3">{$t("settings.language.app_lang")}:</p>
+                            <select class="select select-bordered w-full max-w-xs mt-1" bind:value={$locale}>
+                                {#each locales as l}
+                                    <option value={l}>{l}</option>
+                                {/each}
+                            </select>
+                            <p class="mt-3">{$t("settings.language.workspace_default_lang")}</p>
+                        </div>
                     </div>
                 </div>
+
             {/if}
 
             {#if activeMenuIndex === 1}
-                <div class="">
-                    <p class="font-bold text-2xl mb-4">{$t("settings.advanced.installation_dir")}</p>
-
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <p class="font-bold text-xl mb-4">{$t("settings.advanced.installation_dir")}</p>
 
                     <p>{$t("settings.installation_path")}: {settings.installPath}</p>
-                    <button on:click={selectInstalaltionDir} class="btn btn-success mt-1">{$t("settings.change_dir")}</button>
+                    <button on:click={selectInstalaltionDir} class="btn btn-success mt-3">{$t("settings.change_dir")}</button>
 
-                    <p class="font-bold text-2xl mt-5 mb-4">{$t("settings.advanced.desktop_entry_title")}</p>
+                    <p class="font-bold text-xl mt-5 mb-4">{$t("settings.advanced.desktop_entry_title")}</p>
                     <div class="grid grid-cols-2 gap-4">
                         <p class="mt-3">{$t("settings.advanced.desktop_entry_des")}</p>
                         <div class="flex items-center">
@@ -128,12 +127,12 @@
                 </div>
             {/if}
 
-
         </div>
     </div>
-    <div class="flex flex-row-reverse mx-10 mt-3">
+    <div class="flex justify-end mx-10 mt-3">
         <button on:click={save} class="btn btn-success">{$t("settings.save_button")}</button>
     </div>
+
 {:else}
     <LoadingOverlay loading={!settings}/>
 {/if}

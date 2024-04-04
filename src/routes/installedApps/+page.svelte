@@ -17,9 +17,6 @@
         try {
             appList = await installedAppsList();
             info("App list read successfully");
-            modalOpen = true;
-            modalTitle = $t("applist.success_modal_title");
-            modalMessage = $t("applist.uninstallation_successful");
         }
         catch (e) {
             error(e + "");
@@ -59,24 +56,23 @@
 </script>
 
 <div class="flex flex-col bg-base-200 rounded-box mx-10 mt-10 p-5">
-    <div class="mb-5 flex flex-row justify-between">
-        <p class="font-bold text-2xl">{$t("applist.title")}</p>
-        <input type="text" class="input input-bordered" placeholder={$t("applist.search")}>
+    <div class="mb-5 flex flex-row justify-between items-center">
+        <p class="font-bold text-3xl">{$t("applist.title")}</p>
+        <input type="text" class="input input-bordered w-1/3" placeholder={$t("applist.search")}>
     </div>
 
     {#each appList.apps as app}
-        <div class="flex flex-row justify-between">
-            <div class="flex flex-row">
-                <img height="40px" width="50px" alt="" src="{app.iconBase64}">
-                <p class="font-bold ml-3">{app.name}</p>
+        <div class="flex flex-row justify-between items-center mb-4">
+            <div class="flex flex-row items-center">
+                <img height="40px" width="50px" alt="" src="{app.iconBase64}" class="rounded-lg mr-3">
+                <p class="font-bold text-lg">{app.name}</p>
             </div>
-            <div>
-                <button on:click={()=>{uninstall(app)}} class="btn btn-error">{$t("applist.uninstall")}</button>
-            </div>
+            <button on:click={()=>{uninstall(app)}} class="btn btn-error">{$t("applist.uninstall")}</button>
         </div>
         <div class="divider"></div>
     {/each}
 </div>
+
 
 <Modal modalOpen={modalOpen} closeCallback={()=>{modalOpen = false}}>
     <div class="flex flex-col">

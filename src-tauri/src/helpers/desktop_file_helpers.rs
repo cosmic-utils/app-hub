@@ -2,6 +2,7 @@ use log::{debug, error, info};
 use crate::helpers::file_system_helper::image_to_base64;
 use crate::models::app_list::App;
 use regex::Regex;
+use crate::helpers::desktop_file_builder::DesktopFileBuilder;
 use crate::models::desktop_entry::DesktopEntry;
 
 /// Read all desktop files in the applications directory
@@ -15,43 +16,33 @@ pub fn read_all_app() -> Result<Vec<App>, String> {
     match std::fs::read_dir(applications_dir) {
         Ok(entries) => {
             for entry in entries {
-
                 let entry = entry.as_ref().unwrap();
 
-                // read the .desktop file and get the path of the AppImage
-                let file_content: String =
-                    std::fs::read_to_string(&entry.path()).expect("Failed to read file");
+                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(entry.path().to_str().unwrap().to_string());
 
-                if file_content.contains("X-AppHub=true") {
-                    // parse the desktop entry to get the path of the AppImage
-                    match parse_desktop_entry(&file_content) {
-                        Ok(desktop_entry) => {
-                            debug!("Reading icon at: {:?}", &desktop_entry.icon_path);
-                            if file_content.contains("X-AppHub=true") {
-                                let base64_icon = match image_to_base64(&desktop_entry.icon_path) {
-                                    Ok(base64) => Some(base64),
-                                    Err(err) => {
-                                        info!("Failed to convert image to base64: {}", err);
-                                        None
-                                    }
-                                };
-
-                                apps.push(App {
-                                    name: desktop_entry.name,
-                                    icon_base64: base64_icon,
-                                    app_path: desktop_entry.exec,
-                                });
-                            }
-                        }
-                        Err(err) => {
-                            error!("{}", err)
-                        }
-                    };
-                }
-                else {
-                    info!("Skipping non-AppHub app: {:?}", &entry.path());
+                if desktop_file.is_err() {
+                    error!("Failed to read desktop file: {}", desktop_file.err().unwrap());
+                    continue;
                 }
 
+                let desktop_entry = desktop_file.unwrap();
+
+                debug!("Reading icon at: {:?}", desktop_entry.icon());
+                let base64_icon = match image_to_base64(&desktop_entry.icon().unwrap()) {
+                    Ok(base64) => Some(base64),
+                    Err(err) => {
+                        info!("Failed to convert image to base64: {}", err);
+                        None
+                    }
+                };
+
+                apps.push(App {
+                    name: desktop_entry.name().unwrap(),
+                    icon_base64: base64_icon,
+                    app_path: desktop_entry.exec().unwrap(),
+                    version: desktop_entry.version(),
+                    categories: desktop_entry.categories(),
+                });
             }
         }
         Err(err) => {
@@ -60,46 +51,6 @@ pub fn read_all_app() -> Result<Vec<App>, String> {
     }
 
     Ok(apps)
-}
-
-/// Parse the desktop entry to get the values of "Exec", "Name", and "Icon".
-/// The "Exec" value is the path to the AppImage.
-/// The "Name" value is the name of the application.
-/// The "Icon" value is the path to the icon file.
-/// The function returns a DesktopEntry struct containing these values.
-pub fn parse_desktop_entry(desktop_entry: &str) -> Result<DesktopEntry, &'static str> {
-    // Create a regular expression to match the lines starting with "Exec=", "Name=", and "Icon=".
-    let re = Regex::new(r"(?m)^Exec=(.*)$|^Name=(.*)$|^Icon=(.*)$").unwrap();
-
-    // Initialize empty strings to hold the values of "Exec", "Name", and "Icon".
-    let mut exec = String::new();
-    let mut name = String::new();
-    let mut icon = String::new();
-
-    // Iterate over all the matches in the desktop entry string.
-    for cap in re.captures_iter(desktop_entry) {
-        // If the first capture group (corresponding to "Exec") is matched, store its value.
-        if let Some(matched) = cap.get(1) {
-            exec = matched.as_str().to_string();
-        }
-        // If the second capture group (corresponding to "Name") is matched, store its value.
-        if let Some(matched) = cap.get(2) {
-            name = matched.as_str().to_string();
-        }
-        // If the third capture group (corresponding to "Icon") is matched, store its value.
-        if let Some(matched) = cap.get(3) {
-            icon = matched.as_str().to_string();
-        }
-    }
-
-    // If any of the "Exec", "Name", or "Icon" values are still empty after parsing, return an error.
-    if exec.is_empty() || name.is_empty() || icon.is_empty() {
-        error!("Failed to parse desktop entry: {}", desktop_entry);
-        return Err("Failed to parse desktop entry");
-    }
-
-    // If all values are successfully extracted, return them as a tuple.
-    Ok(DesktopEntry { exec, name, icon_path: icon })
 }
 
 /// Find the desktop entry of the application with the given name.
@@ -112,21 +63,36 @@ pub fn find_desktop_entry(app_name: String) -> Result<DesktopEntry, String> {
     match std::fs::read_dir(applications_dir) {
         Ok(entries) => {
             for entry in entries {
-                // read the .desktop file and get the path of the AppImage
-                let file_content: String =
-                    std::fs::read_to_string(entry.unwrap().path()).expect("Failed to read file");
+                let entry = match entry {
+                    Ok(entry) => {
+                        entry
+                    }
+                    Err(error) => {
+                        error!("{}", error);
+                        continue; // Skip the current entry
+                    }
+                };
 
-                // parse the desktop entry to get the path of the AppImage
-                match parse_desktop_entry(&file_content) {
+
+                let entry_path = entry.path();
+                let path_str = entry_path.to_str().ok_or("Failed to convert path to string")?;
+                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string());
+
+                match desktop_file {
                     Ok(desktop_entry) => {
-                        if desktop_entry.name == app_name {
-                            return Ok(desktop_entry);
+                        if desktop_entry.name().unwrap() == app_name {
+                            return Ok(DesktopEntry {
+                                exec: desktop_entry.exec().unwrap(),
+                                name: desktop_entry.name().unwrap(),
+                                icon_path: desktop_entry.icon().unwrap(),
+                            });
                         }
                     }
                     Err(err) => {
-                        error!("{}", err)
+                        error!("Failed to read desktop file: {}", err);
+                        continue;
                     }
-                };
+                }
             }
             return Err(format!("App not found: {}", app_name));
         }
@@ -149,21 +115,31 @@ pub fn find_desktop_entries_by_exec_contains(contains_exec: &String) -> Result<V
     match std::fs::read_dir(applications_dir) {
         Ok(entries) => {
             for entry in entries {
-                // read the .desktop file and get the path of the AppImage
-                let file_content: String =
-                    std::fs::read_to_string(entry.as_ref().unwrap().path()).expect("Failed to read file");
-
-                // parse the desktop entry to get the path of the AppImage
-                match parse_desktop_entry(&file_content) {
-                    Ok(desktop_entry) => {
-                        if desktop_entry.exec.contains(&contains_exec.as_str()) {
-                            desktop_entries_paths.push(entry.unwrap().path().to_str().unwrap().to_string());
-                        }
+                let entry = match entry {
+                    Ok(entry) => {
+                        entry
                     }
-                    Err(err) => {
-                        error!("{}", err)
+                    Err(error) => {
+                        error!("{}", error);
+                        continue; // Skip the current entry
                     }
                 };
+
+
+                let entry_path = entry.path();
+                let path_str = entry_path.to_str().ok_or("Failed to convert path to string")?;
+                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string());
+
+                match desktop_file {
+                    Ok(desktop_entry) => {
+                        if desktop_entry.exec().unwrap().contains(contains_exec) {
+                            desktop_entries_paths.push(path_str.to_string());
+                        }
+                    }
+                    Err(error) => {
+                        error!("{}", error);
+                    }
+                }
             }
         }
         Err(err) => {
@@ -186,28 +162,47 @@ pub fn delete_desktop_file_by_name(app_name: &String) -> Result<bool, String> {
     match std::fs::read_dir(applications_dir) {
         Ok(entries) => {
             for entry in entries {
-                // read the .desktop file and get the path of the AppImage
-                let file_content: String =
-                    std::fs::read_to_string(entry.as_ref().unwrap().path()).expect("Failed to read file");
 
-                // parse the desktop entry to get the path of the AppImage
-                match parse_desktop_entry(&file_content) {
+                let entry = match entry {
+                    Ok(entry) => {
+                        entry
+                    }
+                    Err(error) => {
+                        error!("{}", error);
+                        continue; // Skip the current entry
+                    }
+                };
+
+
+                let entry_path = entry.path();
+                let path_str = entry_path.to_str().ok_or("Failed to convert path to string")?;
+                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string());
+
+                match desktop_file {
                     Ok(desktop_entry) => {
-                        if desktop_entry.name == *app_name {
-                            match std::fs::remove_file(entry.unwrap().path()) {
-                                Ok(_) => {
-                                    return Ok(true);
+                        match desktop_entry.name() {
+                            Some(name) => {
+                                if name == *app_name {
+                                    match std::fs::remove_file(path_str) {
+                                        Ok(_) => {
+                                            return Ok(true);
+                                        }
+                                        Err(err) => {
+                                            return Err(format!("Failed to remove file: {}", err));
+                                        }
+                                    }
                                 }
-                                Err(err) => {
-                                    return Err(format!("Failed to remove file: {}", err));
-                                }
+                            }
+                            None => {
+                                error!("Failed to read desktop file: Name is None");
+                                continue;
                             }
                         }
                     }
-                    Err(err) => {
-                        error!("{}", err)
+                    Err(error) => {
+                        error!("{}", error);
                     }
-                };
+                }
             }
             return Err(format!("App not found: {}", app_name));
         }

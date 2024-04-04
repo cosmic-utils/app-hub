@@ -9,4 +9,6 @@ pub struct App {
     pub name: String,
     pub icon_base64: Option<String>,
     pub app_path: String,
+    pub version: Option<String>,
+    pub categories: Option<String>,
 }

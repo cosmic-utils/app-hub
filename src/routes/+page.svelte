@@ -72,79 +72,70 @@
 <div class="flex flex-col bg-base-200 rounded-box mx-10 mt-10 p-5">
 
     {#if !!appPath}
-        <p class="font-bold text-2xl">{$t("install_file_selected_title")}</p>
         <div class="mt-3">
-            <p>{$t("install_file_selected_des")} {appPath}</p>
+            <div class="container mx-auto px-4 py-4">
+                <p class="font-bold text-2xl">{$t("install_file_selected_title")}</p>
+                <p>{$t("install_file_selected_des")} {appPath}</p>
 
-            <p class="mt-3 font-bold text-2xl">Select icon</p>
-            {#if !!iconPath}
-                <p>{$t("install_icon_selected")} {iconPath}</p>
-            {:else }
-                <button on:click={chooseIcon} class="btn btn-neutral mt-5">{$t("install_choose_icon_button")}</button>
-            {/if}
+                <p class="mt-3 font-bold text-2xl">{$t("install_choose_icon_button")}</p>
+                {#if !!iconPath}
+                    <p>{$t("install_icon_selected")} {iconPath}</p>
+                {:else }
+                    <button on:click={chooseIcon} class="btn btn-neutral mt-5">{$t("install_choose_icon_button")}</button>
+                {/if}
 
-            <div class="flex flex-col justify-start items-start mt-4">
-                <div class="tooltip tooltip-right"
-                     data-tip={$t("install_file.advanced_options.app_name_des")}>
-                    <p class="text-xl">{$t("install_file.advanced_options.app_name")}</p>
+                <div class="flex flex-col justify-start items-start mt-4">
+                    <div class="tooltip tooltip-right"
+                         data-tip={$t("install_file.advanced_options.app_name_des")}>
+                        <p class="text-xl">{$t("install_file.advanced_options.app_name")}</p>
+                    </div>
+                    <input bind:value={appName} type="text" class="input input-bordered mt-2"
+                           placeholder={$t("install_file.advanced_options.app_name")}/>
                 </div>
-                <input bind:value={appName} type="text" class="input input-bordered mt-2"
-                       placeholder={$t("install_file.advanced_options.app_name")}/>
-            </div>
 
-            <div class="mt-4 form-control w-1/5">
-                <label class="label cursor-pointer">
-                    <span class="label-text">Advanced options</span>
-                    <input bind:value={enableAdvancedOptions} type="checkbox" checked={enableAdvancedOptions}
-                           class="checkbox"/>
-                </label>
+                <div class="mt-4 form-control w-1/5">
+                    <label class="label cursor-pointer">
+                        <span class="label-text">{$t("install_file_advanced_accordio_title")}</span>
+                        <input bind:checked={enableAdvancedOptions} type="checkbox"
+                               class="checkbox"/>
+                    </label>
+                </div>
             </div>
 
             {#if enableAdvancedOptions}
-                <div class="mt-5">
+                <div class="mx-auto px-4 mt-3">
                     <div class="flex flex-col justify-start items-start mt-4">
-                        <div class="tooltip tooltip-right"
-                             data-tip={$t("install_file.advanced_options.app_des_des")}>
+                        <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.app_des_des")}>
                             <p class="text-xl">{$t("install_file.advanced_options.app_des")}</p>
                         </div>
-                        <textarea class="textarea textarea-bordered" bind:value={appDescription}
-                                  placeholder={$t("install_file.advanced_options.app_des")}></textarea>
+                        <textarea class="textarea textarea-bordered mt-2" bind:value={appDescription} placeholder={$t("install_file.advanced_options.app_des")}></textarea>
                     </div>
                     <div class="flex flex-col justify-start items-start mt-4">
-                        <div class="tooltip tooltip-right"
-                             data-tip={$t("install_file.advanced_options.app_type_des")}>
+                        <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.app_type_des")}>
                             <p class="text-xl">{$t("install_file.advanced_options.app_type")}</p>
                         </div>
-                        <input type="text" bind:value={appType} class="input input-bordered mt-2"
-                               placeholder={$t("install_file.advanced_options.app_type")}/>
+                        <input type="text" bind:value={appType} class="input input-bordered mt-2" placeholder={$t("install_file.advanced_options.app_type")}/>
                     </div>
                     <div class="flex flex-col justify-start items-start mt-4">
-                        <div class="tooltip tooltip-right"
-                             data-tip={$t("install_file.advanced_options.app_category_des")}>
+                        <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.app_category_des")}>
                             <p class="text-xl">{$t("install_file.advanced_options.app_category")}</p>
                         </div>
-                        <input type="text" bind:value={appCategory} class="input input-bordered mt-2"
-                               placeholder={$t("install_file.advanced_options.app_category")}/>
+                        <input type="text" bind:value={appCategory} class="input input-bordered mt-2" placeholder={$t("install_file.advanced_options.app_category")}/>
                     </div>
                     <div class="flex flex-col justify-start items-start mt-4">
-                        <div class="tooltip tooltip-right"
-                             data-tip={$t("install_file.advanced_options.app_version_des")}>
+                        <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.app_version_des")}>
                             <p class="text-xl">{$t("install_file.advanced_options.app_version")}</p>
                         </div>
-                        <input type="text" bind:value={appVersion} class="input input-bordered mt-2"
-                               placeholder={$t("install_file.advanced_options.app_version")}/>
+                        <input type="text" bind:value={appVersion} class="input input-bordered mt-2" placeholder={$t("install_file.advanced_options.app_version")}/>
                     </div>
                     <div class="flex flex-col justify-start items-start mt-4">
-                        <div class="tooltip tooltip-right"
-                             data-tip={$t("install_file.advanced_options.app_terminal_des")}>
+                        <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.app_terminal_des")}>
                             <p class="text-xl">{$t("install_file.advanced_options.app_terminal")}</p>
                         </div>
                         <input bind:checked={appTerminal} type="checkbox" class="checkbox"/>
                     </div>
-
                     <div class="flex flex-col justify-start items-start mt-4">
-                        <div class="tooltip tooltip-right"
-                             data-tip={$t("install_file.advanced_options.no_sandbox_des")}>
+                        <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.no_sandbox_des")}>
                             <p class="text-xl">{$t("install_file.advanced_options.no_sandbox")}</p>
                         </div>
                         <input bind:checked={noSandbox} type="checkbox" class="checkbox"/>
@@ -154,9 +145,12 @@
 
         </div>
     {:else }
-        <div>
-            <p class="font-bold text-2xl">{$t("install_choose_file")}</p>
-            <button on:click={chooseFile} class="btn btn-neutral mt-5">{$t("install_choose_button")}</button>
+        <div class="container mx-auto px-4 py-8">
+            <h2 class="font-bold text-3xl mb-4">{$t("install_choose_file")}</h2>
+            <p class="text-lg mb-6">{$t("install_choose_file")}</p>
+            <button on:click={chooseFile} class="btn btn-primary">
+                {$t("install_choose_button")}
+            </button>
         </div>
     {/if}
 

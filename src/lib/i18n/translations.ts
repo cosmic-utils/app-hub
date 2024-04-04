@@ -30,6 +30,7 @@ export default {
         "settings.success_modal_save": "Settings saved successfully",
 
         "install_choose_file": "Choose a file to install",
+        "install_choose_file_des": "Click the button below to select the file you want to install:",
         "install_choose_button": "Choose file",
         "install_choose_icon_button": "Choose icon",
         "install_icon_selected": "Icon selected:",
@@ -103,6 +104,7 @@ export default {
         "settings.success_modal_save": "Impostazioni salvate con successo",
 
         "install_choose_file": "Scegli un file da installare",
+        "install_choose_file_des": "Clicca sul pulsante sottostante per selezionare il file che desideri installare:",
         "install_choose_button": "Scegli file",
         "install_choose_icon_button": "Scegli icona",
         "install_icon_selected": "Icona selezionata:",

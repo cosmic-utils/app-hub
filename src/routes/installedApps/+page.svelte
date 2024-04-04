@@ -6,6 +6,7 @@
     import {error, info} from "@tauri-apps/plugin-log";
     import Modal from "$lib/components/Modal.svelte";
     import {cloneDeep} from "lodash";
+    import TrashIcon from "$lib/icons/TrashIcon.svelte";
 
     let appList: AppList = {
         apps: []
@@ -38,6 +39,9 @@
             if (uninstalled) {
                 console.log("App uninstalled successfully");
                 readApplist();
+                modalOpen = true;
+                modalTitle = $t("applist.success_modal_title");
+                modalMessage = $t("applist.uninstallation_successful");
             }
             else {
                 error("App could not be uninstalled");
@@ -85,7 +89,9 @@
                 <img height="40px" width="50px" alt="" src="{app.iconBase64}" class="rounded-lg mr-3">
                 <p class="font-bold text-lg">{app.name}</p>
             </div>
-            <button on:click={()=>{uninstall(app)}} class="btn btn-error">{$t("applist.uninstall")}</button>
+            <button on:click={()=>{uninstall(app)}} class="btn btn-error">
+                <TrashIcon width="30px" height="30px"/>
+            </button>
         </div>
         <div class="divider"></div>
     {/each}

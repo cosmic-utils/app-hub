@@ -61,7 +61,6 @@ export default {
 
         "applist.title": "App list",
         "applist.search": "Search app",
-        "applist.uninstall": "Uninstall",
         "applist.error_modal_title": "Error",
         "applist.read_app_list_error": "An error occurred while reading the app list",
         "applist.error_modal_uninstall": "An error occurred while uninstalling the application",
@@ -135,7 +134,6 @@ export default {
 
         "applist.title": "Lista delle app",
         "applist.search": "Cerca app",
-        "applist.uninstall": "Disinstalla",
         "applist.error_modal_title": "Errore",
         "applist.read_app_list_error": "Si è verificato un errore durante la lettura dell'elenco delle app",
         "applist.error_modal_uninstall": "Si è verificato un errore durante la disinstallazione dell'applicazione",

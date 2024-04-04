@@ -1,5 +1,9 @@
 <script lang="ts">
     import {t} from "$lib/i18n/i18n";
+    import BoxIcon from "$lib/icons/BoxIcon.svelte";
+    import SettingsIcon from "$lib/icons/SettingsIcon.svelte";
+    import AppStoreIcon from "$lib/icons/AppStoreIcon.svelte";
+    import InfoIcon from "$lib/icons/InfoIcon.svelte";
 
 </script>
 
@@ -22,10 +26,30 @@
         <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label>
         <ul class="menu p-4 w-80 min-h-full bg-base-200">
             <!-- Sidebar content here -->
-            <li><a href="/" class="block py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out">{$t("header.install_app")}</a></li>
-            <li><a href="/settings" class="block py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out">{$t("header.settings")}</a></li>
-            <li><a href="/installedApps" class="block py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out">{$t("header.installed")}</a></li>
-            <li><a href="/appInfo" class="block py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out">{$t("header.app_info")}</a></li>
+            <li>
+                <a href="/" class="py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out flex flex-row">
+                    <BoxIcon height="20px" width="20px"/>
+                    {$t("header.install_app")}
+                </a>
+            </li>
+            <li>
+                <a href="/settings" class="flex flex-row py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out">
+                    <SettingsIcon height="20px" width="20px"/>
+                    {$t("header.settings")}
+                </a>
+            </li>
+            <li>
+                <a href="/installedApps" class="flex flex-row py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out">
+                    <AppStoreIcon height="20px" width="20px"/>
+                    {$t("header.installed")}
+                </a>
+            </li>
+            <li>
+                <a href="/appInfo" class="flex flex-row py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out">
+                    <InfoIcon height="20px" width="20px"/>
+                    {$t("header.app_info")}
+                </a>
+            </li>
         </ul>
     </div>
 

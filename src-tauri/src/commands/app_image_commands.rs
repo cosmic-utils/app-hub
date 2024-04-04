@@ -79,7 +79,12 @@ pub async fn install_app(app: AppHandle, request_installation: RequestInstallati
     // Set optional fields
     desktop_builder.set_icon(icon_path);
     desktop_builder.set_terminal(request_installation.terminal.unwrap_or(false));
-    desktop_builder.set_categories(request_installation.categories.unwrap());
+    if request_installation.categories.is_some() {
+        desktop_builder.set_categories(request_installation.categories.unwrap());
+    }
+    else {
+        desktop_builder.set_categories(vec![String::from("Utility")]);
+    }
     if request_installation.app_description.is_some() {
         desktop_builder.set_comment(request_installation.app_description.unwrap());
     }

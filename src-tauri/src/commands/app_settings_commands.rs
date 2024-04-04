@@ -9,7 +9,7 @@ use log::{debug, error, info, warn};
 use tauri::{AppHandle, Manager, Wry};
 use tauri_plugin_store::{with_store, StoreCollection};
 use crate::helpers::desktop_file_builder::DesktopFileBuilder;
-use crate::helpers::desktop_file_helpers::{find_desktop_entries_by_exec_contains, parse_desktop_entry};
+use crate::helpers::desktop_file_helpers::{find_desktop_entries_by_exec_contains};
 use crate::helpers::file_system_helper::copy_dir_all;
 
 use crate::models::app_settings::AppSettings;

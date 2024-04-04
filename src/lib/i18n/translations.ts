@@ -75,6 +75,7 @@ export default {
         "appInfo.open_issue": "Open an issue",
         "appInfo.acknowledgment": "Acknowledgment",
         "appInfo.legal_notes": "Legal notes",
+        "appInfo.author": "Author",
     },
     it: {
         "yes_label": "Si",
@@ -153,5 +154,6 @@ export default {
         "appInfo.open_issue": "Segnala un problema",
         "appInfo.acknowledgment": "Riconoscimenti",
         "appInfo.legal_notes": "Note legali",
+        "appInfo.author": "Autore",
     },
 };

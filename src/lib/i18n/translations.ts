@@ -66,6 +66,10 @@ export default {
         "applist.error_modal_uninstall": "An error occurred while uninstalling the application",
         "applist.success_modal_title": "Success",
         "applist.uninstallation_successful": "The application was uninstalled successfully",
+        "applist.app_details": "App details",
+        "applist.app_name": "App name",
+        "applist.app_version": "Version",
+        "applist.app_category": "Category",
 
         "appInfo.website": "Website",
         "appInfo.open_issue": "Open an issue",
@@ -139,6 +143,11 @@ export default {
         "applist.error_modal_uninstall": "Si è verificato un errore durante la disinstallazione dell'applicazione",
         "applist.success_modal_title": "Successo",
         "applist.uninstallation_successful": "L'applicazione è stata disinstallata con successo",
+        "applist.app_details": "Dettagli app",
+        "applist.app_name": "Nome app",
+        "applist.app_version": "Versione",
+        "applist.app_category": "Categoria",
+
 
         "appInfo.website": "Sito web",
         "appInfo.open_issue": "Segnala un problema",

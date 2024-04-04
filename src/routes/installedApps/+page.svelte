@@ -17,6 +17,8 @@
     let modalOpen: boolean = false;
     let modalTitle: string;
     let modalMessage: string;
+    let detailsModalOpen: boolean = false;
+    let appDetails: App;
 
     const readApplist = async () => {
         try {
@@ -68,6 +70,12 @@
         }
     }
 
+    const showDetails = (app: App) => {
+        appDetails = app;
+        console.log("Showing details for app: " + appDetails);
+        detailsModalOpen = true;
+    }
+
     onMount(() => {
         readApplist();
     });
@@ -86,7 +94,7 @@
     {#each filteredAppList.apps as app}
         <div class="flex flex-row justify-between items-center mb-4">
             <div class="flex flex-row items-center">
-                <img height="40px" width="50px" alt="" src="{app.iconBase64}" class="rounded-lg mr-3">
+                <img on:click={()=>{showDetails(app)}} height="40px" width="50px" alt="" src="{app.iconBase64}" class="rounded-lg mr-3 cursor-pointer">
                 <p class="font-bold text-lg">{app.name}</p>
             </div>
             <button on:click={()=>{uninstall(app)}} class="btn btn-error">
@@ -103,4 +111,15 @@
         <p class="text-2xl font-bold">{modalTitle}</p>
         <p class="mt-3">{modalMessage}</p>
     </div>
+</Modal>
+
+<Modal modalOpen={detailsModalOpen} closeCallback={()=>{detailsModalOpen = false}}>
+    {#if (appDetails)}
+        <div class="flex flex-col">
+            <p class="text-2xl font-bold">{$t("applist.app_details")}</p>
+            <p class="mt-3">{$t("applist.app_name")}: {appDetails.name}</p>
+            <p>{$t("applist.app_version")}: {appDetails.version}</p>
+            <p>{$t("applist.app_category")}: {appDetails.category ? appDetails.category : ""}</p>
+        </div>
+    {/if}
 </Modal>

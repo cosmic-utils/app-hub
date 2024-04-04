@@ -51,6 +51,7 @@
                 appType,
                 appTerminal,
                 appDescription,
+                appVersion,
                 noSandbox
             )
             console.log("Installation result", res);

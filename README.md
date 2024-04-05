@@ -1,6 +1,17 @@
+<p align="center">
+  <img src="./src-tauri/icons/appHubLogo.png" alt="Logo">
+</p>
+
 # 🚀 AppHub
 
 AppHub is a Linux desktop application that simplifies the installation and management of .appImage packages through an intuitive graphical interface. Additionally, it provides the ability to easily uninstall applications installed via AppImage.
+
+## 📸 Screenshots
+<p align="center">
+  <img src="./screenshots/install.png" alt="Screenshot 1">
+</p>
+
+More screenshots available in the [screenshots](screenshots) folder.
 
 ## 💻 System Requirements
 - **Operating System:** Linux*

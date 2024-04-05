@@ -65,6 +65,12 @@
         const theme = target.value;
         set_theme(theme);
         settings.theme = theme;
+        settingsState.update((s) => {
+            if (!!theme){
+                s = {...s, theme: theme};
+            }
+            return s;
+        });
     }
 
 
@@ -72,7 +78,7 @@
 
 {#if !!settings}
     <div class="flex flex-row bg-base-200 rounded-box mx-10 mt-10 p-5">
-        <div class="flex flex-col w-[20%] bg-white rounded-lg shadow-lg p-3 my-3">
+        <div class={`flex flex-col w-[20%] rounded-lg shadow-lg p-3 my-3 ${settings.theme !== 'dark' ? 'bg-white' : ''}`}>
             <button class={"btn " + (activeMenuIndex === 0 ? "font-bold text-xl" : " ")} on:click={()=>{activeMenuIndex = 0}}>
                 {$t("settings.menu.general_label")}
             </button>
@@ -83,7 +89,7 @@
         <div class="flex flex-col grow w-[80%] p-3">
 
             {#if activeMenuIndex === 0}
-                <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class={`rounded-lg shadow-lg p-6 ${settings.theme !== 'dark' ? 'bg-white' : ''}`}>
                     <p class="font-bold text-xl mb-3">{$t("settings.theme.theme_label")}</p>
                     <div class="my-3">
                         <select data-choose-theme class="select select-bordered max-w-3xl text-xl capitalize" bind:value={settings.theme} on:change={changeTheme}>
@@ -111,7 +117,7 @@
             {/if}
 
             {#if activeMenuIndex === 1}
-                <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class={`rounded-lg shadow-lg p-6 ${settings.theme !== 'dark' ? 'bg-white' : ''}`}>
                     <p class="font-bold text-xl mb-4">{$t("settings.advanced.installation_dir")}</p>
 
                     <p>{$t("settings.installation_path")}: {settings.installPath}</p>

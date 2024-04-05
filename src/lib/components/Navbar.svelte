@@ -4,6 +4,17 @@
     import SettingsIcon from "$lib/icons/SettingsIcon.svelte";
     import AppStoreIcon from "$lib/icons/AppStoreIcon.svelte";
     import InfoIcon from "$lib/icons/InfoIcon.svelte";
+    import {settingsState} from "../../stores/settingsState";
+    import {onMount} from "svelte";
+
+    let theme: string = "light";
+
+    onMount(() => {
+        settingsState.subscribe(value => {
+            console.log("settings changed from navbar", value);
+            theme = value.theme;
+        });
+    });
 
 </script>
 
@@ -28,25 +39,25 @@
             <!-- Sidebar content here -->
             <li>
                 <a href="/" class="py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out flex flex-row">
-                    <BoxIcon height="20px" width="20px"/>
+                    <BoxIcon height="20px" width="20px" isWhite={theme === "dark"}/>
                     {$t("header.install_app")}
                 </a>
             </li>
             <li>
                 <a href="/settings" class="flex flex-row py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out">
-                    <SettingsIcon height="20px" width="20px"/>
+                    <SettingsIcon height="20px" width="20px" isWhite={theme === "dark"}/>
                     {$t("header.settings")}
                 </a>
             </li>
             <li>
                 <a href="/installedApps" class="flex flex-row py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out">
-                    <AppStoreIcon height="20px" width="20px"/>
+                    <AppStoreIcon height="20px" width="20px" isWhite={theme === "dark"}/>
                     {$t("header.installed")}
                 </a>
             </li>
             <li>
                 <a href="/appInfo" class="flex flex-row py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out">
-                    <InfoIcon height="20px" width="20px"/>
+                    <InfoIcon height="20px" width="20px" isWhite={theme === "dark"}/>
                     {$t("header.app_info")}
                 </a>
             </li>

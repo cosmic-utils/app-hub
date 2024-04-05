@@ -41,7 +41,7 @@ pub async fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
         Some(res) => res,
         None => {
             let default_settings = AppSettings {
-                theme: "dark".to_string(),
+                theme: "cupcake".to_string(),
                 language: "en".to_string(),
                 install_path: Some(format!(
                     "{}/AppImages/",

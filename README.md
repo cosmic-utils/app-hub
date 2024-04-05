@@ -79,6 +79,16 @@ Roadmap for the project is not fully defined yet. However, the following feature
 - [ ] Add installation support for other application bundle formats in addition to AppImage (e.g., Flatpak, Snap, .deb, .rpm).
 - [ ] Add support for other desktop environments.
 
+## 💖 Support
+
+If you like the project and want to support it, you can do so by donating:
+
+- Bitcoin: `bc1qkxt5nvyanh59pa4lg3xpq5znmwhxsnld6jtkje`
+- Polkadot: `15e64wTXGgZH1vBrnAXgz7qTiSJLPA5j9APL4nfDFMbQ6inE`
+- Cosmos: `cosmos1asqs7p07yas0523k7eegyy0vq0zupw0cxfwpn4`
+- Solana: `H1qkZg3W92gwQQh3cthAdf3ovMJ7ExnKJ217hZg8MJBQ`
+- Polygon: `0x976b2f699E420027a845Ac63B98b3B78d798e78A`
+
 ---
 
 For further information, please contact the [maintainer of the project](mailto:francesco.gaglione.p@gmail.com).

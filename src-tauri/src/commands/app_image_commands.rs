@@ -5,7 +5,7 @@ use crate::commands::app_settings_commands::read_settings;
 
 use crate::helpers::app_images_helpers::{copy_icon_file, install_app_image};
 use crate::helpers::desktop_file_builder::DesktopFileBuilder;
-use crate::helpers::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry, read_all_app};
+use crate::helpers::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry, find_desktop_file_location, read_all_app};
 use crate::helpers::file_system_helper::rm_file;
 use crate::models::app_list::{App, AppList};
 use crate::models::request_installation::RequestInstallation;
@@ -89,12 +89,10 @@ pub async fn install_app(app: AppHandle, request_installation: RequestInstallati
         desktop_builder.set_comment(request_installation.app_description.unwrap());
     }
 
-    // Create destingation path
-    let home_dir = dirs::home_dir().expect("Failed to get home directory");
-    let desktop_entry_path = home_dir
-        .join(".local")
-        .join("share")
-        .join("applications")
+    // Create destination path
+    let desktop_files_location = find_desktop_file_location().map_err(|err| err.to_string())?;
+    let desktop_files_location_path = std::path::PathBuf::from(desktop_files_location);
+    let desktop_entry_path = desktop_files_location_path
         .join(format!("{}.desktop", request_installation.app_name));
 
     // Set no sandbox

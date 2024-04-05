@@ -1,5 +1,7 @@
+use std::process::Command;
 use log::{error, info, warn};
 use regex::Regex;
+use crate::helpers::file_system_helper::sudo_write_file;
 
 pub struct DesktopFileBuilder {
     /// The `type_` field represents the type of the application. It's usually "Application" for desktop applications.
@@ -240,11 +242,14 @@ impl DesktopFileBuilder {
         file_content.push_str("X-AppHub=true\n");
 
         // Write the file
-        match std::fs::write(path, file_content) {
-            Ok(_) => Ok("Desktop file written successfully".to_string()),
-            Err(e) => {
-                error!("Failed to write file content to file: {}", e);
-                return Err("Failed to write .desktop file".to_string());
+        match sudo_write_file(path.as_str(), file_content.as_str()) {
+            Ok(res) => {
+                info!("Desktop file written successfully");
+                Ok(path)
+            }
+            Err(error) => {
+                error!("Failed to write desktop file: {}", error);
+                Err("Failed to write desktop file".to_string())
             }
         }
     }

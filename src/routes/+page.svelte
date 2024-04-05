@@ -44,7 +44,7 @@
 
     const installApp = async () => {
         try {
-            const res = installAppImage(
+            const res = await installAppImage(
                 appPath,
                 iconPath,
                 appName,

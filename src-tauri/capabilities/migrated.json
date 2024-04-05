@@ -14,6 +14,8 @@
     "menu:default",
     "tray:default",
     "log:default",
-    "log:default"
+    "log:default",
+    "window-state:allow-restore-window-state",
+    "window-state:allow-save-window-state"
   ]
 }

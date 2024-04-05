@@ -156,7 +156,9 @@ dependencies = [
  "tauri-plugin-dialog",
  "tauri-plugin-log",
  "tauri-plugin-persisted-scope",
+ "tauri-plugin-single-instance",
  "tauri-plugin-store",
+ "tauri-plugin-window-state",
 ]
 
 [[package]]
@@ -205,6 +207,31 @@ dependencies = [
  "event-listener-strategy 0.5.0",
  "futures-core",
  "pin-project-lite",
+]
+
+[[package]]
+name = "async-executor"
+version = "1.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "10b3e585719c2358d2660232671ca8ca4ddb4be4ce8a1842d6c2dc8685303316"
+dependencies = [
+ "async-lock 3.3.0",
+ "async-task",
+ "concurrent-queue",
+ "fastrand",
+ "futures-lite",
+ "slab",
+]
+
+[[package]]
+name = "async-fs"
+version = "2.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc19683171f287921f2405677dd2ed2549c3b3bda697a563ebc3a121ace2aba1"
+dependencies = [
+ "async-lock 3.3.0",
+ "blocking",
+ "futures-lite",
 ]
 
 [[package]]
@@ -4041,11 +4068,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "tauri-plugin-single-instance"
+version = "2.0.0-beta.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9af2a40ca0bf696a6d8bd798d1f66c5009c2b82c9f6463ba04e87fec98f7ff3a"
+dependencies = [
+ "log",
+ "serde",
+ "serde_json",
+ "tauri",
+ "thiserror",
+ "windows-sys 0.52.0",
+ "zbus",
+]
+
+[[package]]
 name = "tauri-plugin-store"
 version = "2.0.0-beta.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0142026264556b634203155a0751474e2e1aeed0c38707dd6ce2abe435160ff8"
 dependencies = [
+ "log",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
+ "thiserror",
+]
+
+[[package]]
+name = "tauri-plugin-window-state"
+version = "2.0.0-beta.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6373bc6cd9d53619b34bdb453e8f71739d621589f53f25013a2df1867f54857d"
+dependencies = [
+ "bitflags 2.5.0",
  "log",
  "serde",
  "serde_json",
@@ -5327,9 +5384,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c9ff46f2a25abd690ed072054733e0bc3157e3d4c45f41bd183dce09c2ff8ab9"
 dependencies = [
  "async-broadcast",
+ "async-executor",
+ "async-fs",
+ "async-io",
+ "async-lock 3.3.0",
  "async-process",
  "async-recursion",
+ "async-task",
  "async-trait",
+ "blocking",
  "derivative",
  "enumflags2",
  "event-listener 5.2.0",

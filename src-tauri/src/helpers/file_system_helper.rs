@@ -5,6 +5,7 @@ use mime_guess::from_path;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
+use std::process::Command;
 use log::info;
 
 /// This function is used to convert an image file to a Base64 string
@@ -58,4 +59,35 @@ pub fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<
         }
     }
     Ok(())
+}
+
+/// This function is used to write a file to the filesystem using sudo
+pub fn sudo_write_file(file_path: &str, content: &str) -> Result<(), String> {
+    let output = Command::new("pkexec")
+        .arg("sh")
+        .arg("-c")
+        .arg(format!("echo '{}' > {}", content, file_path))
+        .output()
+        .expect("Failed to execute command");
+
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(format!("Failed to write file: {}", String::from_utf8_lossy(&output.stderr)))
+    }
+}
+
+/// This function is used to remove a file from the filesystem using sudo
+pub fn sudo_remove_file(file_path: &str) -> Result<(), String> {
+    let output = Command::new("pkexec")
+        .arg("rm")
+        .arg(file_path)
+        .output()
+        .expect("Failed to execute command");
+
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(format!("Failed to remove file: {}", String::from_utf8_lossy(&output.stderr)))
+    }
 }

@@ -75,9 +75,9 @@ Please note that this project is developed in spare time and is not a full-time 
 
 Roadmap for the project is not fully defined yet. However, the following features are planned for future releases:
 
-- [] Add support for other Linux distributions.
-- [] Add support for other application bundle formats in addition to AppImage.
-- [] Add support for other desktop environments.
+- [ ] Add support for other Linux distributions.
+- [ ] Add support for other application bundle formats in addition to AppImage.
+- [ ] Add support for other desktop environments.
 
 ---
 

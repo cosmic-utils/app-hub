@@ -71,12 +71,12 @@ Please use it at your own risk.
 ## 📌 Additional Notes
 Please note that this project is developed in spare time and is not a full-time job. Contributions are appreciated and help grow the project.
 
-## Roadmap
+## 🚀 Roadmap
 
 Roadmap for the project is not fully defined yet. However, the following features are planned for future releases:
 
 - [ ] Add support for other Linux distributions.
-- [ ] Add support for other application bundle formats in addition to AppImage.
+- [ ] Add installation support for other application bundle formats in addition to AppImage (e.g., Flatpak, Snap, .deb, .rpm).
 - [ ] Add support for other desktop environments.
 
 ---

@@ -23,7 +23,6 @@
                 settings.theme,
                 $locale,
                 settings.installPath,
-                settings.createDesktopEntry
             );
             console.log(settings);
             modalOpen = true;
@@ -99,7 +98,6 @@
                             {/each}
                         </select>
                     </div>
-
                     <div class="mt-6">
                         <p class="font-bold text-xl mb-3">{$t("settings.language.language_label")}</p>
                         <div class="flex flex-col">
@@ -113,23 +111,13 @@
                         </div>
                     </div>
                 </div>
-
             {/if}
 
             {#if activeMenuIndex === 1}
                 <div class={`rounded-lg shadow-lg p-6 ${settings.theme !== 'dark' ? 'bg-white' : ''}`}>
                     <p class="font-bold text-xl mb-4">{$t("settings.advanced.installation_dir")}</p>
-
                     <p>{$t("settings.installation_path")}: {settings.installPath}</p>
                     <button on:click={selectInstalaltionDir} class="btn btn-success mt-3">{$t("settings.change_dir")}</button>
-
-                    <p class="font-bold text-xl mt-5 mb-4">{$t("settings.advanced.desktop_entry_title")}</p>
-                    <div class="grid grid-cols-2 gap-4">
-                        <p class="mt-3">{$t("settings.advanced.desktop_entry_des")}</p>
-                        <div class="flex items-center">
-                            <input bind:checked={settings.createDesktopEntry} type="checkbox" name="radio-1" class="checkbox"/>
-                        </div>
-                    </div>
                 </div>
             {/if}
 

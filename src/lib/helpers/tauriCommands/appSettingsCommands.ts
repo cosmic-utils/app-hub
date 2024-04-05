@@ -5,7 +5,6 @@ async function saveSettings(
     theme: string,
     language: string,
     installPath: string | undefined,
-    createDesktopEntry: boolean,
 ) {
     try {
         await invoke("save_settings", {
@@ -13,7 +12,6 @@ async function saveSettings(
                 theme,
                 language,
                 installPath,
-                createDesktopEntry
             }
         });
     }

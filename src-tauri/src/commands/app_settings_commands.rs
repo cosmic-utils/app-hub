@@ -47,7 +47,6 @@ pub async fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
                     "{}/AppImages/",
                     dirs::home_dir().unwrap().to_string_lossy()
                 )),
-                create_desktop_entry: true,
             };
             let serialized_settings =
                 serde_json::to_value(default_settings.clone()).map_err(|e| e.to_string())?;

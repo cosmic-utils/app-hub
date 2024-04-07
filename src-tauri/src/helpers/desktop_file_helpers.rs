@@ -20,7 +20,7 @@ pub fn read_all_app() -> Result<Vec<App>, String> {
             for entry in entries {
                 let entry = entry.as_ref().unwrap();
 
-                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(entry.path().to_str().unwrap().to_string());
+                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(entry.path().to_str().unwrap().to_string(), true);
 
                 if desktop_file.is_err() {
                     error!("Failed to read desktop file: {}", desktop_file.err().unwrap());
@@ -77,7 +77,7 @@ pub fn find_desktop_entry(app_name: String) -> Result<DesktopEntry, String> {
 
                 let entry_path = entry.path();
                 let path_str = entry_path.to_str().ok_or("Failed to convert path to string")?;
-                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string());
+                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string(), true);
 
                 match desktop_file {
                     Ok(desktop_entry) => {
@@ -125,10 +125,9 @@ pub fn find_desktop_entries_by_exec_contains(contains_exec: &String) -> Result<V
                     }
                 };
 
-
                 let entry_path = entry.path();
                 let path_str = entry_path.to_str().ok_or("Failed to convert path to string")?;
-                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string());
+                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string(), true);
 
                 match desktop_file {
                     Ok(desktop_entry) => {
@@ -174,7 +173,7 @@ pub fn delete_desktop_file_by_name(app_name: &String) -> Result<bool, String> {
 
                 let entry_path = entry.path();
                 let path_str = entry_path.to_str().ok_or("Failed to convert path to string")?;
-                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string());
+                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string(), true);
 
                 match desktop_file {
                     Ok(desktop_entry) => {

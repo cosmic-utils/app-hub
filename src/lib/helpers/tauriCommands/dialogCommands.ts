@@ -21,19 +21,7 @@ async function pickAppImage(): Promise<string> {
     }
 }
 
-// Pick an icon from the file system using a dialog
-async function pickAppIcon(): Promise<string> {
-    try {
-        return await invoke<string>('pick_app_icon', {});
-    }
-    catch (e) {
-        console.error(e);
-        throw new Error('Failed to pick app icon');
-    }
-}
-
 export {
     pickDirectory,
     pickAppImage,
-    pickAppIcon
 };

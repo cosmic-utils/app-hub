@@ -1,7 +1,10 @@
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
-use log::info;
+
+use log::{debug, error, info};
+
+use crate::helpers::file_system_helper::{copy_dir_all};
 
 /// Install an AppImage file using the given file path
 pub fn install_app_image(file_path: &String, installation_path: &String) -> Result<String, String> {
@@ -35,31 +38,82 @@ pub fn install_app_image(file_path: &String, installation_path: &String) -> Resu
     Ok("Installation successful".to_string())
 }
 
-/// Copy the icon file to the installation directory
-pub fn copy_icon_file(icon_path: &str, installation_path: &str) -> Result<String, String> {
-    let icons_path = Path::new(installation_path).join("icons");
+/// Extract the .desktop file from the AppImage
+pub fn app_image_extract_desktop_file(app_image_path: &str, app_name: &str) -> Result<(), &'static str> {
+    let output = std::process::Command::new("bash")
+        .arg("-c")
+        .arg(format!("cd {} && ./{} --appimage-extract *.desktop", app_image_path, app_name))
+        .output()
+        .expect("Failed to execute command");
 
-    // Try to create the directory and handle the error if it already exists
-    if let Err(e) = fs::create_dir_all(&icons_path) {
-        if e.kind() != std::io::ErrorKind::AlreadyExists {
-            return Err(format!("Failed to create directory: {}", e));
-        }
-        info!("Directory already exists");
+    if output.status.success() {
+        Ok(())
+    } else {
+        let err = String::from_utf8_lossy(&output.stderr);
+        error!("Failed to extract AppImage desktop file: {}", err);
+        Err("Failed to extract AppImage icon")
     }
-
-    let path_buf = Path::new(icon_path);
-    let file_name = match path_buf.file_name() {
-        Some(name) => name,
-        None => return Err("Failed to get file name".to_string()),
-    };
-    let dest_path = icons_path.join(file_name);
-
-    // Copy the file and handle potential errors
-    if let Err(e) = fs::copy(icon_path, &dest_path) {
-        return Err(format!("Failed to copy file: {}", e));
-    }
-
-    info!("File copied to: {:?}", dest_path);
-
-    Ok(dest_path.to_string_lossy().to_string())
 }
+
+/// Extract all the files from the AppImage
+pub fn app_image_extract_all(app_image_path: &str, app_name: &str) -> Result<(), &'static str> {
+    let output = std::process::Command::new("bash")
+        .arg("-c")
+        .arg(format!("cd {} && ./{} --appimage-extract", app_image_path, app_name))
+        .output()
+        .expect("Failed to execute command");
+
+    if output.status.success() {
+        Ok(())
+    } else {
+        let err = String::from_utf8_lossy(&output.stderr);
+        error!("Failed to extract AppImage desktop file: {}", err);
+        Err("Failed to extract AppImage icon")
+    }
+}
+
+// Install the icons from the AppImage by moving them to the system icons folder
+pub fn install_icons(
+    squashfs_root_path: &str
+) -> Result<(), &'static str> {
+    let icons_paths = [
+        "/share/icons/hicolor/22x22/apps/",
+        "/share/icons/hicolor/24x24/apps/",
+        "/share/icons/hicolor/32x32/apps/",
+        "/share/icons/hicolor/48x48/apps/",
+        "/share/icons/hicolor/64x64/apps/",
+        "/share/icons/hicolor/128x128/apps/",
+        "/share/icons/hicolor/256x256/apps/",
+        "/share/icons/hicolor/512x512/apps/",
+        "/share/icons/hicolor/scalable/apps/",
+        "/usr/share/icons/hicolor/22x22/apps/",
+        "/usr/share/icons/hicolor/24x24/apps/",
+        "/usr/share/icons/hicolor/32x32/apps/",
+        "/usr/share/icons/hicolor/48x48/apps/",
+        "/usr/share/icons/hicolor/64x64/apps/",
+        "/usr/share/icons/hicolor/128x128/apps/",
+        "/usr/share/icons/hicolor/256x256/apps/",
+        "/usr/share/icons/hicolor/512x512/apps/",
+        "/usr/share/icons/hicolor/scalable/apps/",
+    ];
+
+    for icon_path in icons_paths.iter() {
+        let path = Path::new(squashfs_root_path).join(icon_path);
+        if path.exists() {
+            // non va bene perchè deve essere creato con lo stesso percorso di sopra
+            // mettere icon_path va bene? funziona?
+            match copy_dir_all(&path, Path::new(icon_path)) {
+                Ok(copied) => {
+                    info!("Copied: {:?}", copied);
+                }
+                Err(error) => {
+                    error!("Error coping icon: {:?}", error);
+                }
+            };
+
+        }
+    }
+
+    Ok(())
+}
+

@@ -102,7 +102,7 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
 
                     for desktop_entry_path in desktop_entries.unwrap() {
                         
-                        match DesktopFileBuilder::from_desktop_entry_path(desktop_entry_path.clone()) {
+                        match DesktopFileBuilder::from_desktop_entry_path(desktop_entry_path.clone(), true) {
                             Ok(mut desktop_file_builder) => {
 
                                 // Check exec field

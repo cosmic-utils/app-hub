@@ -4,9 +4,9 @@ use base64::Engine;
 use mime_guess::from_path;
 use std::fs::File;
 use std::io::Read;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
-use log::info;
+use log::{debug, info};
 
 /// This function is used to convert an image file to a Base64 string
 /// It returns a Result containing the Base64 string or an error
@@ -90,4 +90,30 @@ pub fn sudo_remove_file(file_path: &str) -> Result<(), String> {
     } else {
         Err(format!("Failed to remove file: {}", String::from_utf8_lossy(&output.stderr)))
     }
+}
+
+/// Find a .desktop file in the given directory
+pub fn find_desktop_file_in_dir(dir_path: &str) -> Result<String, String> {
+    let dir = Path::new(dir_path);
+    let entries = match fs::read_dir(dir) {
+        Ok(entries) => entries,
+        Err(e) => return Err(format!("Failed to read directory: {}", e)),
+    };
+
+    for entry in entries {
+        let entry = match entry {
+            Ok(entry) => entry,
+            Err(e) => return Err(format!("Failed to read entry: {}", e)),
+        };
+        let path = entry.path();
+        let extension = match path.extension() {
+            Some(ext) => ext,
+            None => continue,
+        };
+        if extension == "desktop" {
+            return Ok(path.to_string_lossy().to_string());
+        }
+    }
+
+    Err("No desktop file found".to_string())
 }

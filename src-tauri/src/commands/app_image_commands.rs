@@ -1,7 +1,7 @@
 use dirs;
 use log::{error, info, warn};
 use tauri::AppHandle;
-use crate::commands::app_settings_commands::read_settings;
+use crate::commands::app_settings_commands::read_settings_command;
 
 use crate::helpers::app_images_helpers::{app_image_extract_all, app_image_extract_desktop_file, find_icons_paths, install_app_image, install_icons, update_icon_cache};
 use crate::helpers::desktop_file_builder::DesktopFileBuilder;
@@ -11,7 +11,7 @@ use crate::models::app_list::{App, AppList};
 use crate::models::request_installation::RequestInstallation;
 
 #[tauri::command]
-pub async fn install_app(app: AppHandle, request_installation: RequestInstallation) -> Result<String, String> {
+pub async fn install_app_command(app: AppHandle, request_installation: RequestInstallation) -> Result<String, String> {
 
     info!("##### REQUESTED TO INSTALL APP ####");
     info!("# File path: {:?}", request_installation.file_path);
@@ -22,7 +22,7 @@ pub async fn install_app(app: AppHandle, request_installation: RequestInstallati
     add_executable_permission(&request_installation.file_path);
 
     // Read path where to install apps
-    let apps_installation_path = match read_settings(app).await {
+    let apps_installation_path = match read_settings_command(app).await {
         Ok(settings) => settings.install_path.unwrap(),
         Err(err) => {
             error!("{}", err);
@@ -172,13 +172,13 @@ pub async fn install_app(app: AppHandle, request_installation: RequestInstallati
 }
 
 #[tauri::command]
-pub async fn read_app_list() -> Result<AppList, String> {
+pub async fn read_app_list_command() -> Result<AppList, String> {
     let apps: Vec<App> = read_all_app()?;
     Ok(AppList { apps })
 }
 
 #[tauri::command]
-pub async fn uninstall_app(app: App) -> Result<bool, String> {
+pub async fn uninstall_app_command(app: App) -> Result<bool, String> {
     let desktop_entry = match find_desktop_entry(app.name.clone()) {
         Ok(path) => path,
         Err(err) => {

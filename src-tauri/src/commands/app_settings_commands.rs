@@ -15,7 +15,7 @@ use crate::helpers::file_system_helper::copy_dir_all;
 use crate::models::app_settings::AppSettings;
 
 #[tauri::command]
-pub async fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
+pub async fn read_settings_command(app: AppHandle) -> Result<AppSettings, String> {
     // Clone the app handle to avoid borrowing issues
     let app_clone = app.clone();
 
@@ -69,7 +69,7 @@ pub async fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
 }
 
 #[tauri::command]
-pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), String> {
+pub async fn save_settings_command(app: AppHandle, settings: AppSettings) -> Result<(), String> {
 
     // Check if the install path is empty
     if let Some(install_path) = &settings.install_path {
@@ -83,7 +83,7 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
                 return Err("Install path does not exist".into());
             }
             // Check if the new path is different from the old path
-            let old_settings = read_settings(app.clone()).await?;
+            let old_settings = read_settings_command(app.clone()).await?;
             if let Some(old_install_path) = old_settings.install_path {
                 if !old_install_path.eq(install_path) {
                     info!("Install path changed from {} to {}", old_install_path, install_path);

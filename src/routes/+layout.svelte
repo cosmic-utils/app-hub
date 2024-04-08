@@ -8,19 +8,20 @@
     import {set_theme} from "$lib/helpers/themeController";
     import Modal from "$lib/components/Modal.svelte";
     import {t} from "$lib/i18n/i18n";
+    import {getSettings} from "$lib/helpers/tauriCommands/appSettingsCommands";
 
     let errorModalOpen = false;
 
     let readSettings = async () => {
         try {
-            const settings: AppSettings = await invoke<AppSettings>("read_settings");
+            const settings: AppSettings = await getSettings();
             console.log('Settings read', settings);
             settingsState.update(() => settings);
 
             set_theme(settings.theme);
-
-        } catch (error) {
-            console.error('Error reading settings', error);
+        }
+        catch (e) {
+            console.error('Error reading settings', e);
             errorModalOpen = true;
         }
     }

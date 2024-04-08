@@ -7,7 +7,7 @@ async function installAppImage(
     noSandBox: boolean,
 ): Promise<string> {
     try {
-        return await invoke<string>('install_app', {
+        return await invoke<string>('install_app_command', {
             requestInstallation: {
                 filePath: appPath,
                 noSandbox: noSandBox
@@ -23,7 +23,7 @@ async function installAppImage(
 // Get the list of installed apps
 async function installedAppsList(): Promise<AppList> {
     try {
-        return await invoke<AppList>("read_app_list");
+        return await invoke<AppList>("read_app_list_command");
     }
     catch (e) {
         console.error(e);
@@ -34,7 +34,7 @@ async function installedAppsList(): Promise<AppList> {
 // Uninstall an app
 async function uninstallApp(app: App): Promise<boolean> {
     try {
-        return await invoke<boolean>("uninstall_app", {app: app});
+        return await invoke<boolean>("uninstall_app_command", {app: app});
     }
     catch (e) {
         console.error(e);

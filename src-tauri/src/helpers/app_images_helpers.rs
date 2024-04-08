@@ -8,7 +8,7 @@ use log::{debug, error, info};
 use crate::helpers::file_system_helper::{add_executable_permission, copy_dir_all, is_directory_empty};
 
 /// Install an AppImage file using the given file path
-pub fn install_app_image(file_path: &String, installation_path: &String) -> Result<String, String> {
+pub fn install_app_image_from_path(file_path: &String, installation_path: &String) -> Result<String, String> {
     // Try to create the directory and handle the error if it already exists
     match fs::create_dir(&installation_path) {
         Ok(_) => {}

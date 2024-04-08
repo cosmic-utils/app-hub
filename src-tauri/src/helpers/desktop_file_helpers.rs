@@ -8,60 +8,6 @@ use crate::helpers::app_images_helpers::find_icons_paths;
 use crate::helpers::desktop_file_builder::DesktopFileBuilder;
 use crate::models::desktop_entry::DesktopEntry;
 
-/// Read all desktop files in the applications directory
-/// This retrieved list contains only files installed by AppHub
-pub fn read_all_app() -> Result<Vec<App>, String> {
-    let mut apps: Vec<App> = Vec::new();
-
-    // read all .desktop files in the applications directory
-    let applications_dir: String = find_desktop_file_location().map_err(|e| e.to_string())?;
-
-    match std::fs::read_dir(applications_dir) {
-        Ok(entries) => {
-            for entry in entries {
-                let entry = entry.as_ref().unwrap();
-
-                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(entry.path().to_str().unwrap().to_string(), true);
-
-                if desktop_file.is_err() {
-                    error!("Failed to read desktop file: {}", desktop_file.err().unwrap());
-                    continue;
-                }
-
-                let desktop_entry = desktop_file.unwrap();
-
-                let icons_path = find_icons_paths(&desktop_entry.icon().unwrap());
-
-                debug!("Reading icon at: {:?}", desktop_entry.icon());
-                let base64_icon: Option<String> = if icons_path.len() > 0 {
-                    match image_to_base64(icons_path.get(0).unwrap().as_str()) {
-                        Ok(base64) => Some(base64),
-                        Err(err) => {
-                            info!("Failed to convert image to base64: {}", err);
-                            None
-                        }
-                    }
-                } else {
-                    None
-                };
-
-                apps.push(App {
-                    name: desktop_entry.name().unwrap(),
-                    icon_base64: base64_icon,
-                    app_path: desktop_entry.exec().unwrap(),
-                    version: desktop_entry.version(),
-                    categories: desktop_entry.categories(),
-                });
-            }
-        }
-        Err(err) => {
-            return Err(format!("Failed to read directory: {}", err));
-        }
-    }
-
-    Ok(apps)
-}
-
 /// Find the desktop entry of the application with the given name.
 /// The function reads all the .desktop files in the applications directory and compares the "Name" value
 /// of each file with the given app_name. If a match is found, the function returns the DesktopEntry struct

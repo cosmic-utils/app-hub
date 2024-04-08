@@ -6,7 +6,7 @@ use tauri_plugin_log::fern::colors::{Color, ColoredLevelConfig};
 use crate::commands::app_image_commands::{install_app, read_app_list, uninstall_app};
 
 use crate::commands::app_settings_commands::{read_settings, save_settings};
-use crate::commands::dialog_commands::{pick_app_icon, pick_app_image, pick_dir};
+use crate::commands::dialog_commands::{pick_app_image, pick_dir};
 use crate::models::app_state::AppState;
 
 mod commands;
@@ -23,7 +23,7 @@ fn main() {
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_persisted_scope::init())
         .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {}))
-        .plugin(tauri_plugin_window_state::Builder::default().build())
+        //.plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(
             tauri_plugin_log::Builder::new()
                 .targets([
@@ -41,7 +41,6 @@ fn main() {
         )
         .invoke_handler(tauri::generate_handler![
             pick_app_image,
-            pick_app_icon,
             pick_dir,
             install_app,
             read_app_list,

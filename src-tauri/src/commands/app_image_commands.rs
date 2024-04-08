@@ -3,52 +3,64 @@ use log::{error, info, warn};
 use tauri::AppHandle;
 use crate::commands::app_settings_commands::read_settings;
 
-use crate::helpers::app_images_helpers::{copy_icon_file, install_app_image};
+use crate::helpers::app_images_helpers::{app_image_extract_all, app_image_extract_desktop_file, find_icons_paths, install_app_image, install_icons, update_icon_cache};
 use crate::helpers::desktop_file_builder::DesktopFileBuilder;
 use crate::helpers::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry, find_desktop_file_location, read_all_app};
-use crate::helpers::file_system_helper::rm_file;
+use crate::helpers::file_system_helper::{add_executable_permission, find_desktop_file_in_dir, rm_dir_all, rm_file, sudo_remove_file};
 use crate::models::app_list::{App, AppList};
 use crate::models::request_installation::RequestInstallation;
 
 #[tauri::command]
 pub async fn install_app(app: AppHandle, request_installation: RequestInstallation) -> Result<String, String> {
-    info!("Installing file: {:?}", request_installation);
 
-    info!("### REQUESTED TO INSTALL APP ###");
-    info!("File path: {:?}", request_installation.file_path);
-    info!("Icon path: {:?}", request_installation.icon_path);
-    info!("App name: {:?}", request_installation.app_name);
-    info!(
-        "App description: {:?}",
-        request_installation.app_description
-    );
-    info!("App type: {:?}", request_installation.app_type);
-    info!("Terminal: {:?}", request_installation.terminal);
+    info!("##### REQUESTED TO INSTALL APP ####");
+    info!("# File path: {:?}", request_installation.file_path);
+    info!("# No sandbox: {:?}", request_installation.no_sandbox);
     info!("#################################");
 
-    let settings = match read_settings(app).await {
-        Ok(settings) => settings,
+    // Add executable permission to the AppImage
+    add_executable_permission(&request_installation.file_path);
+
+    // Read path where to install apps
+    let apps_installation_path = match read_settings(app).await {
+        Ok(settings) => settings.install_path.unwrap(),
         Err(err) => {
             error!("{}", err);
             return Err(err);
         }
     };
 
-    match install_app_image(&request_installation.file_path, settings.install_path.as_ref().unwrap()) {
+    // AppImage file path selected by the user
+    let app_image_file_path = std::path::PathBuf::from(&request_installation.file_path);
+    // AppImage file name
+    let file_name = app_image_file_path.file_name().expect("Failed to get file name");
+    // AppImage to install parent directory path
+    let app_image_directory_path = app_image_file_path.parent().expect("Failed to get directory").to_path_buf();
+
+    // Extract the AppImage .desktop file
+    match app_image_extract_desktop_file(
+        app_image_directory_path.to_str().unwrap(),
+        file_name.to_string_lossy().to_string().as_str()
+    ) {
         Ok(_) => {
-            info!("AppImage installation successful");
+            info!("AppImage extracted .desktop file successfully");
         }
         Err(err) => {
-            return Err(err);
+            error!("{}", err);
+            return Err(err.to_string());
         }
     }
 
-    let path_buf = std::path::PathBuf::from(&request_installation.file_path);
-    let file_name = path_buf.file_name().expect("Failed to get file name");
+    // Squashfs-root directory path (app image extracted directory)
+    let squashfs_path = std::path::PathBuf::from(app_image_directory_path.clone()).join("squashfs-root");
 
-    let icon_path = match copy_icon_file(&request_installation.icon_path, settings.install_path.as_ref().unwrap()) {
+    // Find the desktop file in the squashfs-root directory
+    //TODO can be improved? (.desktop file location is known)
+    let desktop_file_path = match find_desktop_file_in_dir(
+        squashfs_path.to_string_lossy().to_string().as_str()
+    ) {
         Ok(path) => {
-            info!("Icon file copied to: {:?}", path);
+            info!("Desktop file found at: {:?}", path);
             path
         }
         Err(err) => {
@@ -56,44 +68,63 @@ pub async fn install_app(app: AppHandle, request_installation: RequestInstallati
         }
     };
 
-    let mut desktop_builder = DesktopFileBuilder::new();
+    // Parse the desktop file
+    let mut desktop_builder = match DesktopFileBuilder::from_desktop_entry_path(
+        desktop_file_path.to_string(),
+        false
+    ) {
+        Ok(db) => {
+            info!("Desktop entry parsed successfully");
+            db
+        }
+        Err(error) => {
+            return Err(error);
+        }
+    };
+
+    // Extract all appImage content
+    match app_image_extract_all(
+        app_image_directory_path.to_str().unwrap(),
+        file_name.to_string_lossy().to_string().as_str()
+    ) {
+        Ok(_res) => {
+            info!("AppImage extracted successfully");
+        }
+        Err(error) => {
+            error!("Error extracting all app image content: {}", error);
+            return Err(error.to_string());
+        }
+    }
+
+    // Move icons to the system icons folder
+    match install_icons(
+        squashfs_path.to_str().unwrap(),
+    ) {
+        Ok(_res) => {
+            info!("Icon file copied");
+        }
+        Err(err) => {
+            error!("{}", err);
+            return Err(err.to_string());
+        }
+    }
 
     // Set mandatory fields
-    if request_installation.app_type.is_some() {
-        desktop_builder.set_type(request_installation.app_type.unwrap());
-    } else {
-        desktop_builder.set_type("Application".to_string());
-    }
-    if request_installation.app_version.is_some() {
-        desktop_builder.set_version(request_installation.app_version.unwrap());
-    } else {
-        desktop_builder.set_version("1.0".to_string());
-    }
-    desktop_builder.set_name(request_installation.app_name.clone());
     desktop_builder.set_exec(format!(
-        "{}/{}",
-        settings.install_path.unwrap(),
+        "{}{}",
+        apps_installation_path,
         file_name.to_string_lossy()
     ));
 
     // Set optional fields
-    desktop_builder.set_icon(icon_path);
-    desktop_builder.set_terminal(request_installation.terminal.unwrap_or(false));
-    if request_installation.categories.is_some() {
-        desktop_builder.set_categories(request_installation.categories.unwrap());
-    }
-    else {
-        desktop_builder.set_categories(vec![String::from("Utility")]);
-    }
-    if request_installation.app_description.is_some() {
-        desktop_builder.set_comment(request_installation.app_description.unwrap());
-    }
+    //desktop_builder.set_icon(copied_icon_path);
 
     // Create destination path
     let desktop_files_location = find_desktop_file_location().map_err(|err| err.to_string())?;
     let desktop_files_location_path = std::path::PathBuf::from(desktop_files_location);
+    //TODO: Check if the app name is present
     let desktop_entry_path = desktop_files_location_path
-        .join(format!("{}.desktop", request_installation.app_name));
+        .join(format!("{}.desktop", desktop_builder.name().unwrap()));
 
     // Set no sandbox
     if request_installation.no_sandbox.is_some() && request_installation.no_sandbox.unwrap() {
@@ -108,6 +139,32 @@ pub async fn install_app(app: AppHandle, request_installation: RequestInstallati
         }
         Err(err) => {
             return Err(err);
+        }
+    }
+
+    // Install the AppImage
+    match install_app_image(
+        &app_image_file_path.to_str().unwrap().to_string(),
+        &apps_installation_path
+    ) {
+        Ok(res) => {
+            info!("AppImage installed successfully");
+        }
+        Err(err) => {
+            error!("{}", err);
+            return Err(err);
+        }
+    }
+
+    rm_dir_all(squashfs_path.to_str().unwrap()).expect("Failed to remove squashfs-root directory");
+
+    // Update icons cache
+    match update_icon_cache() {
+        Ok(_res) => {
+            info!("Icon cache updated successfully");
+        }
+        Err(error) => {
+            error!("{}", error);
         }
     }
 
@@ -143,22 +200,6 @@ pub async fn uninstall_app(app: App) -> Result<bool, String> {
         }
     };
 
-    // Remove the icon
-    let icon_removed: bool = match rm_file(&desktop_entry.icon_path) {
-        Ok(result) => {
-            info!("Icon removed successfully");
-            result
-        }
-        Err(err) => {
-            error!("{}", err);
-            return Err(err);
-        }
-    };
-
-    if !icon_removed {
-        warn!("Failed to remove icon");
-    }
-
     // Remove the desktop entry
     let desktop_removed: bool = match delete_desktop_file_by_name(&app.name) {
         Ok(result) => {
@@ -170,6 +211,27 @@ pub async fn uninstall_app(app: App) -> Result<bool, String> {
             return Err(err);
         }
     };
+
+    // Remove icons
+    let icon_name: String = desktop_entry.icon;
+    let icons = find_icons_paths(&icon_name.as_str());
+
+    for icon in icons {
+        info!("Removing icon: {:?}", icon);
+        let icon_removed: bool = match sudo_remove_file(&icon) {
+            Ok(_result) => {
+                info!("Icon removed successfully");
+                true
+            }
+            Err(err) => {
+                error!("{}", err);
+                false
+            }
+        };
+        if !icon_removed {
+            warn!("Failed to remove icon");
+        }
+    }
 
     if app_removed && desktop_removed {
         info!("App uninstalled successfully");

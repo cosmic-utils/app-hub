@@ -4,24 +4,12 @@ import type {App, AppList} from "$lib/models/Applist";
 // Install an app image in the target directory
 async function installAppImage(
     appPath: string,
-    iconPath: string,
-    appName: string,
-    appType: string,
-    terminal: boolean,
-    appDescription: string,
-    appVersion: string,
     noSandBox: boolean,
 ): Promise<string> {
     try {
         return await invoke<string>('install_app', {
             requestInstallation: {
                 filePath: appPath,
-                iconPath: iconPath,
-                appName: appName,
-                appType: appType,
-                terminal: terminal,
-                appDescription: appDescription,
-                appVersion: appVersion,
                 noSandbox: noSandBox
             }
         })

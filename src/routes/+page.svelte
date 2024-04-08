@@ -1,20 +1,13 @@
 <script lang="ts">
     import {t} from "$lib/i18n/i18n";
-    import {pickAppIcon, pickAppImage} from "$lib/helpers/tauriCommands/dialogCommands";
+    import {pickAppImage} from "$lib/helpers/tauriCommands/dialogCommands";
     import {installAppImage} from "$lib/helpers/tauriCommands/appImageCommands";
     import Modal from "$lib/components/Modal.svelte";
 
     let appPath: string;
-    let iconPath: string;
     let enableAdvancedOptions: boolean = false;
 
-    let appName: string;
-    let appDescription: string;
-    let appType: string = "Application";
-    let appCategory: string = "Utility";
-    let appTerminal: boolean = false;
     let noSandbox: boolean = false;
-    let appVersion: string = "1.0.0";
 
     let modalOpen: boolean = false;
     let modalTitle: string;
@@ -31,27 +24,10 @@
         }
     }
 
-    const chooseIcon = async () => {
-        try {
-            iconPath = await pickAppIcon();
-        } catch (e) {
-            console.error(e);
-            modalOpen = true;
-            modalTitle = $t("install_file.error_modal_title");
-            modalMessage = $t("install_file.error_modal_choose_file");
-        }
-    }
-
     const installApp = async () => {
         try {
             const res = await installAppImage(
                 appPath,
-                iconPath,
-                appName,
-                appType,
-                appTerminal,
-                appDescription,
-                appVersion,
                 noSandbox
             )
             console.log("Installation result", res);
@@ -77,22 +53,6 @@
                 <p class="font-bold text-2xl">{$t("install_file_selected_title")}</p>
                 <p>{$t("install_file_selected_des")} {appPath}</p>
 
-                <p class="mt-3 font-bold text-2xl">{$t("install_choose_icon_button")}</p>
-                {#if !!iconPath}
-                    <p>{$t("install_icon_selected")} {iconPath}</p>
-                {:else }
-                    <button on:click={chooseIcon} class="btn btn-neutral mt-5">{$t("install_choose_icon_button")}</button>
-                {/if}
-
-                <div class="flex flex-col justify-start items-start mt-4">
-                    <div class="tooltip tooltip-right"
-                         data-tip={$t("install_file.advanced_options.app_name_des")}>
-                        <p class="text-xl">{$t("install_file.advanced_options.app_name")}</p>
-                    </div>
-                    <input bind:value={appName} type="text" class="input input-bordered mt-2"
-                           placeholder={$t("install_file.advanced_options.app_name")}/>
-                </div>
-
                 <div class="mt-4 form-control w-1/5">
                     <label class="label cursor-pointer">
                         <span class="label-text">{$t("install_file_advanced_accordio_title")}</span>
@@ -104,36 +64,6 @@
 
             {#if enableAdvancedOptions}
                 <div class="mx-auto px-4 mt-3">
-                    <div class="flex flex-col justify-start items-start mt-4">
-                        <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.app_des_des")}>
-                            <p class="text-xl">{$t("install_file.advanced_options.app_des")}</p>
-                        </div>
-                        <textarea class="textarea textarea-bordered mt-2" bind:value={appDescription} placeholder={$t("install_file.advanced_options.app_des")}></textarea>
-                    </div>
-                    <div class="flex flex-col justify-start items-start mt-4">
-                        <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.app_type_des")}>
-                            <p class="text-xl">{$t("install_file.advanced_options.app_type")}</p>
-                        </div>
-                        <input type="text" bind:value={appType} class="input input-bordered mt-2" placeholder={$t("install_file.advanced_options.app_type")}/>
-                    </div>
-                    <div class="flex flex-col justify-start items-start mt-4">
-                        <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.app_category_des")}>
-                            <p class="text-xl">{$t("install_file.advanced_options.app_category")}</p>
-                        </div>
-                        <input type="text" bind:value={appCategory} class="input input-bordered mt-2" placeholder={$t("install_file.advanced_options.app_category")}/>
-                    </div>
-                    <div class="flex flex-col justify-start items-start mt-4">
-                        <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.app_version_des")}>
-                            <p class="text-xl">{$t("install_file.advanced_options.app_version")}</p>
-                        </div>
-                        <input type="text" bind:value={appVersion} class="input input-bordered mt-2" placeholder={$t("install_file.advanced_options.app_version")}/>
-                    </div>
-                    <div class="flex flex-col justify-start items-start mt-4">
-                        <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.app_terminal_des")}>
-                            <p class="text-xl">{$t("install_file.advanced_options.app_terminal")}</p>
-                        </div>
-                        <input bind:checked={appTerminal} type="checkbox" class="checkbox"/>
-                    </div>
                     <div class="flex flex-col justify-start items-start mt-4">
                         <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.no_sandbox_des")}>
                             <p class="text-xl">{$t("install_file.advanced_options.no_sandbox")}</p>
@@ -156,10 +86,9 @@
 
 </div>
 <div class="my-5 mx-10">
-    <button
-            on:click={installApp}
+    <button on:click={installApp}
             class="btn btn-success w-full"
-            disabled="{!appPath || !iconPath || !appName}">
+            disabled="{!appPath}">
         {$t("install_file_install_button")}
     </button>
 </div>

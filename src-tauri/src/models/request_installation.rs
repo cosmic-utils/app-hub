@@ -4,12 +4,5 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct RequestInstallation {
     pub file_path: String,
-    pub icon_path: String,
-    pub app_name: String,
-    pub app_description: Option<String>,
-    pub app_type: Option<String>,
-    pub categories: Option<Vec<String>>,
-    pub terminal: Option<bool>,
-    pub app_version: Option<String>,
     pub no_sandbox: Option<bool>,
 }

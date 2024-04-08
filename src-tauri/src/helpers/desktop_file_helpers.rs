@@ -4,6 +4,7 @@ use log::{debug, error, info};
 use crate::helpers::file_system_helper::{image_to_base64, sudo_remove_file};
 use crate::models::app_list::App;
 use regex::Regex;
+use crate::helpers::app_images_helpers::find_icons_paths;
 use crate::helpers::desktop_file_builder::DesktopFileBuilder;
 use crate::models::desktop_entry::DesktopEntry;
 
@@ -20,7 +21,7 @@ pub fn read_all_app() -> Result<Vec<App>, String> {
             for entry in entries {
                 let entry = entry.as_ref().unwrap();
 
-                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(entry.path().to_str().unwrap().to_string());
+                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(entry.path().to_str().unwrap().to_string(), true);
 
                 if desktop_file.is_err() {
                     error!("Failed to read desktop file: {}", desktop_file.err().unwrap());
@@ -29,13 +30,19 @@ pub fn read_all_app() -> Result<Vec<App>, String> {
 
                 let desktop_entry = desktop_file.unwrap();
 
+                let icons_path = find_icons_paths(&desktop_entry.icon().unwrap());
+
                 debug!("Reading icon at: {:?}", desktop_entry.icon());
-                let base64_icon = match image_to_base64(&desktop_entry.icon().unwrap()) {
-                    Ok(base64) => Some(base64),
-                    Err(err) => {
-                        info!("Failed to convert image to base64: {}", err);
-                        None
+                let base64_icon: Option<String> = if icons_path.len() > 0 {
+                    match image_to_base64(icons_path.get(0).unwrap().as_str()) {
+                        Ok(base64) => Some(base64),
+                        Err(err) => {
+                            info!("Failed to convert image to base64: {}", err);
+                            None
+                        }
                     }
+                } else {
+                    None
                 };
 
                 apps.push(App {
@@ -77,7 +84,7 @@ pub fn find_desktop_entry(app_name: String) -> Result<DesktopEntry, String> {
 
                 let entry_path = entry.path();
                 let path_str = entry_path.to_str().ok_or("Failed to convert path to string")?;
-                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string());
+                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string(), true);
 
                 match desktop_file {
                     Ok(desktop_entry) => {
@@ -85,7 +92,7 @@ pub fn find_desktop_entry(app_name: String) -> Result<DesktopEntry, String> {
                             return Ok(DesktopEntry {
                                 exec: desktop_entry.exec().unwrap(),
                                 name: desktop_entry.name().unwrap(),
-                                icon_path: desktop_entry.icon().unwrap(),
+                                icon: desktop_entry.icon().unwrap(),
                             });
                         }
                     }
@@ -125,10 +132,9 @@ pub fn find_desktop_entries_by_exec_contains(contains_exec: &String) -> Result<V
                     }
                 };
 
-
                 let entry_path = entry.path();
                 let path_str = entry_path.to_str().ok_or("Failed to convert path to string")?;
-                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string());
+                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string(), true);
 
                 match desktop_file {
                     Ok(desktop_entry) => {
@@ -174,7 +180,7 @@ pub fn delete_desktop_file_by_name(app_name: &String) -> Result<bool, String> {
 
                 let entry_path = entry.path();
                 let path_str = entry_path.to_str().ok_or("Failed to convert path to string")?;
-                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string());
+                let desktop_file = DesktopFileBuilder::from_desktop_entry_path(path_str.to_string(), true);
 
                 match desktop_file {
                     Ok(desktop_entry) => {

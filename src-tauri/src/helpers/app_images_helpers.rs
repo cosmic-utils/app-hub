@@ -4,7 +4,7 @@ use std::path::Path;
 
 use log::{debug, error, info};
 
-use crate::helpers::file_system_helper::{add_executable_permission, copy_dir_all};
+use crate::helpers::file_system_helper::{add_executable_permission, copy_dir_all, is_directory_empty};
 
 /// Install an AppImage file using the given file path
 pub fn install_app_image(file_path: &String, installation_path: &String) -> Result<String, String> {
@@ -97,7 +97,20 @@ pub fn install_icons(
     for icon_path in icons_paths.iter() {
         let path = Path::new(squashfs_root_path).join(icon_path);
         if path.exists() {
-            sh_template_script.push_str(&format!("cp -r {} {} 2>/dev/null  || : \n", path.to_str().unwrap(), icon_path));
+            match is_directory_empty(&path) {
+                Ok(empty) => {
+                    if empty {
+                        info!("Directory is empty: {:?}", path);
+                        continue; // Skip copying if directory is empty
+                    } else {
+                        info!("Directory is not empty: {:?}", path)
+                    }
+                }
+                Err(error) => {
+                    error!("Failed to check if directory is empty: {:?}", error);
+                }
+            }
+            sh_template_script.push_str(&format!("cp -r {}* /{} 2>/dev/null  || : \n", path.to_str().unwrap(), icon_path));
         }
     }
 
@@ -112,6 +125,8 @@ pub fn install_icons(
         .expect("Failed to execute command");
 
     if output.status.success() {
+        debug!("Icons installed successfully");
+        debug!("Output: {:?}", output.stdout);
         Ok(())
     } else {
         let err = String::from_utf8_lossy(&output.stderr);
@@ -120,3 +135,69 @@ pub fn install_icons(
     }
 }
 
+pub fn remove_icons(
+    app_name: &str
+) -> Result<(), &'static str> {
+    let icons_paths = [
+        "share/icons/hicolor/22x22/apps/",
+        "share/icons/hicolor/24x24/apps/",
+        "share/icons/hicolor/32x32/apps/",
+        "share/icons/hicolor/48x48/apps/",
+        "share/icons/hicolor/64x64/apps/",
+        "share/icons/hicolor/128x128/apps/",
+        "share/icons/hicolor/256x256/apps/",
+        "share/icons/hicolor/512x512/apps/",
+        "share/icons/hicolor/scalable/apps/",
+        "usr/share/icons/hicolor/22x22/apps/",
+        "usr/share/icons/hicolor/24x24/apps/",
+        "usr/share/icons/hicolor/32x32/apps/",
+        "usr/share/icons/hicolor/48x48/apps/",
+        "usr/share/icons/hicolor/64x64/apps/",
+        "usr/share/icons/hicolor/128x128/apps/",
+        "usr/share/icons/hicolor/256x256/apps/",
+        "usr/share/icons/hicolor/512x512/apps/",
+        "usr/share/icons/hicolor/scalable/apps/",
+    ];
+
+    let mut sh_template_script = String::new();
+
+    for icon_path in icons_paths.iter() {
+        sh_template_script.push_str(&format!("rm -r {}{} 2>/dev/null  || : \n", "/usr/", icon_path));
+    }
+
+    debug!("Remove icons script: {}", sh_template_script);
+
+    // Run the script with sudo
+    let output = std::process::Command::new("pkexec")
+        .arg("sh")
+        .arg("-c")
+        .arg(sh_template_script)
+        .output()
+        .expect("Failed to execute command");
+
+    if output.status.success() {
+        Ok(())
+    } else {
+        let err = String::from_utf8_lossy(&output.stderr);
+        error!("Failed to remove icons: {}", err);
+        Err("Failed to remove icons")
+    }
+}
+
+/// Update the icon cache
+pub fn update_icon_cache() -> Result<(), &'static str> {
+    let output = std::process::Command::new("pkexec")
+        .arg("gtk-update-icon-cache")
+        .arg("-f")
+        .arg("/usr/share/icons/hicolor")
+        .output()
+        .expect("Failed to execute command");
+
+    if output.status.success() {
+        Ok(())
+    } else {
+        let err = String::from_utf8_lossy(&output.stderr);
+        error!("Failed to update icon cache: {}", err);
+        Err("Failed to update icon cache")
+    }
+}

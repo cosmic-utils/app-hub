@@ -3,7 +3,7 @@ use log::{error, info, warn};
 use tauri::AppHandle;
 use crate::commands::app_settings_commands::read_settings;
 
-use crate::helpers::app_images_helpers::{app_image_extract_all, app_image_extract_desktop_file, install_app_image, install_icons};
+use crate::helpers::app_images_helpers::{app_image_extract_all, app_image_extract_desktop_file, install_app_image, install_icons, update_icon_cache};
 use crate::helpers::desktop_file_builder::DesktopFileBuilder;
 use crate::helpers::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry, find_desktop_file_location, read_all_app};
 use crate::helpers::file_system_helper::{add_executable_permission, find_desktop_file_in_dir, rm_dir_all, rm_file};
@@ -100,8 +100,8 @@ pub async fn install_app(app: AppHandle, request_installation: RequestInstallati
     match install_icons(
         squashfs_path.to_str().unwrap(),
     ) {
-        Ok(path) => {
-            info!("Icon file copied to: {:?}", path);
+        Ok(_res) => {
+            info!("Icon file copied");
         }
         Err(err) => {
             error!("{}", err);
@@ -158,6 +158,16 @@ pub async fn install_app(app: AppHandle, request_installation: RequestInstallati
 
     rm_dir_all(squashfs_path.to_str().unwrap()).expect("Failed to remove squashfs-root directory");
 
+    // Update icons cache
+    match update_icon_cache() {
+        Ok(_res) => {
+            info!("Icon cache updated successfully");
+        }
+        Err(error) => {
+            error!("{}", error);
+        }
+    }
+
     Ok("Installation successful".to_string())
 }
 
@@ -191,7 +201,8 @@ pub async fn uninstall_app(app: App) -> Result<bool, String> {
     };
 
     // Remove the icon
-    let icon_removed: bool = match rm_file(&desktop_entry.icon_path) {
+    //TODO: Implement icon removal now icons are in different location (system icons folder)
+    /*let icon_removed: bool = match rm_file(&desktop_entry.icon_path) {
         Ok(result) => {
             info!("Icon removed successfully");
             result
@@ -205,6 +216,7 @@ pub async fn uninstall_app(app: App) -> Result<bool, String> {
     if !icon_removed {
         warn!("Failed to remove icon");
     }
+     */
 
     // Remove the desktop entry
     let desktop_removed: bool = match delete_desktop_file_by_name(&app.name) {

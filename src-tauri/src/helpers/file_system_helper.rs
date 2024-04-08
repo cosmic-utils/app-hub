@@ -139,3 +139,9 @@ pub fn add_executable_permission(file_path: &str) {
     perms.set_mode(0o755);
     fs::set_permissions(&file_path, perms).expect("Failed to set permissions")
 }
+
+/// Check if a directory is empty
+pub fn is_directory_empty(dir_path: &Path) -> io::Result<bool> {
+    let mut entries = fs::read_dir(dir_path)?;
+    Ok(entries.next().is_none())
+}

@@ -63,7 +63,7 @@ pub fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
 }
 
 /// Save the app settings to the store
-pub fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), String> {
+pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), String> {
     // Check if the install path is empty
     if let Some(install_path) = &settings.install_path {
         if install_path.is_empty() {

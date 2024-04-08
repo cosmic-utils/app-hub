@@ -21,7 +21,7 @@ pub async fn read_settings_command(app: AppHandle) -> Result<AppSettings, String
 
 #[tauri::command]
 pub async fn save_settings_command(app: AppHandle, settings: AppSettings) -> Result<(), String> {
-    match save_settings(app, settings) {
+    match save_settings(app, settings).await {
         Ok(_) => {
             Ok(())
         }

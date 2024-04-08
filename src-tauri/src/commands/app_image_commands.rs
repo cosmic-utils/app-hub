@@ -13,7 +13,7 @@ use crate::services::app_image_service::{install_app_image, read_all_app, uninst
 
 #[tauri::command]
 pub async fn install_app_command(app: AppHandle, request_installation: RequestInstallation) -> Result<String, String> {
-    match install_app_image(app, request_installation) {
+    match install_app_image(app, request_installation).await {
         Ok(_) => {
             info!("App installed successfully");
             Ok("App installed successfully".to_string())

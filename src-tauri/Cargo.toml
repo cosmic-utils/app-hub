@@ -30,6 +30,7 @@ tauri-plugin-log = { version = "2.0.0-beta.3", features = ["colored"] }
 tauri-plugin-persisted-scope = "2.0.0-beta.4"
 tauri-plugin-single-instance = "2.0.0-beta.5"
 tauri-plugin-window-state = "2.0.0-beta.4"
+glob = "0.3.1"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

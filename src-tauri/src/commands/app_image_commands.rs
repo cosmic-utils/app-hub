@@ -3,10 +3,10 @@ use log::{error, info, warn};
 use tauri::AppHandle;
 use crate::commands::app_settings_commands::read_settings;
 
-use crate::helpers::app_images_helpers::{app_image_extract_all, app_image_extract_desktop_file, install_app_image, install_icons, update_icon_cache};
+use crate::helpers::app_images_helpers::{app_image_extract_all, app_image_extract_desktop_file, find_icons_paths, install_app_image, install_icons, update_icon_cache};
 use crate::helpers::desktop_file_builder::DesktopFileBuilder;
 use crate::helpers::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry, find_desktop_file_location, read_all_app};
-use crate::helpers::file_system_helper::{add_executable_permission, find_desktop_file_in_dir, rm_dir_all, rm_file};
+use crate::helpers::file_system_helper::{add_executable_permission, find_desktop_file_in_dir, rm_dir_all, rm_file, sudo_remove_file};
 use crate::models::app_list::{App, AppList};
 use crate::models::request_installation::RequestInstallation;
 
@@ -200,24 +200,6 @@ pub async fn uninstall_app(app: App) -> Result<bool, String> {
         }
     };
 
-    // Remove the icon
-    //TODO: Implement icon removal now icons are in different location (system icons folder)
-    /*let icon_removed: bool = match rm_file(&desktop_entry.icon_path) {
-        Ok(result) => {
-            info!("Icon removed successfully");
-            result
-        }
-        Err(err) => {
-            error!("{}", err);
-            return Err(err);
-        }
-    };
-
-    if !icon_removed {
-        warn!("Failed to remove icon");
-    }
-     */
-
     // Remove the desktop entry
     let desktop_removed: bool = match delete_desktop_file_by_name(&app.name) {
         Ok(result) => {
@@ -229,6 +211,27 @@ pub async fn uninstall_app(app: App) -> Result<bool, String> {
             return Err(err);
         }
     };
+
+    // Remove icons
+    let icon_name: String = desktop_entry.icon;
+    let icons = find_icons_paths(&icon_name.as_str());
+
+    for icon in icons {
+        info!("Removing icon: {:?}", icon);
+        let icon_removed: bool = match sudo_remove_file(&icon) {
+            Ok(_result) => {
+                info!("Icon removed successfully");
+                true
+            }
+            Err(err) => {
+                error!("{}", err);
+                false
+            }
+        };
+        if !icon_removed {
+            warn!("Failed to remove icon");
+        }
+    }
 
     if app_removed && desktop_removed {
         info!("App uninstalled successfully");

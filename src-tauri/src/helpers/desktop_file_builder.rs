@@ -53,8 +53,6 @@ impl DesktopFileBuilder {
 
     /// Read a .desktop file from a given path and return a DesktopFileBuilder instance.
     pub fn from_desktop_entry_path(path: String, is_app_hub_app: bool) -> Result<Self, String> {
-        info!("Reading .desktop file from path: {}", path);
-
         // Read the file content
         let file_content = match std::fs::read_to_string(&path) {
             Ok(content) => content,
@@ -66,7 +64,6 @@ impl DesktopFileBuilder {
 
         // Check if the file content contains the AppHub specific field
         if is_app_hub_app && !file_content.contains("X-AppHub=true") {
-            log::error!("Invalid .desktop file: does not contain 'X-AppHub=true'");
             return Err("Invalid .desktop file".to_string());
         }
 

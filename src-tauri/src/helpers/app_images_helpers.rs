@@ -1,6 +1,7 @@
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
+use glob::glob;
 
 use log::{debug, error, info};
 
@@ -200,4 +201,47 @@ pub fn update_icon_cache() -> Result<(), &'static str> {
         error!("Failed to update icon cache: {}", err);
         Err("Failed to update icon cache")
     }
+}
+
+pub fn find_icons_paths(icon_name: &str) -> Vec<String> {
+    let icons_paths = [
+        "/share/icons/hicolor/22x22/apps/",
+        "/share/icons/hicolor/24x24/apps/",
+        "/share/icons/hicolor/32x32/apps/",
+        "/share/icons/hicolor/48x48/apps/",
+        "/share/icons/hicolor/64x64/apps/",
+        "/share/icons/hicolor/128x128/apps/",
+        "/share/icons/hicolor/256x256/apps/",
+        "/share/icons/hicolor/512x512/apps/",
+        "/share/icons/hicolor/scalable/apps/",
+        "/usr/share/icons/hicolor/22x22/apps/",
+        "/usr/share/icons/hicolor/24x24/apps/",
+        "/usr/share/icons/hicolor/32x32/apps/",
+        "/usr/share/icons/hicolor/48x48/apps/",
+        "/usr/share/icons/hicolor/64x64/apps/",
+        "/usr/share/icons/hicolor/128x128/apps/",
+        "/usr/share/icons/hicolor/256x256/apps/",
+        "/usr/share/icons/hicolor/512x512/apps/",
+        "/usr/share/icons/hicolor/scalable/apps/",
+    ];
+
+    let mut paths = Vec::new();
+
+    for icon_path in icons_paths.iter() {
+        let pattern = format!("{}{}.*", icon_path, icon_name);
+
+        for entry in glob(&pattern).expect("Failed to read glob pattern") {
+            match entry {
+                Ok(path) => {
+                    if path.is_file() {
+                        paths.push(path.to_str().unwrap().to_string());
+                    }
+                },
+                Err(e) => println!("{:?}", e),
+            }
+        }
+    }
+
+
+    paths
 }

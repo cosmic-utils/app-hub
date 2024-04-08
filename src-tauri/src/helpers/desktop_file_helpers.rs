@@ -85,7 +85,7 @@ pub fn find_desktop_entry(app_name: String) -> Result<DesktopEntry, String> {
                             return Ok(DesktopEntry {
                                 exec: desktop_entry.exec().unwrap(),
                                 name: desktop_entry.name().unwrap(),
-                                icon_path: desktop_entry.icon().unwrap(),
+                                icon: desktop_entry.icon().unwrap(),
                             });
                         }
                     }

@@ -27,8 +27,7 @@ pub fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
             // If the settings are not found, return None
             None => Ok(None),
         }
-    })
-        .map_err(|e| e.to_string())?;
+    }).map_err(|e| e.to_string())?;
 
     // If the settings were not found, create and save default settings
     let res = match res {
@@ -42,12 +41,10 @@ pub fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
                     dirs::home_dir().unwrap().to_string_lossy()
                 )),
             };
-            let serialized_settings =
-                serde_json::to_value(default_settings.clone()).map_err(|e| e.to_string())?;
+            let serialized_settings = serde_json::to_value(default_settings.clone()).map_err(|e| e.to_string())?;
             with_store(app_clone, stores, path, |store| {
                 store.insert("app_settings".to_string(), serialized_settings)
-            })
-                .expect("error saving default settings");
+            }).expect("error saving default settings");
             serde_json::to_value(default_settings).map_err(|e| e.to_string())?
         }
     };
@@ -68,8 +65,7 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
     if let Some(install_path) = &settings.install_path {
         if install_path.is_empty() {
             return Err("Install path cannot be empty".into());
-        }
-        else {
+        } else {
             // Check if the install path is valid
             let path = PathBuf::from(install_path);
             if !path.exists() {
@@ -83,7 +79,7 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
                     // Move all AppImages and icons to the new path
                     let moved = copy_dir_all(
                         &old_install_path,
-                        install_path
+                        install_path,
                     );
                     if let Err(e) = moved {
                         error!("Error moving AppImages and icons: {:?}", e);
@@ -94,7 +90,6 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
                     let desktop_entries = find_desktop_entries_by_exec_contains(&old_install_path);
 
                     for desktop_entry_path in desktop_entries.unwrap() {
-
                         match DesktopFileBuilder::from_desktop_entry_path(desktop_entry_path.clone(), true) {
                             Ok(mut desktop_file_builder) => {
 

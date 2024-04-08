@@ -24,7 +24,7 @@ pub async fn install_app_image(app: AppHandle, request_installation: RequestInst
         Ok(settings) => settings.install_path.unwrap(),
         Err(err) => {
             error!("{}", err);
-            return Err(err);
+            return Err("Failed to read settings".to_string());
         }
     };
 
@@ -36,18 +36,10 @@ pub async fn install_app_image(app: AppHandle, request_installation: RequestInst
     let app_image_directory_path = app_image_file_path.parent().expect("Failed to get directory").to_path_buf();
 
     // Extract the AppImage .desktop file
-    match app_image_extract_desktop_file(
+    app_image_extract_desktop_file(
         app_image_directory_path.to_str().unwrap(),
         file_name.to_string_lossy().to_string().as_str()
-    ) {
-        Ok(_) => {
-            info!("AppImage extracted .desktop file successfully");
-        }
-        Err(err) => {
-            error!("{}", err);
-            return Err(err.to_string());
-        }
-    }
+    )?;
 
     // Squashfs-root directory path (app image extracted directory)
     let squashfs_path = std::path::PathBuf::from(app_image_directory_path.clone()).join("squashfs-root");
@@ -76,7 +68,7 @@ pub async fn install_app_image(app: AppHandle, request_installation: RequestInst
             db
         }
         Err(error) => {
-            return Err(error);
+            return Err(error.to_string());
         }
     };
 
@@ -118,7 +110,7 @@ pub async fn install_app_image(app: AppHandle, request_installation: RequestInst
     //desktop_builder.set_icon(copied_icon_path);
 
     // Create destination path
-    let desktop_files_location = find_desktop_file_location().map_err(|err| err.to_string())?;
+    let desktop_files_location = find_desktop_file_location()?;
     let desktop_files_location_path = std::path::PathBuf::from(desktop_files_location);
     //TODO: Check if the app name is present
     let desktop_entry_path = desktop_files_location_path
@@ -135,8 +127,8 @@ pub async fn install_app_image(app: AppHandle, request_installation: RequestInst
         Ok(_) => {
             info!("Desktop entry created successfully");
         }
-        Err(err) => {
-            return Err(err);
+        Err(err) => {  
+            return Err(err.to_string());
         }
     }
 
@@ -150,7 +142,7 @@ pub async fn install_app_image(app: AppHandle, request_installation: RequestInst
         }
         Err(err) => {
             error!("{}", err);
-            return Err(err);
+            return Err(err.to_string());
         }
     }
 

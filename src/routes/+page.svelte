@@ -3,6 +3,7 @@
     import {pickAppImage} from "$lib/helpers/tauriCommands/dialogCommands";
     import {installAppImage} from "$lib/helpers/tauriCommands/appImageCommands";
     import Modal from "$lib/components/Modal.svelte";
+    import LoadingOverlay from "$lib/components/LoadingOverlay.svelte";
 
     let appPath: string;
     let enableAdvancedOptions: boolean = false;
@@ -12,6 +13,7 @@
     let modalOpen: boolean = false;
     let modalTitle: string;
     let modalMessage: string;
+    let isLoading: boolean = false;
 
     const chooseFile = async () => {
         try {
@@ -25,6 +27,7 @@
     }
 
     const installApp = async () => {
+        isLoading = true;
         try {
             const res = await installAppImage(
                 appPath,
@@ -39,6 +42,9 @@
             modalOpen = true;
             modalTitle = $t("install_file.error_modal_title");
             modalMessage = $t("install_file.error_modal_install");
+        }
+        finally {
+            isLoading = false;
         }
     }
 
@@ -99,3 +105,5 @@
         <p class="mt-3">{modalMessage}</p>
     </div>
 </Modal>
+
+<LoadingOverlay loading={isLoading}/>

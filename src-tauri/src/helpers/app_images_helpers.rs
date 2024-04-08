@@ -203,6 +203,7 @@ pub fn update_icon_cache() -> Result<(), &'static str> {
     }
 }
 
+/// Find the icon paths for the given icon name
 pub fn find_icons_paths(icon_name: &str) -> Vec<String> {
     let icons_paths = [
         "/share/icons/hicolor/22x22/apps/",

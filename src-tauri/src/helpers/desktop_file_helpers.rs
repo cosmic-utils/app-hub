@@ -4,6 +4,7 @@ use log::{debug, error, info};
 use crate::helpers::file_system_helper::{image_to_base64, sudo_remove_file};
 use crate::models::app_list::App;
 use regex::Regex;
+use crate::helpers::app_images_helpers::find_icons_paths;
 use crate::helpers::desktop_file_builder::DesktopFileBuilder;
 use crate::models::desktop_entry::DesktopEntry;
 
@@ -29,13 +30,19 @@ pub fn read_all_app() -> Result<Vec<App>, String> {
 
                 let desktop_entry = desktop_file.unwrap();
 
+                let icons_path = find_icons_paths(&desktop_entry.icon().unwrap());
+
                 debug!("Reading icon at: {:?}", desktop_entry.icon());
-                let base64_icon = match image_to_base64(&desktop_entry.icon().unwrap()) {
-                    Ok(base64) => Some(base64),
-                    Err(err) => {
-                        info!("Failed to convert image to base64: {}", err);
-                        None
+                let base64_icon: Option<String> = if icons_path.len() > 0 {
+                    match image_to_base64(icons_path.get(0).unwrap().as_str()) {
+                        Ok(base64) => Some(base64),
+                        Err(err) => {
+                            info!("Failed to convert image to base64: {}", err);
+                            None
+                        }
                     }
+                } else {
+                    None
                 };
 
                 apps.push(App {

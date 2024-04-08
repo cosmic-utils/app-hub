@@ -4,6 +4,7 @@ use base64::Engine;
 use mime_guess::from_path;
 use std::fs::File;
 use std::io::Read;
+use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use log::{debug, info};
@@ -43,6 +44,17 @@ pub fn rm_file(file_path: &String) -> Result<bool, String> {
             Ok(true)
         },
         Err(e) => Err(format!("Failed to remove file: {}", e)),
+    }
+}
+
+/// This function is used to remove a directory and all its contents from the filesystem
+pub fn rm_dir_all(dir_path: &str) -> Result<bool, String> {
+    match fs::remove_dir_all(dir_path) {
+        Ok(_) => {
+            info!("Directory removed successfully");
+            Ok(true)
+        },
+        Err(e) => Err(format!("Failed to remove directory: {}", e)),
     }
 }
 
@@ -116,4 +128,14 @@ pub fn find_desktop_file_in_dir(dir_path: &str) -> Result<String, String> {
     }
 
     Err("No desktop file found".to_string())
+}
+
+pub fn add_executable_permission(file_path: &str) {
+    // Set the executable permission to the file
+    let mut perms = fs::metadata(&file_path)
+        .expect("Failed to get metadata")
+        .permissions();
+    // Set the executable permission to the file
+    perms.set_mode(0o755);
+    fs::set_permissions(&file_path, perms).expect("Failed to set permissions")
 }

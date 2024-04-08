@@ -6,52 +6,9 @@ use crate::commands::app_settings_commands::read_settings;
 use crate::helpers::app_images_helpers::{app_image_extract_all, app_image_extract_desktop_file, install_app_image, install_icons};
 use crate::helpers::desktop_file_builder::DesktopFileBuilder;
 use crate::helpers::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry, find_desktop_file_location, read_all_app};
-use crate::helpers::file_system_helper::{find_desktop_file_in_dir, rm_file};
+use crate::helpers::file_system_helper::{add_executable_permission, find_desktop_file_in_dir, rm_dir_all, rm_file};
 use crate::models::app_list::{App, AppList};
 use crate::models::request_installation::RequestInstallation;
-
-///TODO WORK TO DO
-/// Questo comando va riscritto tutto con le nuove info che ho
-/// le app image possono essere estratte con il comando ./appImage --appimage-extract
-/// Queta estrazione crea una cartella chiamata squashfs-root che contiene il file .desktop e le icone (ovviamente oltre al file eseguibile)
-/// Per il mio caso specifico mi serve solo il file .desktop e l'icona
-/// Il file .desktop lo posso parsare con la mia funzione e sovrascrivo i voalri che devo sovrascriere
-/// Per le icone il discorso è un po piu complesso in quanto possono essere in diversi percorsi, qui sotto li segno tutti:
-///
-///    let squashfs_icons_paths = [
-///         "./squashfs-root/share/icons/hicolor/22x22/apps/",
-///         "./squashfs-root/share/icons/hicolor/24x24/apps/",
-///         "./squashfs-root/share/icons/hicolor/32x32/apps/",
-///         "./squashfs-root/share/icons/hicolor/48x48/apps/",
-///         "./squashfs-root/share/icons/hicolor/64x64/apps/",
-///         "./squashfs-root/share/icons/hicolor/128x128/apps/",
-///         "./squashfs-root/share/icons/hicolor/256x256/apps/",
-///         "./squashfs-root/share/icons/hicolor/512x512/apps/",
-///         "./squashfs-root/share/icons/hicolor/scalable/apps/",
-///         "./squashfs-root/usr/share/icons/hicolor/22x22/apps/",
-///         "./squashfs-root/usr/share/icons/hicolor/24x24/apps/",
-///         "./squashfs-root/usr/share/icons/hicolor/32x32/apps/",
-///         "./squashfs-root/usr/share/icons/hicolor/48x48/apps/",
-///         "./squashfs-root/usr/share/icons/hicolor/64x64/apps/",
-///         "./squashfs-root/usr/share/icons/hicolor/128x128/apps/",
-///         "./squashfs-root/usr/share/icons/hicolor/256x256/apps/",
-///         "./squashfs-root/usr/share/icons/hicolor/512x512/apps/",
-///         "./squashfs-root/usr/share/icons/hicolor/scalable/apps/",
-///     ];
-///
-/// Invece di cercare in quale percorso si trovo l'icona posso copiare direttamente tutti questi percorsi nella cartella di sistema delle icone
-/// la cartella di sistema delle icone è /usr/share/icons di solito (verifica in seguito se è sempre così, nel mio sistema è cosi)
-/// e i percorsi sono gli stessi di sopra... quindi basta copiare tutte le icone in tutti i percorsi possibili (gestengo i possibili errori nel codice)
-///
-/// I passi da fare sono quindi:
-/// 1- Estraggo il file .desktop -> fatto
-/// 2- Parsare il file .desktop -> fatto
-/// 3- Copiare tutte le icone nei percorsi possibili
-///    3.1- Estrarre tutta la appimage -> fatto
-///    3.2- Copiare tutte le icone (dai percorsi sopra) nella cartella di sistema delle icone -> fatto
-/// 4- Sovrascrivere i valori del file .desktop
-/// 5- Scriere il file .desktop nella cartella di sistema delle app
-/// 6- Cancello la cartella estratta (squashfs-root)
 
 #[tauri::command]
 pub async fn install_app(app: AppHandle, request_installation: RequestInstallation) -> Result<String, String> {
@@ -60,6 +17,9 @@ pub async fn install_app(app: AppHandle, request_installation: RequestInstallati
     info!("# File path: {:?}", request_installation.file_path);
     info!("# No sandbox: {:?}", request_installation.no_sandbox);
     info!("#################################");
+
+    // Add executable permission to the AppImage
+    add_executable_permission(&request_installation.file_path);
 
     // Read path where to install apps
     let apps_installation_path = match read_settings(app).await {
@@ -151,7 +111,7 @@ pub async fn install_app(app: AppHandle, request_installation: RequestInstallati
 
     // Set mandatory fields
     desktop_builder.set_exec(format!(
-        "{}/{}",
+        "{}{}",
         apps_installation_path,
         file_name.to_string_lossy()
     ));
@@ -181,6 +141,22 @@ pub async fn install_app(app: AppHandle, request_installation: RequestInstallati
             return Err(err);
         }
     }
+
+    // Install the AppImage
+    match install_app_image(
+        &app_image_file_path.to_str().unwrap().to_string(),
+        &apps_installation_path
+    ) {
+        Ok(res) => {
+            info!("AppImage installed successfully");
+        }
+        Err(err) => {
+            error!("{}", err);
+            return Err(err);
+        }
+    }
+
+    rm_dir_all(squashfs_path.to_str().unwrap()).expect("Failed to remove squashfs-root directory");
 
     Ok("Installation successful".to_string())
 }

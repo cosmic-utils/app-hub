@@ -241,6 +241,8 @@ impl DesktopFileBuilder {
         // AppHub specific fields
         file_content.push_str("X-AppHub=true\n");
 
+        info!("Writing desktop file to: {}", path);
+
         // Write the file
         match sudo_write_file(path.as_str(), file_content.as_str()) {
             Ok(res) => {

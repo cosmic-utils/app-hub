@@ -69,7 +69,7 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
             // Check if the install path is valid
             let path = PathBuf::from(install_path);
             if !path.exists() {
-                return Err("Install path does not exist".into());
+                 return Err("Install path does not exist".to_string());
             }
             // Check if the new path is different from the old path
             let old_settings = read_settings_command(app.clone()).await?;

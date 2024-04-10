@@ -99,7 +99,7 @@ pub async fn install_app_image(app: AppHandle, request_installation: RequestInst
 
     // Set mandatory fields
     desktop_builder.set_exec(format!(
-        "{}{}",
+        "{}/{}",
         apps_installation_path,
         file_name.to_string_lossy()
     ));

@@ -52,19 +52,19 @@ impl DesktopFileBuilder {
     }
 
     /// Read a .desktop file from a given path and return a DesktopFileBuilder instance.
-    pub fn from_desktop_entry_path(path: String, is_app_hub_app: bool) -> Result<Self, String> {
+    pub fn from_desktop_entry_path(path: String, is_app_hub_app: bool) -> Result<Self, &'static str> {
         // Read the file content
         let file_content = match std::fs::read_to_string(&path) {
             Ok(content) => content,
             Err(e) => {
                 log::error!("Failed to read file: {}", e);
-                return Err("Failed to read .desktop file".to_string());
+                return Err("Failed to read .desktop file");
             }
         };
 
         // Check if the file content contains the AppHub specific field
         if is_app_hub_app && !file_content.contains("X-AppHub=true") {
-            return Err("Invalid .desktop file".to_string());
+            return Err("Invalid .desktop file");
         }
 
         // Parse the file content
@@ -177,19 +177,19 @@ impl DesktopFileBuilder {
     }
 
 
-    pub fn write_to_file(self, path: String) -> Result<String, String> {
+    pub fn write_to_file(self, path: String) -> Result<String, &'static str> {
         // Check mandatory fields
         if self.type_.is_none() {
-            return Err("Type field is mandatory".to_string());
+            return Err("Type field is mandatory");
         }
         if self.version.is_none() {
-            return Err("Version field is mandatory".to_string());
+            return Err("Version field is mandatory");
         }
         if self.name.is_none() {
-            return Err("Name field is mandatory".to_string());
+            return Err("Name field is mandatory");
         }
         if self.exec.is_none() {
-            return Err("Exec field is mandatory".to_string());
+            return Err("Exec field is mandatory");
         }
 
         // Create the file content
@@ -248,7 +248,7 @@ impl DesktopFileBuilder {
             }
             Err(error) => {
                 error!("Failed to write desktop file: {}", error);
-                Err("Failed to write desktop file".to_string())
+                Err("Failed to write desktop file")
             }
         }
     }

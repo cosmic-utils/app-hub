@@ -3,15 +3,16 @@
 
 use tauri_plugin_log::{Target, TargetKind};
 use tauri_plugin_log::fern::colors::{Color, ColoredLevelConfig};
-use crate::commands::app_image_commands::{install_app, read_app_list, uninstall_app};
+use crate::commands::app_image_commands::{install_app_command, read_app_list_command, uninstall_app_command};
 
-use crate::commands::app_settings_commands::{read_settings, save_settings};
-use crate::commands::dialog_commands::{pick_app_image, pick_dir};
+use crate::commands::app_settings_commands::{read_settings_command, save_settings_command};
+use crate::commands::dialog_commands::{pick_app_image_command, pick_dir_command};
 use crate::models::app_state::AppState;
 
 mod commands;
 mod helpers;
 mod models;
+mod services;
 
 fn main() {
     tauri::Builder::default()
@@ -40,13 +41,13 @@ fn main() {
                 .build(),
         )
         .invoke_handler(tauri::generate_handler![
-            pick_app_image,
-            pick_dir,
-            install_app,
-            read_app_list,
-            uninstall_app,
-            read_settings,
-            save_settings
+            pick_app_image_command,
+            pick_dir_command,
+            install_app_command,
+            read_app_list_command,
+            uninstall_app_command,
+            read_settings_command,
+            save_settings_command
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

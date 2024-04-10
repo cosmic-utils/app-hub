@@ -3,7 +3,7 @@ use tauri::AppHandle;
 use tauri_plugin_dialog::DialogExt;
 
 #[tauri::command]
-pub async fn pick_app_image(app: AppHandle) -> Result<String, String> {
+pub async fn pick_app_image_command(app: AppHandle) -> Result<String, String> {
     info!("Opening file dialog");
     let file_path = app
         .dialog()
@@ -25,7 +25,7 @@ pub async fn pick_app_image(app: AppHandle) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub async fn pick_dir(app: AppHandle) -> Result<String, String> {
+pub async fn pick_dir_command(app: AppHandle) -> Result<String, String> {
     info!("Opening directory dialog");
     let dir_path = app
         .dialog()

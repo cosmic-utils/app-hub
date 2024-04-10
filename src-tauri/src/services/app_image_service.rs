@@ -10,7 +10,6 @@ use crate::models::request_installation::RequestInstallation;
 
 /// Install an AppImage
 pub async fn install_app_image(app: AppHandle, request_installation: RequestInstallation) -> Result<(), String> {
-
     info!("##### REQUESTED TO INSTALL APP ####");
     info!("# File path: {:?}", request_installation.file_path);
     info!("# No sandbox: {:?}", request_installation.no_sandbox);
@@ -45,7 +44,6 @@ pub async fn install_app_image(app: AppHandle, request_installation: RequestInst
     let squashfs_path = std::path::PathBuf::from(app_image_directory_path.clone()).join("squashfs-root");
 
     // Find the desktop file in the squashfs-root directory
-    //TODO can be improved? (.desktop file location is known)
     let desktop_file_path = match find_desktop_file_in_dir(
         squashfs_path.to_string_lossy().to_string().as_str()
     ) {
@@ -137,7 +135,7 @@ pub async fn install_app_image(app: AppHandle, request_installation: RequestInst
         &app_image_file_path.to_str().unwrap().to_string(),
         &apps_installation_path
     ) {
-        Ok(res) => {
+        Ok(_res) => {
             info!("AppImage installed successfully");
         }
         Err(err) => {

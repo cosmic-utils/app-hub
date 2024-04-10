@@ -86,9 +86,9 @@ Please note that this project is developed in spare time and is not a full-time 
 
 Roadmap for the project is not fully defined yet. However, the following features are planned for future releases:
 
-- [ ] Add support for other Linux distributions.
-- [ ] Add installation support for other application bundle formats in addition to AppImage (e.g., Flatpak, Snap, .deb, .rpm).
-- [ ] Add support for other desktop environments.
+- [ ] Improve the application's performance and stability
+- [ ] Improve the application's user interface and user experience
+- [ ] Create an app store for AppImage applications
 - [x] Automaticaly extract AppImage icon
 
 ## 💖 Support

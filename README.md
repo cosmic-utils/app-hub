@@ -84,12 +84,7 @@ Please note that this project is developed in spare time and is not a full-time 
 
 ## 🚀 Roadmap
 
-Roadmap for the project is not fully defined yet. However, the following features are planned for future releases:
-
-- [ ] Improve the application's performance and stability
-- [ ] Improve the application's user interface and user experience
-- [ ] Create an app store for AppImage applications
-- [x] Automaticaly extract AppImage icon
+Take a look to the roadmap in the [ROADMAP](roadmap.md).
 
 ## 💖 Support
 

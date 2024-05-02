@@ -1,0 +1,14 @@
+
+[tasks.build]
+command = "cargo"
+args = ["build", "--release"]
+
+[tasks.copy]
+command = "cp"
+args = ["target/release/app_hub_backend", "../src-tauri/binaries/app_hub_backend-x86_64-unknown-linux-gnu"]
+
+[tasks.full_build]
+dependencies = [
+    "build",
+    "copy"
+]

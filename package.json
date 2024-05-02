@@ -4,11 +4,12 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
+		"prebuild": "cd ./app_hub_backend && cargo make full_build",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"tauri:dev": "tauri dev"
+		"tauri:dev": "pnpm prebuild && tauri dev"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",

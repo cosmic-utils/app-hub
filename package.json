@@ -10,7 +10,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"tauri:dev": "pnpm prebuild && tauri dev",
-		"tauri:build": "pnpm prebuild && tauri build"
+		"tauri:build": "pnpm prebuild && NO_STRIP=true tauri build"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",

@@ -1,3 +1,4 @@
+use std::process::Command;
 use dirs;
 use log::{error, info, warn};
 use tauri::AppHandle;
@@ -33,29 +34,20 @@ pub async fn read_app_list_command(app_handle: AppHandle) -> Result<AppList, Str
 
     //TODO test purposes code (remove it when not needed anymore)
     println!("start of test purposes code");
-    let shell = app_handle.shell();
-    let (mut rx, mut child) = shell.sidecar("app_hub_backend")
-        .unwrap().args(&["--file-path", "/usr/share/applications/test.txt"])
-        .spawn()
-        .expect("Sidecar failed to start due to an error.");
 
-    while let Some(event) = rx.recv().await {
-        match event {
-            CommandEvent::Stderr(error) => {
-                println!("error: {}", String::from_utf8(error).unwrap());
-            }
-            CommandEvent::Stdout(out) => {
-                println!("out: {}", String::from_utf8(out).unwrap());
-            }
-            CommandEvent::Error(error) => {
-                println!("error: {}", error);
-            }
-            CommandEvent::Terminated(terminated) => {
-                println!("terminated: {:?}", terminated);
-            }
-            _ => {
-                println!("other event");
-            }
+    let p = std::env::current_exe().map_err(|_| "unable to get current exe")?.parent().unwrap().join("app_hub_backend");
+    let mut cmd = Command::new("pkexec")
+        .arg(p)
+        .arg("--file-path")
+        .arg("/usr/share/applications/test.txt")
+        .spawn();
+    match cmd {
+        Ok(res) => {
+            let output = res.wait_with_output().expect("Failed to wait on child");
+            println!("output: {:?}", output);
+        }
+        Err(error) => {
+            println!("error: {:?}", error);
         }
     }
     // end of test purposes code

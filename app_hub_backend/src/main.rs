@@ -1,3 +1,5 @@
+use std::fs::File;
+use std::io::Write;
 use clap::Parser;
 
 #[derive(Parser, Debug)]
@@ -12,31 +14,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
     println!("Trying to install AppImage: {}", args.file_path);
 
-    let command = format!("pkexec --user root sh -c \"echo '{}' > {}\"", "Hello, world!", "/usr/share/applications/test.txt");
-    let output = std::process::Command::new("sh")
-        .arg("-c")
-        .arg(&command)
-        .output();
+    // write a file to /usr/share/applications/test.txt using rust
+    let mut file = File::create("/usr/share/applications/test.txt")?;
+    file.write_all(b"Hello, world!")?;
 
-    let command = format!("pkexec --user root sh -c \"echo '{}' > {}\"", "Hello, world!", "/usr/share/applications/test.txt");
-    let output = std::process::Command::new("sh")
-        .arg("-c")
-        .arg(&command)
-        .output();
-
-    match output {
-        Ok(output) => {
-            if output.status.success() {
-                println!("File written successfully");
-                Ok(())
-            } else {
-                println!("Failed to write file: {}", String::from_utf8_lossy(&output.stderr));
-                Err("Failed to write file".into())
-            }
-        },
-        Err(e) => {
-            println!("Failed to execute command '{}': {}", command, e);
-            Err("Failed to execute command".into())
-        }
-    }
+    Ok(())
 }

@@ -2,10 +2,10 @@ use std::path::PathBuf;
 use log::{debug, error, info, warn};
 use tauri::{AppHandle, Manager, Wry};
 use tauri_plugin_store::{StoreCollection, with_store};
+use common_utils::desktop_file_builder::DesktopFileBuilder;
+use common_utils::desktop_file_helpers::find_desktop_entries_by_exec_contains;
+use common_utils::file_system_helpers::copy_dir_all;
 use crate::commands::app_settings_commands::read_settings_command;
-use crate::helpers::desktop_file_builder::DesktopFileBuilder;
-use crate::helpers::desktop_file_helpers::find_desktop_entries_by_exec_contains;
-use crate::helpers::file_system_helper::copy_dir_all;
 use crate::models::app_settings::AppSettings;
 
 /// Read the app settings from the store

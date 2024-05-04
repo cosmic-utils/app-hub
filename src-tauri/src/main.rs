@@ -10,7 +10,6 @@ use crate::commands::dialog_commands::{pick_app_image_command, pick_dir_command}
 use crate::models::app_state::AppState;
 
 mod commands;
-mod helpers;
 mod models;
 mod services;
 

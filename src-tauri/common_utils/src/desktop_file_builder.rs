@@ -1,7 +1,5 @@
-use std::process::Command;
-use log::{error, info, warn};
 use regex::Regex;
-use crate::helpers::file_system_helper::sudo_write_file;
+use log::info;
 
 pub struct DesktopFileBuilder {
     /// The `type_` field represents the type of the application. It's usually "Application" for desktop applications.
@@ -176,8 +174,8 @@ impl DesktopFileBuilder {
         self
     }
 
-
-    pub fn write_to_file(self, path: String) -> Result<String, &'static str> {
+    /// Generate the content of the .desktop file as a string.
+    pub fn generate_content_string(self) -> Result<String, &'static str> {
         // Check mandatory fields
         if self.type_.is_none() {
             return Err("Type field is mandatory");
@@ -193,64 +191,52 @@ impl DesktopFileBuilder {
         }
 
         // Create the file content
-        let mut file_content = String::from("[Desktop Entry]\n");
+        let mut desktop_file_content = String::from("[Desktop Entry]\n");
 
         if let Some(type_) = self.type_ {
-            file_content.push_str(&format!("Type={}\n", type_));
+            desktop_file_content.push_str(&format!("Type={}\n", type_));
         }
 
         if let Some(version) = self.version {
-            file_content.push_str(&format!("Version={}\n", version));
+            desktop_file_content.push_str(&format!("Version={}\n", version));
         }
 
         if let Some(name) = self.name {
-            file_content.push_str(&format!("Name={}\n", name));
+            desktop_file_content.push_str(&format!("Name={}\n", name));
         }
 
         if let Some(comment) = self.comment {
-            file_content.push_str(&format!("Comment={}\n", comment));
+            desktop_file_content.push_str(&format!("Comment={}\n", comment));
         }
 
         if let Some(path) = self.path {
-            file_content.push_str(&format!("Path={}\n", path));
+            desktop_file_content.push_str(&format!("Path={}\n", path));
         }
 
         if let Some(exec) = self.exec {
             if self.no_sanbox.is_some() && self.no_sanbox.unwrap() {
-                file_content.push_str(&format!("Exec={} --no-sandbox\n", exec));
+                desktop_file_content.push_str(&format!("Exec={} --no-sandbox\n", exec));
             } else {
-                file_content.push_str(&format!("Exec={}\n", exec));
+                desktop_file_content.push_str(&format!("Exec={}\n", exec));
             }
         }
 
         if let Some(icon) = self.icon {
-            file_content.push_str(&format!("Icon={}\n", icon));
+            desktop_file_content.push_str(&format!("Icon={}\n", icon));
         }
 
         if let Some(terminal) = self.terminal {
-            file_content.push_str(&format!("Terminal={}\n", terminal));
+            desktop_file_content.push_str(&format!("Terminal={}\n", terminal));
         }
 
         if let Some(categories) = self.categories {
-            file_content.push_str(&format!("Categories={}\n", categories));
+            desktop_file_content.push_str(&format!("Categories={}\n", categories));
         }
 
         // AppHub specific fields
-        file_content.push_str("X-AppHub=true\n");
+        desktop_file_content.push_str("X-AppHub=true\n");
 
-        info!("Writing desktop file to: {}", path);
-
-        // Write the file
-        match sudo_write_file(path.as_str(), file_content.as_str()) {
-            Ok(res) => {
-                info!("Desktop file written successfully");
-                Ok(path)
-            }
-            Err(error) => {
-                error!("Failed to write desktop file: {}", error);
-                Err("Failed to write desktop file")
-            }
-        }
+        Ok(desktop_file_content)
     }
 
     pub fn type_(&self) -> Option<String> {
@@ -291,5 +277,71 @@ impl DesktopFileBuilder {
 
     pub fn no_sanbox(&self) -> Option<bool> {
         self.no_sanbox
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let builder = DesktopFileBuilder::new();
+        assert!(builder.type_().is_none());
+        assert!(builder.version().is_none());
+        assert!(builder.name().is_none());
+        assert!(builder.comment().is_none());
+        assert!(builder.path().is_none());
+        assert!(builder.exec().is_none());
+        assert!(builder.icon().is_none());
+        assert!(builder.terminal().is_none());
+        assert!(builder.categories().is_none());
+        assert!(builder.no_sanbox().is_none());
+    }
+
+    #[test]
+    fn test_setters() {
+        let mut builder = DesktopFileBuilder::new();
+        builder.set_type("Application".to_string());
+        builder.set_version("1.0".to_string());
+        builder.set_name("Test App".to_string());
+        builder.set_comment("This is a test".to_string());
+        builder.set_path("/usr/bin/test".to_string());
+        builder.set_exec("test".to_string());
+        builder.set_icon("/usr/share/icons/test.png".to_string());
+        builder.set_terminal(true);
+        builder.set_categories(vec!["Utility".to_string()]);
+        builder.set_no_sandbox(true);
+
+        assert_eq!(builder.type_(), Some("Application".to_string()));
+        assert_eq!(builder.version(), Some("1.0".to_string()));
+        assert_eq!(builder.name(), Some("Test App".to_string()));
+        assert_eq!(builder.comment(), Some("This is a test".to_string()));
+        assert_eq!(builder.path(), Some("/usr/bin/test".to_string()));
+        assert_eq!(builder.exec(), Some("test".to_string()));
+        assert_eq!(builder.icon(), Some("/usr/share/icons/test.png".to_string()));
+        assert_eq!(builder.terminal(), Some(true));
+        assert_eq!(builder.categories(), Some("Utility".to_string()));
+        assert_eq!(builder.no_sanbox(), Some(true));
+    }
+
+
+    #[test]
+    fn test_generate_content_string() {
+        let mut builder = DesktopFileBuilder::new();
+        builder.set_type("Application".to_string());
+        builder.set_version("1.0".to_string());
+        builder.set_name("Test App".to_string());
+        builder.set_comment("This is a test".to_string());
+        builder.set_path("/usr/bin/test".to_string());
+        builder.set_exec("test".to_string());
+        builder.set_icon("/usr/share/icons/test.png".to_string());
+        builder.set_terminal(true);
+        builder.set_categories(vec!["Utility".to_string()]);
+        builder.set_no_sandbox(true);
+
+        let content = builder.generate_content_string().unwrap();
+        let expected_content = "[Desktop Entry]\nType=Application\nVersion=1.0\nName=Test App\nComment=This is a test\nPath=/usr/bin/test\nExec=test --no-sandbox\nIcon=/usr/share/icons/test.png\nTerminal=true\nCategories=Utility\nX-AppHub=true\n";
+        assert_eq!(content, expected_content);
     }
 }

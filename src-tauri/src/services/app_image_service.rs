@@ -1,10 +1,11 @@
 use log::{debug, error, info, warn};
 use tauri::AppHandle;
+use common_utils::app_images_helpers::{app_image_extract_all, app_image_extract_desktop_file, find_icons_paths, install_app_image_from_path, install_icons, update_icon_cache};
+use common_utils::desktop_file_builder::DesktopFileBuilder;
+use common_utils::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry, find_desktop_file_location};
+use common_utils::file_system_helpers::{add_executable_permission, find_desktop_file_in_dir, rm_dir_all, rm_file, sudo_remove_file};
+use common_utils::icons_helpers::image_to_base64;
 use crate::commands::app_settings_commands::read_settings_command;
-use crate::helpers::app_images_helpers::{app_image_extract_all, app_image_extract_desktop_file, find_icons_paths, install_app_image_from_path, install_icons, update_icon_cache};
-use crate::helpers::desktop_file_builder::DesktopFileBuilder;
-use crate::helpers::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry, find_desktop_file_location};
-use crate::helpers::file_system_helper::{add_executable_permission, find_desktop_file_in_dir, image_to_base64, rm_dir_all, rm_file, sudo_remove_file};
 use crate::models::app_list::App;
 use crate::models::request_installation::RequestInstallation;
 

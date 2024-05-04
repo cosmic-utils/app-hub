@@ -1,12 +1,9 @@
 use std::env;
 use std::path::Path;
-use log::{debug, error, info};
-use crate::helpers::file_system_helper::{image_to_base64, sudo_remove_file};
-use crate::models::app_list::App;
-use regex::Regex;
-use crate::helpers::app_images_helpers::find_icons_paths;
-use crate::helpers::desktop_file_builder::DesktopFileBuilder;
-use crate::models::desktop_entry::DesktopEntry;
+use log::{error};
+use crate::desktop_entry::DesktopEntry;
+use crate::desktop_file_builder::DesktopFileBuilder;
+use crate::file_system_helpers::sudo_remove_file;
 
 /// Find the desktop entry of the application with the given name.
 /// The function reads all the .desktop files in the applications directory and compares the "Name" value

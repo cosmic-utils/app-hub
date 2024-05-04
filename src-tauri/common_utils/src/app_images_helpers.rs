@@ -1,11 +1,9 @@
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 use glob::glob;
 
 use log::{debug, error, info};
-
-use crate::helpers::file_system_helper::{add_executable_permission, copy_dir_all, is_directory_empty};
+use crate::file_system_helpers::{add_executable_permission, is_directory_empty};
 
 /// Install an AppImage file using the given file path
 pub fn install_app_image_from_path(file_path: &String, installation_path: &String) -> Result<String, String> {

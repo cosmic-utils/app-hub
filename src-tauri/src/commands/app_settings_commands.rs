@@ -2,7 +2,7 @@
 // https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/store#usage-from-rust
 // plugin is in beta, so the API may change
 
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle};
 
 use crate::models::app_settings::AppSettings;
 use crate::services::settings_service::{read_settings, save_settings};

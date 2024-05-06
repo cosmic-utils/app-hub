@@ -1,6 +1,7 @@
-use std::fs::{File, OpenOptions};
-use std::io::Write;
+use std::fs::{File, OpenOptions, remove_dir_all};
+use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
+use std::process::{Command, Stdio};
 use log::{debug, error, info, warn};
 use tauri::{AppHandle, Manager, Wry};
 use tauri_plugin_store::{StoreCollection, with_store};
@@ -77,61 +78,56 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
             let old_settings = read_settings_command(app.clone()).await?;
             if let Some(old_install_path) = old_settings.install_path {
                 if !old_install_path.eq(install_path) {
-                    info!("Install path changed from {} to {}", old_install_path, install_path);
-                    // Move all AppImages and icons to the new path
-                    let moved = copy_dir_all(
-                        &old_install_path,
-                        install_path,
-                    );
-                    if let Err(e) = moved {
-                        error!("Error moving AppImages and icons: {:?}", e);
-                    }
-                    info!("AppImages and icons moved successfully");
+                    let path = std::env::current_exe().map_err(|_| "unable to get current exe")?;
+                    let cmd = Command::new("pkexec")
+                        .arg(path.parent().unwrap().join("app_hub_backend"))
+                        .arg("--action")
+                        .arg("update")
+                        .arg("--new-install-dir")
+                        .arg(install_path)
+                        .arg("--old-install-dir")
+                        .arg(old_install_path)
+                        .stdout(Stdio::piped())
+                        .stderr(Stdio::piped())
+                        .spawn();
 
-                    // Update the path in the .desktop files
-                    let desktop_entries = find_desktop_entries_by_exec_contains(&old_install_path);
-
-                    for desktop_entry_path in desktop_entries.unwrap() {
-                        match DesktopFileBuilder::from_desktop_entry_path(&PathBuf::from(&desktop_entry_path), true) {
-                            Ok(mut desktop_file_builder) => {
-
-                                // Check exec field
-                                if desktop_file_builder.exec().is_none() {
-                                    error!("Failed to parse desktop entry (exec missing): {}", &desktop_entry_path);
-                                    continue;
-                                }
-
-                                let new_exec = desktop_file_builder.exec().unwrap().replace(old_install_path.as_str(), install_path.as_str());
-                                debug!("new exec: {}", new_exec);
-                                desktop_file_builder.set_exec(new_exec);
-                                if desktop_file_builder.path().is_some() {
-                                    desktop_file_builder.set_path(desktop_file_builder.path().unwrap().replace(old_install_path.as_str(), install_path.as_str()));
-                                }
-                                if desktop_file_builder.icon().is_some() {
-                                    desktop_file_builder.set_icon(desktop_file_builder.icon().unwrap().replace(old_install_path.as_str(), install_path.as_str()));
-                                }
-                                match desktop_file_builder.generate_content_string() {
-                                    Ok(content) => {
-                                        let mut file = File::create(&desktop_entry_path);
-                                        match file {
-                                            Ok(mut file) => {
-                                                file.write_all(content.as_bytes()).expect("Error updating .desktop file");
-                                            },
-                                            Err(error) => {
-                                                warn!("Error updating .desktop file: {}", error);
-                                            }
-                                        }
-                                    }
-                                    Err(error) => {
-                                        warn!("Error updating .desktop file: {}", error);
+                    match cmd {
+                        Ok(mut child) => {
+                            // Leggi lo stdout
+                            if let Some(stdout) = child.stdout.take() {
+                                let reader = BufReader::new(stdout);
+                                for line in reader.lines() {
+                                    if let Ok(line) = line {
+                                        debug!("app_hub_backend output: {}", line);
                                     }
                                 }
                             }
-                            Err(error) => {
-                                warn!("Error updating .desktop file: {}", error);
+
+                            // Leggi lo stderr
+                            if let Some(stderr) = child.stderr.take() {
+                                let reader = BufReader::new(stderr);
+                                for line in reader.lines() {
+                                    if let Ok(line) = line {
+                                        error!("app_hub_backend error: {}", line); // Stampalo come errore nel logger
+                                    }
+                                }
+                            }
+
+                            let output = child.wait_with_output().expect("Failed to wait on child");
+                            debug!("output: {:?}", output);
+                            if output.status.success() {
+                                info!("Installation successful");
+                            } else {
+                                error!("Installation failed");
+                                return Err("Installation failed".to_string());
                             }
                         }
+                        Err(error) => {
+                            error!("error: {:?}", error);
+                            return Err("Failed to install AppImage".to_string());
+                        }
                     }
+
                 }
             }
         }

@@ -7,6 +7,7 @@ use log::{error, info};
 use serde::Serialize;
 use crate::managers::app_image_installer::install_app_image;
 use crate::managers::app_image_uninstaller::uninstall_app_image;
+use crate::managers::app_image_updater::app_image_update;
 
 #[derive(
     clap::ValueEnum, Clone, Default, Debug, Serialize,
@@ -15,7 +16,8 @@ use crate::managers::app_image_uninstaller::uninstall_app_image;
 enum Action {
     #[default]
     Install,
-    Uninstall
+    Uninstall,
+    Update
 }
 
 #[derive(Parser, Debug)]
@@ -38,8 +40,10 @@ struct Args {
         value_enum,
         requires_if("install", "file_path"),
         requires_if("install", "install_dir"),
-        requires_if("uninstall", "uninstall_app_name")
-    )]
+        requires_if("uninstall", "uninstall_app_name"),
+        requires_if("update", "new_install_dir"),
+        requires_if("update", "old_install_dir"),
+   )]
     action: Action,
 
     /// App name to uninstall
@@ -49,10 +53,21 @@ struct Args {
     /// No sandbox flag
     #[arg(short, long)]
     no_sandbox: Option<bool>,
+
+    /// New app images directory path
+    /// The new path to the directory where the AppImages are stored
+    #[arg(long)]
+    new_install_dir: Option<String>,
+
+    /// Old app images directory path
+    /// The old path to the directory where the AppImages are stored
+    #[arg(long)]
+    old_install_dir: Option<String>,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
+
     info!("Starting AppHub backend");
     let args = Args::parse();
 
@@ -81,12 +96,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 return Err("Failed to uninstall AppImage".into());
             }
             info!("Uninstalling AppImage with app name: {}", app_name);
+        },
+        Action::Update => {
+            // read required arguments
+            let new_install_dir = args.new_install_dir.as_ref().ok_or("new_install_dir is required")?;
+            let old_install_dir = args.old_install_dir.as_ref().ok_or("old_install_dir is required")?;
+
+            info!("Updating desktop files with new install dir: {}", new_install_dir);
+
+            app_image_update(old_install_dir.clone(), new_install_dir.clone())?;
         }
     }
-
-    // write a file to /usr/share/applications/test.txt using rust
-    let mut file = File::create("/usr/share/applications/test.txt")?;
-    file.write_all(b"Hello, world!")?;
 
     Ok(())
 }

@@ -47,6 +47,7 @@ pub fn install_app_image(file_path: String, installation_dir: String, no_sandbox
     };
 
     // copy icons to icons directory
+    info!("Installing icons...");
     if let Err(e) = install_icons(&squashroot_path) {
         return Err(e.to_string());
     }
@@ -81,9 +82,9 @@ pub fn install_app_image(file_path: String, installation_dir: String, no_sandbox
     let mut file = File::create(desktop_entry_path).map_err(|e| "Failed to create .desktop file")?;
     file.write_all(desktop_file_content.as_bytes()).map_err(|_| "Failed to write .desktop file")?;
 
-    // Move the AppImage to the installation directory
+    // Copy the AppImage to the installation directory
     let installation_path = format!("{}/{}", installation_dir, installation_file_name);
-    std::fs::rename(&file_path, &installation_path).map_err(|_| "Failed to move AppImage to installation directory")?;
+    std::fs::copy(&file_path, &installation_path).map_err(|_| "Failed to copy AppImage to installation dir")?;
 
     // remove squashrootfs directory
     std::fs::remove_dir_all(&squashroot_path).map_err(|_| "Failed to remove squashroot dir")?;

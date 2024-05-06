@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use log::{debug, error, info, warn};
 use tauri::AppHandle;
-use common_utils::app_images_helpers::{find_icons_paths, install_app_image_from_path, install_icons, update_icon_cache};
+use common_utils::app_images_helpers::{find_icons_paths, install_app_image_from_path, install_icons};
 use common_utils::desktop_file_builder::DesktopFileBuilder;
 use common_utils::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry, find_desktop_file_location};
 use common_utils::file_system_helpers::{add_executable_permission, find_desktop_file_in_dir, rm_dir_all, rm_file};

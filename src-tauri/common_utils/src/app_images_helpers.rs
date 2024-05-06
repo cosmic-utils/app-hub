@@ -1,6 +1,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 use glob::glob;
+use fs_extra::dir;
 
 use log::{debug, error, info};
 use crate::file_system_helpers::{add_executable_permission};
@@ -85,32 +86,32 @@ pub fn app_image_extract_squashroot(app_image_path: &str) -> Result<PathBuf, &'s
 pub fn install_icons(
     squashfs_root_path: &PathBuf
 ) -> Result<(), &'static str> {
-    let icons_paths = [
-        "/share/icons/hicolor/22x22/apps/",
-        "/share/icons/hicolor/24x24/apps/",
-        "/share/icons/hicolor/32x32/apps/",
-        "/share/icons/hicolor/48x48/apps/",
-        "/share/icons/hicolor/64x64/apps/",
-        "/share/icons/hicolor/128x128/apps/",
-        "/share/icons/hicolor/256x256/apps/",
-        "/share/icons/hicolor/512x512/apps/",
-        "/share/icons/hicolor/scalable/apps/",
-        "/usr/share/icons/hicolor/22x22/apps/",
-        "/usr/share/icons/hicolor/24x24/apps/",
-        "/usr/share/icons/hicolor/32x32/apps/",
-        "/usr/share/icons/hicolor/48x48/apps/",
-        "/usr/share/icons/hicolor/64x64/apps/",
-        "/usr/share/icons/hicolor/128x128/apps/",
-        "/usr/share/icons/hicolor/256x256/apps/",
-        "/usr/share/icons/hicolor/512x512/apps/",
-        "/usr/share/icons/hicolor/scalable/apps/",
-    ];
+    let source_path = squashfs_root_path.join("share/icons");
+    let usr_source_path = squashfs_root_path.join("usr/share/icons");
+    let destination_path = PathBuf::from("/usr/share/icons");
 
-    for icon_path in icons_paths.iter() {
-        if squashfs_root_path.exists() {
-            if let Err(err) = fs::copy(squashfs_root_path.to_str().unwrap(), icon_path) {
-                error!("Failed to copy icons in {}: {}", icon_path, err);
-            }
+    if source_path.exists() {
+        info!("Copying icons from: {:?}", source_path);
+        recursive_copy(&source_path, &destination_path);
+    }
+    else if usr_source_path.exists() {
+        info!("Copying icons from: {:?}", usr_source_path);
+        recursive_copy(&usr_source_path, &destination_path);
+    }
+
+    Ok(())
+}
+
+fn recursive_copy(source: &Path, destination: &Path) -> Result<(), &'static str> {
+    let mut options = dir::CopyOptions::new();
+    options.overwrite = true;
+    match dir::copy(source, destination, &options) {
+        Ok(copied) => {
+            info!("Copied {} icons", copied);
+        }
+        Err(error) => {
+            error!("Failed to copy icons: {}", error);
+            return Err("Failed to copy icons");
         }
     }
     Ok(())
@@ -160,24 +161,6 @@ pub fn remove_icons() -> Result<(), &'static str> {
         let err = String::from_utf8_lossy(&output.stderr);
         error!("Failed to remove icons: {}", err);
         Err("Failed to remove icons")
-    }
-}
-
-/// Update the icon cache
-pub fn update_icon_cache() -> Result<(), &'static str> {
-    let output = std::process::Command::new("pkexec")
-        .arg("gtk-update-icon-cache")
-        .arg("-f")
-        .arg("/usr/share/icons/hicolor")
-        .output()
-        .expect("Failed to execute command");
-
-    if output.status.success() {
-        Ok(())
-    } else {
-        let err = String::from_utf8_lossy(&output.stderr);
-        error!("Failed to update icon cache: {}", err);
-        Err("Failed to update icon cache")
     }
 }
 

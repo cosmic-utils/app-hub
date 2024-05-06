@@ -1,3 +1,5 @@
+use std::fs::{File, OpenOptions};
+use std::io::Write;
 use std::path::PathBuf;
 use log::{debug, error, info, warn};
 use tauri::{AppHandle, Manager, Wry};
@@ -90,12 +92,12 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
                     let desktop_entries = find_desktop_entries_by_exec_contains(&old_install_path);
 
                     for desktop_entry_path in desktop_entries.unwrap() {
-                        match DesktopFileBuilder::from_desktop_entry_path(desktop_entry_path.clone(), true) {
+                        match DesktopFileBuilder::from_desktop_entry_path(&PathBuf::from(&desktop_entry_path), true) {
                             Ok(mut desktop_file_builder) => {
 
                                 // Check exec field
                                 if desktop_file_builder.exec().is_none() {
-                                    error!("Failed to parse desktop entry (exec missing): {}", desktop_entry_path);
+                                    error!("Failed to parse desktop entry (exec missing): {}", &desktop_entry_path);
                                     continue;
                                 }
 
@@ -108,7 +110,22 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
                                 if desktop_file_builder.icon().is_some() {
                                     desktop_file_builder.set_icon(desktop_file_builder.icon().unwrap().replace(old_install_path.as_str(), install_path.as_str()));
                                 }
-                                desktop_file_builder.write_to_file(desktop_entry_path).expect("Error updating .desktop file");
+                                match desktop_file_builder.generate_content_string() {
+                                    Ok(content) => {
+                                        let mut file = File::create(&desktop_entry_path);
+                                        match file {
+                                            Ok(mut file) => {
+                                                file.write_all(content.as_bytes()).expect("Error updating .desktop file");
+                                            },
+                                            Err(error) => {
+                                                warn!("Error updating .desktop file: {}", error);
+                                            }
+                                        }
+                                    }
+                                    Err(error) => {
+                                        warn!("Error updating .desktop file: {}", error);
+                                    }
+                                }
                             }
                             Err(error) => {
                                 warn!("Error updating .desktop file: {}", error);

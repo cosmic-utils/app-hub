@@ -1,7 +1,6 @@
 use std::{fs, io};
 use std::os::unix::fs::PermissionsExt;
-use std::path::Path;
-use std::process::Command;
+use std::path::{Path, PathBuf};
 use log::info;
 
 /// This function is used to remove a file from the filesystem (used to remove AppImages and icons)
@@ -42,41 +41,9 @@ pub fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<
     Ok(())
 }
 
-/// This function is used to write a file to the filesystem using sudo
-pub fn sudo_write_file(file_path: &str, content: &str) -> Result<(), String> {
-    let output = Command::new("pkexec")
-        .arg("sh")
-        .arg("-c")
-        .arg(format!("echo '{}' > {}", content, file_path))
-        .output()
-        .expect("Failed to execute command");
-
-    if output.status.success() {
-        Ok(())
-    } else {
-        Err(format!("Failed to write file: {}", String::from_utf8_lossy(&output.stderr)))
-    }
-}
-
-/// This function is used to remove a file from the filesystem using sudo
-pub fn sudo_remove_file(file_path: &str) -> Result<(), String> {
-    let output = Command::new("pkexec")
-        .arg("rm")
-        .arg(file_path)
-        .output()
-        .expect("Failed to execute command");
-
-    if output.status.success() {
-        Ok(())
-    } else {
-        Err(format!("Failed to remove file: {}", String::from_utf8_lossy(&output.stderr)))
-    }
-}
-
 /// Find a .desktop file in the given directory
-pub fn find_desktop_file_in_dir(dir_path: &str) -> Result<String, String> {
-    let dir = Path::new(dir_path);
-    let entries = match fs::read_dir(dir) {
+pub fn find_desktop_file_in_dir(dir_path: &PathBuf) -> Result<PathBuf, String> {
+    let entries = match fs::read_dir(dir_path.as_path()) {
         Ok(entries) => entries,
         Err(e) => return Err(format!("Failed to read directory: {}", e)),
     };
@@ -92,10 +59,9 @@ pub fn find_desktop_file_in_dir(dir_path: &str) -> Result<String, String> {
             None => continue,
         };
         if extension == "desktop" {
-            return Ok(path.to_string_lossy().to_string());
+            return Ok(path);
         }
     }
-
     Err("No desktop file found".to_string())
 }
 
@@ -114,4 +80,13 @@ pub fn add_executable_permission(file_path: &str) {
 pub fn is_directory_empty(dir_path: &Path) -> io::Result<bool> {
     let mut entries = fs::read_dir(dir_path)?;
     Ok(entries.next().is_none())
+}
+
+/// Get the file name from a path
+pub fn get_file_name(file_path: &str) -> Result<String, String>{
+    let path = Path::new(file_path);
+    match path.file_name() {
+        Some(file_name) => Ok(file_name.to_string_lossy().to_string()),
+        None => Err("Failed to get file name".to_string()),
+    }
 }

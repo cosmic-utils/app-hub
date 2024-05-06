@@ -23,33 +23,12 @@ pub async fn install_app_command(app: AppHandle, request_installation: RequestIn
 #[tauri::command]
 pub async fn read_app_list_command() -> Result<AppList, String> {
     let apps: Vec<App> = read_all_app()?;
-
-    //TODO test purposes code (remove it when not needed anymore)
-    println!("start of test purposes code");
-
-    let p = std::env::current_exe().map_err(|_| "unable to get current exe")?.parent().unwrap().join("app_hub_backend");
-    let cmd = Command::new("pkexec")
-        .arg(p)
-        .arg("--file-path")
-        .arg("/usr/share/applications/test.txt")
-        .spawn();
-    match cmd {
-        Ok(res) => {
-            let output = res.wait_with_output().expect("Failed to wait on child");
-            println!("output: {:?}", output);
-        }
-        Err(error) => {
-            println!("error: {:?}", error);
-        }
-    }
-    // end of test purposes code
-
     Ok(AppList { apps })
 }
 
 #[tauri::command]
 pub async fn uninstall_app_command(app: App) -> Result<bool, String> {
-    match uninstall_app(app) {
+    match uninstall_app(app.name) {
         Ok(uninstalled) => {
             info!("App uninstalled successfully");
             Ok(uninstalled)

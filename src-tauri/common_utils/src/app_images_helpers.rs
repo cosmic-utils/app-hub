@@ -1,9 +1,9 @@
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use glob::glob;
 
 use log::{debug, error, info};
-use crate::file_system_helpers::{add_executable_permission, is_directory_empty};
+use crate::file_system_helpers::{add_executable_permission};
 
 /// Install an AppImage file using the given file path
 pub fn install_app_image_from_path(file_path: &String, installation_path: &String) -> Result<String, String> {
@@ -33,10 +33,35 @@ pub fn install_app_image_from_path(file_path: &String, installation_path: &Strin
 }
 
 /// Extract the .desktop file from the AppImage
-pub fn app_image_extract_desktop_file(app_image_path: &str, app_name: &str) -> Result<(), &'static str> {
+/// Returns the path to the extracted .desktop file
+pub fn app_image_extract_squashroot(app_image_path: &str) -> Result<PathBuf, &'static str> {
     info!("Starting extraction of .desktop file from AppImage...");
 
-    let command = format!("cd {} && ./{} --appimage-extract *.desktop", app_image_path, app_name);
+    let app_image_path = Path::new(app_image_path);
+
+    if !app_image_path.exists() || !app_image_path.is_file() {
+        error!("AppImage file does not exist or is not a file");
+        return Err("AppImage file does not exist or is not a file");
+    }
+
+    let app_name = match app_image_path.file_name() {
+        None => return Err("Failed to get AppImage file name"),
+        Some(name) => {
+            name.to_str().ok_or_else(|| "Failed to convert OsStr to str")?
+        }
+    };
+
+    // Get parent directory of app_image_path
+    let parent_dir = match app_image_path.parent() {
+        None => {
+            error!("Failed to get parent directory of AppImage file");
+            return Err("Failed to get parent directory of AppImage file");
+        }
+        Some(dir) => dir
+    };
+
+
+    let command = format!("cd {} && ./{} --appimage-extract", parent_dir.to_str().unwrap(), app_name);
     debug!("Running command: {}", command);
 
     let output = std::process::Command::new("bash")
@@ -47,102 +72,51 @@ pub fn app_image_extract_desktop_file(app_image_path: &str, app_name: &str) -> R
 
     if output.status.success() {
         info!("Successfully extracted .desktop file from AppImage.");
-        Ok(())
     } else {
         let err = String::from_utf8_lossy(&output.stderr);
         error!("Failed to extract AppImage desktop file: {}", err);
-        Err("Failed to extract AppImage desktop file")
+        return Err("Failed to extract AppImage desktop file");
     }
-}
-
-/// Extract all the files from the AppImage
-pub fn app_image_extract_all(app_image_path: &str, app_name: &str) -> Result<(), &'static str> {
-    let output = std::process::Command::new("bash")
-        .arg("-c")
-        .arg(format!("cd {} && ./{} --appimage-extract", app_image_path, app_name))
-        .output()
-        .expect("Failed to execute command");
-
-    if output.status.success() {
-        Ok(())
-    } else {
-        let err = String::from_utf8_lossy(&output.stderr);
-        error!("Failed to extract AppImage desktop file: {}", err);
-        Err("Failed to extract AppImage icon")
-    }
+    let squashfs_root_path = parent_dir.join(format!("squashfs-root"));
+    Ok(squashfs_root_path)
 }
 
 // Install the icons from the AppImage by moving them to the system icons folder
 pub fn install_icons(
-    squashfs_root_path: &str
+    squashfs_root_path: &PathBuf
 ) -> Result<(), &'static str> {
     let icons_paths = [
-        "share/icons/hicolor/22x22/apps/",
-        "share/icons/hicolor/24x24/apps/",
-        "share/icons/hicolor/32x32/apps/",
-        "share/icons/hicolor/48x48/apps/",
-        "share/icons/hicolor/64x64/apps/",
-        "share/icons/hicolor/128x128/apps/",
-        "share/icons/hicolor/256x256/apps/",
-        "share/icons/hicolor/512x512/apps/",
-        "share/icons/hicolor/scalable/apps/",
-        "usr/share/icons/hicolor/22x22/apps/",
-        "usr/share/icons/hicolor/24x24/apps/",
-        "usr/share/icons/hicolor/32x32/apps/",
-        "usr/share/icons/hicolor/48x48/apps/",
-        "usr/share/icons/hicolor/64x64/apps/",
-        "usr/share/icons/hicolor/128x128/apps/",
-        "usr/share/icons/hicolor/256x256/apps/",
-        "usr/share/icons/hicolor/512x512/apps/",
-        "usr/share/icons/hicolor/scalable/apps/",
+        "/share/icons/hicolor/22x22/apps/",
+        "/share/icons/hicolor/24x24/apps/",
+        "/share/icons/hicolor/32x32/apps/",
+        "/share/icons/hicolor/48x48/apps/",
+        "/share/icons/hicolor/64x64/apps/",
+        "/share/icons/hicolor/128x128/apps/",
+        "/share/icons/hicolor/256x256/apps/",
+        "/share/icons/hicolor/512x512/apps/",
+        "/share/icons/hicolor/scalable/apps/",
+        "/usr/share/icons/hicolor/22x22/apps/",
+        "/usr/share/icons/hicolor/24x24/apps/",
+        "/usr/share/icons/hicolor/32x32/apps/",
+        "/usr/share/icons/hicolor/48x48/apps/",
+        "/usr/share/icons/hicolor/64x64/apps/",
+        "/usr/share/icons/hicolor/128x128/apps/",
+        "/usr/share/icons/hicolor/256x256/apps/",
+        "/usr/share/icons/hicolor/512x512/apps/",
+        "/usr/share/icons/hicolor/scalable/apps/",
     ];
 
-    let mut sh_template_script = String::new();
-
     for icon_path in icons_paths.iter() {
-        let path = Path::new(squashfs_root_path).join(icon_path);
-        if path.exists() {
-            match is_directory_empty(&path) {
-                Ok(empty) => {
-                    if empty {
-                        info!("Directory is empty: {:?}", path);
-                        continue; // Skip copying if directory is empty
-                    } else {
-                        info!("Directory is not empty: {:?}", path)
-                    }
-                }
-                Err(error) => {
-                    error!("Failed to check if directory is empty: {:?}", error);
-                }
+        if squashfs_root_path.exists() {
+            if let Err(err) = fs::copy(squashfs_root_path.to_str().unwrap(), icon_path) {
+                error!("Failed to copy icons in {}: {}", icon_path, err);
             }
-            sh_template_script.push_str(&format!("cp -r {}* /{} 2>/dev/null  || : \n", path.to_str().unwrap(), icon_path));
         }
     }
-
-    debug!("Install icons script: {}", sh_template_script);
-
-    // Run the script with sudo
-    let output = std::process::Command::new("pkexec")
-        .arg("sh")
-        .arg("-c")
-        .arg(sh_template_script)
-        .output()
-        .expect("Failed to execute command");
-
-    if output.status.success() {
-        debug!("Icons installed successfully");
-        debug!("Output: {:?}", output.stdout);
-        Ok(())
-    } else {
-        let err = String::from_utf8_lossy(&output.stderr);
-        error!("Failed to install icons: {}", err);
-        Err("Failed to install icons")
-    }
+    Ok(())
 }
 
-pub fn remove_icons(
-    app_name: &str
-) -> Result<(), &'static str> {
+pub fn remove_icons() -> Result<(), &'static str> {
     let icons_paths = [
         "share/icons/hicolor/22x22/apps/",
         "share/icons/hicolor/24x24/apps/",

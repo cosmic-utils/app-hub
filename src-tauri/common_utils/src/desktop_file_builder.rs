@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use regex::Regex;
 use log::info;
 
@@ -50,7 +51,7 @@ impl DesktopFileBuilder {
     }
 
     /// Read a .desktop file from a given path and return a DesktopFileBuilder instance.
-    pub fn from_desktop_entry_path(path: String, is_app_hub_app: bool) -> Result<Self, &'static str> {
+    pub fn from_desktop_entry_path(path: &PathBuf, is_app_hub_app: bool) -> Result<Self, &'static str> {
         // Read the file content
         let file_content = match std::fs::read_to_string(&path) {
             Ok(content) => content,
@@ -115,7 +116,7 @@ impl DesktopFileBuilder {
             desktop_file_builder.set_categories(cap[1].split(";").map(|s| s.to_string()).collect());
         }
 
-        info!("Successfully parsed .desktop file from path: {}", path);
+        info!("Successfully parsed .desktop file from path: {:?}", path);
         Ok(desktop_file_builder)
     }
 
@@ -179,9 +180,6 @@ impl DesktopFileBuilder {
         // Check mandatory fields
         if self.type_.is_none() {
             return Err("Type field is mandatory");
-        }
-        if self.version.is_none() {
-            return Err("Version field is mandatory");
         }
         if self.name.is_none() {
             return Err("Name field is mandatory");

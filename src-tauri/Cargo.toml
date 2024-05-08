@@ -1,3 +1,5 @@
+workspace = { members = ["common_utils"] }
+
 [package]
 name = "app"
 version = "0.1.0"
@@ -15,26 +17,24 @@ rust-version = "1.60"
 tauri-build = { version = "2.0.0-beta.10", features = [] }
 
 [dependencies]
+common_utils = { path = "./common_utils" }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "2.0.0-beta.13", features = [] }
-tauri-plugin-dialog = "2.0.0-beta.3"
-tauri-plugin-store = "2.0.0-beta.4"
+tauri = { version = "2.0.0-beta.17", features = [] }
+tauri-plugin-shell = "2.0.0-beta.4"
+tauri-plugin-dialog = "2.0.0-beta.7"
+tauri-plugin-store = "2.0.0-beta.6"
 log = "0.4.21"
 env_logger = "0.11.3"
-dirs = "5.0.1"
 regex = "1.10.4"
-base64 = "0.21.7"
-mime_guess = "2.0.4"
-tauri-plugin-log = { version = "2.0.0-beta.3", features = ["colored"] }
-tauri-plugin-persisted-scope = "2.0.0-beta.4"
-tauri-plugin-single-instance = "2.0.0-beta.5"
-tauri-plugin-window-state = "2.0.0-beta.4"
-glob = "0.3.1"
+tauri-plugin-log = { version = "2.0.0-beta.4", features = ["colored"] }
+tauri-plugin-persisted-scope = "2.0.0-beta.7"
+tauri-plugin-single-instance = "2.0.0-beta.7"
+dirs = "5.0.1"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.
-# If you use cargo directly instead of tauri's cli you can use this feature flag to switch between tauri's `dev` and `build` modes.
+# If you use cargo directly instead of tauri's cli you can use this feature flag to swith between tauri's `dev` and `build` modes.
 # DO NOT REMOVE!!
 custom-protocol = [ "tauri/custom-protocol" ]
 

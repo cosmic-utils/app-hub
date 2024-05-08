@@ -11,7 +11,9 @@
     "category": "DeveloperTool",
     "copyright": "",
     "targets": "all",
-    "externalBin": [],
+    "externalBin": [
+      "binaries/app_hub_backend"
+    ],
     "icon": [
       "icons/appHubLogo.png"
     ],
@@ -36,8 +38,8 @@
       }
     }
   },
-  "productName": "AppHub",
-  "version": "0.1.0-beta.3",
+ "productName": "AppHub",
+  "version": "0.1.0-beta.4",
   "identifier": "com.apphub.desktop",
   "plugins": {},
   "app": {

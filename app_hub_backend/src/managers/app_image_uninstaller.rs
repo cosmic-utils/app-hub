@@ -15,13 +15,13 @@ pub fn uninstall_app_image(app_name: String) -> Result<(), String> {
 
     // Remove the AppImage
     if let Err(err) = rm_file(&desktop_entry.exec) {
-        error!("{}", err);
+        error!("Failed to remove app image file at {}: {}", desktop_entry.exec, err);
         return Err("Failed to remove AppImage".into());
     }
 
     // Remove the desktop entry
     if let Err(err) = delete_desktop_file_by_name(&app_name) {
-        error!("{}", err);
+        error!("Failed to remove desktop entry: {}", err);
         return Err("Failed to remove desktop entry".into());
     }
 
@@ -31,7 +31,7 @@ pub fn uninstall_app_image(app_name: String) -> Result<(), String> {
     for icon in icons {
         info!("Removing icon: {:?}", icon);
         if let Err(err) = rm_file(&icon) {
-            warn!("{}", err);
+            warn!("Failed to remove icon: {}", err);
         }
     }
 

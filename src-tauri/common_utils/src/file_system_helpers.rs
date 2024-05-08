@@ -1,7 +1,7 @@
 use std::{fs, io};
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
-use log::info;
+use log::{error, info};
 
 /// This function is used to remove a file from the filesystem (used to remove AppImages and icons)
 /// It returns a boolean indicating if the file was removed successfully
@@ -29,6 +29,10 @@ pub fn rm_dir_all(dir_path: &str) -> Result<bool, String> {
 /// This function is used to copy a directory and all its contents to a new location
 pub fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
     fs::create_dir_all(&dst)?;
+    if let Err(err) = fs::create_dir_all(&dst) {
+        error!("Failed to create directory: {}", err);
+        return Err(err);
+    }
     for entry in fs::read_dir(src)? {
         let entry = entry?;
         let ty = entry.file_type()?;

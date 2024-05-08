@@ -153,9 +153,34 @@ pub fn uninstall_app(app_name: String) -> Result<bool, String> {
         .arg(app_name)
         .spawn();
     match cmd {
-        Ok(res) => {
+        Ok(mut res) => {
+            // Leggi lo stdout
+            if let Some(stdout) = res.stdout.take() {
+                let reader = BufReader::new(stdout);
+                for line in reader.lines() {
+                    if let Ok(line) = line {
+                        debug!("app_hub_backend output: {}", line);
+                    }
+                }
+            }
+
+            // Leggi lo stderr
+            if let Some(stderr) = res.stderr.take() {
+                let reader = BufReader::new(stderr);
+                for line in reader.lines() {
+                    if let Ok(line) = line {
+                        error!("app_hub_backend error: {}", line); // Stampalo come errore nel logger
+                    }
+                }
+            }
+
             let output = res.wait_with_output().expect("Failed to wait on child");
-            debug!("output: {:?}", output);
+            if output.status.success() {
+                info!("Uninstallation successful");
+            } else {
+                error!("Uninstallation failed");
+                return Err("Uninstallation failed".to_string());
+            }
             Ok(true)
         }
         Err(error) => {

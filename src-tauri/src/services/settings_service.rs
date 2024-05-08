@@ -98,7 +98,10 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
                                 let reader = BufReader::new(stdout);
                                 for line in reader.lines() {
                                     if let Ok(line) = line {
-                                        debug!("app_hub_backend output: {}", line);
+                                        info!("app_hub_backend output: {}", line);
+                                    }
+                                    else {
+                                        warn!("Failed to read app_hub_backend output");
                                     }
                                 }
                             }
@@ -110,11 +113,13 @@ pub async fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), 
                                     if let Ok(line) = line {
                                         error!("app_hub_backend error: {}", line); // Stampalo come errore nel logger
                                     }
+                                    else {
+                                        warn!("Failed to read app_hub_backend error");
+                                    }
                                 }
                             }
 
                             let output = child.wait_with_output().expect("Failed to wait on child");
-                            debug!("output: {:?}", output);
                             if output.status.success() {
                                 info!("Installation successful");
                             } else {

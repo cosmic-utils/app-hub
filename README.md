@@ -48,7 +48,7 @@ cd AppHub
 pnpm install
 
 # Build the project
-pnpm tauri build
+pnpm tauri:build
 
 # Install the application
 sudo dkpg -i ./target/release/bundle/apphub_<version>_amd64.deb

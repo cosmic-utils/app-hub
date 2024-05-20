@@ -1,4 +1,3 @@
-use std::process::Command;
 use log::{error, info};
 use tauri::AppHandle;
 

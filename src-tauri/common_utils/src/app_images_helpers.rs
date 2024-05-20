@@ -1,6 +1,6 @@
+use walkdir::WalkDir;
 use std::fs;
 use std::path::{Path, PathBuf};
-use glob::glob;
 use fs_extra::dir;
 
 use log::{debug, error, info};
@@ -82,24 +82,53 @@ pub fn app_image_extract_squashroot(app_image_path: &str) -> Result<PathBuf, &'s
     Ok(squashfs_root_path)
 }
 
-// Install the icons from the AppImage by moving them to the system icons folder
-pub fn install_icons(
-    squashfs_root_path: &PathBuf
-) -> Result<(), &'static str> {
-    let source_path = squashfs_root_path.join("share/icons");
-    let usr_source_path = squashfs_root_path.join("usr/share/icons");
-    let destination_path = PathBuf::from("/usr/share/icons");
+/// Install the icons from the AppImage by moving them to the installation dir icons folder
+pub fn choose_icon(
+    squashfs_root_path: &PathBuf,
+    installation_path: &PathBuf
+) -> Result<PathBuf, &'static str> {
 
-    if source_path.exists() {
-        info!("Copying icons from: {:?}", source_path);
-        recursive_copy(&source_path, &destination_path);
-    }
-    else if usr_source_path.exists() {
-        info!("Copying icons from: {:?}", usr_source_path);
-        recursive_copy(&usr_source_path, &destination_path);
+    // Find all icons file
+    let image_files = find_image_files(squashfs_root_path);
+    debug!("Found {} image files", image_files.len());
+    debug!("Image files: {:?}", image_files);
+    if image_files.len() == 0 {
+        return Err("No image files found");
     }
 
-    Ok(())
+    // Choose the biggest image file
+    let biggest_image = image_files.iter().max_by_key(|f| f.metadata().unwrap().len()).unwrap();
+
+    debug!("Biggest image file: {:?}", biggest_image);
+
+    // Check if the icons directory exists or create it
+    let icons_dir = installation_path.join("icons");
+    match fs::create_dir(&icons_dir) {
+        Ok(_) => {
+            info!("Created icons directory: {:?}", icons_dir);
+        }
+        Err(ref e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
+            info!("Icons directory already exists");
+        }
+        Err(e) => {
+            error!("Failed to create icons directory: {}", e);
+            return Err("Failed to create icons directory");
+        }
+    }
+
+    // Copy the biggest image file into the installation path
+    let icon_path = installation_path.join("icons").join(biggest_image.file_name().unwrap());
+    match fs::copy(biggest_image, &icon_path) {
+        Ok(_) => {
+            info!("Copied icon to: {:?}", icon_path);
+        }
+        Err(e) => {
+            error!("Failed to copy icon: {}", e);
+            return Err("Failed to copy icon");
+        }
+    }
+
+    Ok(icon_path)
 }
 
 fn recursive_copy(source: &Path, destination: &Path) -> Result<(), &'static str> {
@@ -117,93 +146,39 @@ fn recursive_copy(source: &Path, destination: &Path) -> Result<(), &'static str>
     Ok(())
 }
 
-pub fn remove_icons() -> Result<(), &'static str> {
-    let icons_paths = [
-        "share/icons/hicolor/22x22/apps/",
-        "share/icons/hicolor/24x24/apps/",
-        "share/icons/hicolor/32x32/apps/",
-        "share/icons/hicolor/48x48/apps/",
-        "share/icons/hicolor/64x64/apps/",
-        "share/icons/hicolor/128x128/apps/",
-        "share/icons/hicolor/256x256/apps/",
-        "share/icons/hicolor/512x512/apps/",
-        "share/icons/hicolor/scalable/apps/",
-        "usr/share/icons/hicolor/22x22/apps/",
-        "usr/share/icons/hicolor/24x24/apps/",
-        "usr/share/icons/hicolor/32x32/apps/",
-        "usr/share/icons/hicolor/48x48/apps/",
-        "usr/share/icons/hicolor/64x64/apps/",
-        "usr/share/icons/hicolor/128x128/apps/",
-        "usr/share/icons/hicolor/256x256/apps/",
-        "usr/share/icons/hicolor/512x512/apps/",
-        "usr/share/icons/hicolor/scalable/apps/",
-    ];
-
-    let mut sh_template_script = String::new();
-
-    for icon_path in icons_paths.iter() {
-        sh_template_script.push_str(&format!("rm -r {}{} 2>/dev/null  || : \n", "/usr/", icon_path));
-    }
-
-    debug!("Remove icons script: {}", sh_template_script);
-
-    // Run the script with sudo
-    let output = std::process::Command::new("pkexec")
-        .arg("sh")
-        .arg("-c")
-        .arg(sh_template_script)
-        .output()
-        .expect("Failed to execute command");
-
-    if output.status.success() {
-        Ok(())
+pub fn remove_icon(icon_path: &PathBuf) -> Result<(), &'static str> {
+    if icon_path.exists() {
+        match fs::remove_file(icon_path) {
+            Ok(_) => {
+                info!("Removed icon: {:?}", icon_path);
+            }
+            Err(e) => {
+                error!("Failed to remove icon: {}", e);
+                return Err("Failed to remove icon");
+            }
+        }
     } else {
-        let err = String::from_utf8_lossy(&output.stderr);
-        error!("Failed to remove icons: {}", err);
-        Err("Failed to remove icons")
+        info!("Icon does not exist: {:?}", icon_path);
     }
+
+    Ok(())
 }
 
-/// Find the icon paths for the given icon name
-pub fn find_icons_paths(icon_name: &str) -> Vec<String> {
-    let icons_paths = [
-        "/share/icons/hicolor/22x22/apps/",
-        "/share/icons/hicolor/24x24/apps/",
-        "/share/icons/hicolor/32x32/apps/",
-        "/share/icons/hicolor/48x48/apps/",
-        "/share/icons/hicolor/64x64/apps/",
-        "/share/icons/hicolor/128x128/apps/",
-        "/share/icons/hicolor/256x256/apps/",
-        "/share/icons/hicolor/512x512/apps/",
-        "/share/icons/hicolor/scalable/apps/",
-        "/usr/share/icons/hicolor/22x22/apps/",
-        "/usr/share/icons/hicolor/24x24/apps/",
-        "/usr/share/icons/hicolor/32x32/apps/",
-        "/usr/share/icons/hicolor/48x48/apps/",
-        "/usr/share/icons/hicolor/64x64/apps/",
-        "/usr/share/icons/hicolor/128x128/apps/",
-        "/usr/share/icons/hicolor/256x256/apps/",
-        "/usr/share/icons/hicolor/512x512/apps/",
-        "/usr/share/icons/hicolor/scalable/apps/",
-    ];
+/// Find all the image files in the given directory
+fn find_image_files(dir: &PathBuf) -> Vec<PathBuf> {
+    let mut image_files = Vec::new();
+    let extensions = vec!["png", "jpg", "jpeg", "svg"];
 
-    let mut paths = Vec::new();
-
-    for icon_path in icons_paths.iter() {
-        let pattern = format!("{}{}.*", icon_path, icon_name);
-
-        for entry in glob(&pattern).expect("Failed to read glob pattern") {
-            match entry {
-                Ok(path) => {
-                    if path.is_file() {
-                        paths.push(path.to_str().unwrap().to_string());
-                    }
-                },
-                Err(e) => println!("{:?}", e),
+    for entry in WalkDir::new(dir) {
+        let entry = entry.unwrap();
+        if entry.file_type().is_file() {
+            if let Some(ext) = entry.path().extension() {
+                if extensions.contains(&ext.to_str().unwrap()) {
+                    image_files.push(entry.path().to_path_buf());
+                }
             }
         }
     }
 
-
-    paths
+    image_files
 }

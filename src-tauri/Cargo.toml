@@ -14,7 +14,7 @@ rust-version = "1.60"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-beta.10", features = [] }
+tauri-build = { version = "2.0.0-beta.13", features = [] }
 
 [dependencies]
 common_utils = { path = "./common_utils" }

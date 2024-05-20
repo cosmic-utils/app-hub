@@ -1,7 +1,8 @@
-use log::{error, info, warn};
-use common_utils::app_images_helpers::find_icons_paths;
+use std::path::PathBuf;
+use common_utils::app_images_helpers::{remove_icon};
 use common_utils::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry};
 use common_utils::file_system_helpers::rm_file;
+use log::{error, info, warn};
 
 pub fn uninstall_app_image(app_name: String) -> Result<(), String> {
     info!("Uninstalling AppImage with app name: {}", app_name);
@@ -15,7 +16,10 @@ pub fn uninstall_app_image(app_name: String) -> Result<(), String> {
 
     // Remove the AppImage
     if let Err(err) = rm_file(&desktop_entry.exec) {
-        error!("Failed to remove app image file at {}: {}", desktop_entry.exec, err);
+        error!(
+            "Failed to remove app image file at {}: {}",
+            desktop_entry.exec, err
+        );
         return Err("Failed to remove AppImage".into());
     }
 
@@ -26,13 +30,8 @@ pub fn uninstall_app_image(app_name: String) -> Result<(), String> {
     }
 
     // Remove icons
-    let icons = find_icons_paths(&desktop_entry.icon);
-
-    for icon in icons {
-        info!("Removing icon: {:?}", icon);
-        if let Err(err) = rm_file(&icon) {
-            warn!("Failed to remove icon: {}", err);
-        }
+    if let Err(err) = remove_icon(&PathBuf::from(&desktop_entry.icon)) {
+        error!("Failed to remove icons: {}", err);
     }
 
     Ok(())

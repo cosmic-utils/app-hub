@@ -1,10 +1,8 @@
-use std::future::Future;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
-use log::{debug, error, info, warn};
+use log::{debug, error, info};
 use tauri::AppHandle;
-use common_utils::app_images_helpers::{find_icons_paths, install_app_image_from_path, install_icons};
 use common_utils::desktop_file_builder::DesktopFileBuilder;
 use common_utils::desktop_file_helpers::{delete_desktop_file_by_name, find_desktop_entry, find_desktop_file_location};
 use common_utils::file_system_helpers::{add_executable_permission, find_desktop_file_in_dir, rm_dir_all, rm_file};
@@ -50,22 +48,28 @@ pub async fn install_app_image(app: AppHandle, request_installation: RequestInst
 
     match cmd {
         Ok(mut child) => {
-            // Leggi lo stdout
+            // Read stdout
             if let Some(stdout) = child.stdout.take() {
                 let reader = BufReader::new(stdout);
                 for line in reader.lines() {
                     if let Ok(line) = line {
                         debug!("app_hub_backend output: {}", line);
                     }
+                    else {
+                        error!("Failed to read line from stdout");
+                    }
                 }
             }
 
-            // Leggi lo stderr
+            // Read stderr
             if let Some(stderr) = child.stderr.take() {
                 let reader = BufReader::new(stderr);
                 for line in reader.lines() {
                     if let Ok(line) = line {
-                        error!("app_hub_backend error: {}", line); // Stampalo come errore nel logger
+                        error!("app_hub_backend error: {}", line);
+                    }
+                    else {
+                        error!("Failed to read line from stderr");
                     }
                 }
             }
@@ -110,19 +114,13 @@ pub fn read_all_app() -> Result<Vec<App>, String> {
 
                 let desktop_entry = desktop_file.unwrap();
 
-                let icons_path = find_icons_paths(&desktop_entry.icon().unwrap());
-
-                debug!("Reading icon at: {:?}", desktop_entry.icon());
-                let base64_icon: Option<String> = if icons_path.len() > 0 {
-                    match image_to_base64(icons_path.get(0).unwrap().as_str()) {
-                        Ok(base64) => Some(base64),
-                        Err(err) => {
-                            info!("Failed to convert image to base64: {}", err);
-                            None
-                        }
+                let base64_icon: Option<String> = match image_to_base64(desktop_entry.icon().unwrap().as_str()) {
+                    Ok(base64) => Some(base64),
+                    Err(err) => {
+                        debug!("from path: {}", desktop_entry.icon().unwrap());
+                        info!("Failed to convert image to base64: {}", err);
+                        None
                     }
-                } else {
-                    None
                 };
 
                 apps.push(App {

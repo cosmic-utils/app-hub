@@ -12,3 +12,11 @@ dependencies = [
     "build",
     "copy"
 ]
+
+[tasks.dev]
+dependencies = [
+    "build",
+    "copy"
+]
+command = "cargo"
+args = ["run"]

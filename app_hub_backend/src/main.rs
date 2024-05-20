@@ -1,23 +1,21 @@
 mod managers;
 
-use std::fs::File;
-use std::io::Write;
-use clap::Parser;
-use log::{error, info};
-use serde::Serialize;
 use crate::managers::app_image_installer::install_app_image;
 use crate::managers::app_image_uninstaller::uninstall_app_image;
 use crate::managers::app_image_updater::app_image_update;
+use clap::Parser;
+use log::{error, info};
+use serde::Serialize;
+use std::fs::File;
+use std::io::Write;
 
-#[derive(
-    clap::ValueEnum, Clone, Default, Debug, Serialize,
-)]
+#[derive(clap::ValueEnum, Clone, Default, Debug, Serialize)]
 #[serde(rename_all = "kebab-case")]
 enum Action {
     #[default]
     Install,
     Uninstall,
-    Update
+    Update,
 }
 
 #[derive(Parser, Debug)]
@@ -42,8 +40,8 @@ struct Args {
         requires_if("install", "install_dir"),
         requires_if("uninstall", "uninstall_app_name"),
         requires_if("update", "new_install_dir"),
-        requires_if("update", "old_install_dir"),
-   )]
+        requires_if("update", "old_install_dir")
+    )]
     action: Action,
 
     /// App name to uninstall
@@ -66,7 +64,7 @@ struct Args {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    env_logger::init();
+    env_logger::builder().filter_level(log::LevelFilter::Debug).init();
 
     info!("Starting AppHub backend");
     let args = Args::parse();
@@ -80,7 +78,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let no_sandbox = args.no_sandbox.unwrap_or(false);
 
             // install the AppImage
-            if let Err(e) = install_app_image(file_path.clone(), installation_dir.clone(), no_sandbox) {
+            if let Err(e) =
+                install_app_image(file_path.clone(), installation_dir.clone(), no_sandbox)
+            {
                 error!("Failed to install AppImage: {}", e);
                 return Err("Failed to install AppImage".into());
             }
@@ -88,7 +88,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Action::Uninstall => {
             // read required arguments
-            let app_name = args.uninstall_app_name.as_ref().ok_or("uninstall_app_name is required")?;
+            let app_name = args
+                .uninstall_app_name
+                .as_ref()
+                .ok_or("uninstall_app_name is required")?;
 
             // uninstall the AppImage
             if let Err(e) = uninstall_app_image(app_name.clone()) {
@@ -96,17 +99,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 return Err("Failed to uninstall AppImage".into());
             }
             info!("Uninstalling AppImage with app name: {}", app_name);
-        },
+        }
         Action::Update => {
             // read required arguments
-            let new_install_dir = args.new_install_dir.as_ref().ok_or("new_install_dir is required")?;
-            let old_install_dir = args.old_install_dir.as_ref().ok_or("old_install_dir is required")?;
+            let new_install_dir = args
+                .new_install_dir
+                .as_ref()
+                .ok_or("new_install_dir is required")?;
+            let old_install_dir = args
+                .old_install_dir
+                .as_ref()
+                .ok_or("old_install_dir is required")?;
 
-            info!("Updating desktop files with new install dir: {}", new_install_dir);
+            info!(
+                "Updating desktop files with new install dir: {}",
+                new_install_dir
+            );
 
             app_image_update(old_install_dir.clone(), new_install_dir.clone())?;
         }
     }
+
+    info!("AppHub backend finished successfully");
 
     Ok(())
 }

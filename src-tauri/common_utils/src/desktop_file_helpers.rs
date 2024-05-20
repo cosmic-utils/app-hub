@@ -126,7 +126,7 @@ pub fn delete_desktop_file_by_name(app_name: &String) -> Result<bool, String> {
                             Some(name) => {
                                 if name == *app_name {
                                     match fs::remove_file(path_str) {
-                                        Ok(res) => {
+                                        Ok(_res) => {
                                             return Ok(true);
                                         }
                                         Err(error) => {

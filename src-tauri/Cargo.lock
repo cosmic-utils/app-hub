@@ -771,6 +771,7 @@ dependencies = [
  "log",
  "mime_guess",
  "regex",
+ "walkdir",
 ]
 
 [[package]]

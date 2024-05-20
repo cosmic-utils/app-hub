@@ -1,7 +1,7 @@
 # Roadmap
 
 ## v0.1
-- [ ] Improve application's performance and stability
+- [X] Improve application's performance and stability
 - [ ] Improve application's user interface and user experience
 - [x] Automaticaly extract AppImage icons
 

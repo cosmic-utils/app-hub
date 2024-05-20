@@ -71,6 +71,10 @@ Note: The license may change in the future due to the use of third-party librari
 ## 🤝 Contributing
 AppHub is a project developed in spare time, and contributions are welcome! However, there are currently no specific contribution guidelines. They will be defined once the project is more stable and structured.
 
+In the meantime, feel free to fork the project and submit pull requests. We will review them and provide feedback.
+
+Or, if you have any suggestions or feedback, please open an issue, and we will address it as soon as possible.
+
 ## ⚠️ Project Status
 The project is currently in its initial development phase. There are still many bugs to be fixed and many features to be implemented. Please be patient as we work to improve and refine the application.
 

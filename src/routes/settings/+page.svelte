@@ -91,7 +91,7 @@
                 <div class={`rounded-lg shadow-lg p-6 ${settings.theme !== 'dark' ? 'bg-white' : ''}`}>
                     <p class="font-bold text-xl mb-3">{$t("settings.theme.theme_label")}</p>
                     <div class="my-3">
-                        <select data-choose-theme class="select select-bordered max-w-3xl text-xl capitalize" bind:value={settings.theme} on:change={changeTheme}>
+                        <select data-choose-theme class="select select-bordered max-w-3xl capitalize" bind:value={settings.theme} on:change={changeTheme}>
                             <option disabled selected>{$t("settings.theme.choose_theme")}</option>
                             {#each themes as theme}
                                 <option value={theme} class="capitalize">{theme}</option>
@@ -101,7 +101,6 @@
                     <div class="mt-6">
                         <p class="font-bold text-xl mb-3">{$t("settings.language.language_label")}</p>
                         <div class="flex flex-col">
-                            <p class="mt-3">{$t("settings.language.app_lang")}:</p>
                             <select class="select select-bordered w-full max-w-xs mt-1" bind:value={$locale}>
                                 {#each locales as l}
                                     <option value={l}>{l}</option>

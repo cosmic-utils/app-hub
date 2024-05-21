@@ -27,6 +27,12 @@ pub fn install_app_image(
     // extract squashrootfs from AppImage
     let squashroot_path = app_image_extract_squashroot(&file_path)?;
 
+    // check installation dir exist
+    if !std::path::Path::new(&installation_dir).exists() {
+        std::fs::create_dir_all(&installation_dir)
+            .map_err(|_| "Failed to create installation directory")?;
+    }
+
     // parse AppImage desktop file
     let desktop_file_path = match find_desktop_file_in_dir(&squashroot_path) {
         Ok(path) => {
@@ -95,6 +101,7 @@ pub fn install_app_image(
         File::create(desktop_entry_path).map_err(|e| "Failed to create .desktop file")?;
     file.write_all(desktop_file_content.as_bytes())
         .map_err(|_| "Failed to write .desktop file")?;
+
 
     // Copy the AppImage to the installation directory
     let installation_path = format!("{}/{}", installation_dir, installation_file_name);

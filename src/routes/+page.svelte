@@ -4,6 +4,7 @@
     import {installAppImage} from "$lib/helpers/tauriCommands/appImageCommands";
     import Modal from "$lib/components/Modal.svelte";
     import LoadingOverlay from "$lib/components/LoadingOverlay.svelte";
+    import { fade } from "svelte/transition";
 
     let appPath: string | undefined = undefined;
     let enableAdvancedOptions: boolean = false;
@@ -53,7 +54,7 @@
 
 </script>
 
-<div class="flex flex-col bg-base-200 rounded-box mx-10 mt-10 p-5">
+<div class="flex flex-col bg-base-200 rounded-box mx-10 mt-10 p-5" in:fade={{duration: 500}}>
     {#if !!appPath}
         <div class="mt-3">
             <div class="container mx-auto px-4 py-4">

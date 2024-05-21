@@ -4,8 +4,9 @@
     import {installAppImage} from "$lib/helpers/tauriCommands/appImageCommands";
     import Modal from "$lib/components/Modal.svelte";
     import LoadingOverlay from "$lib/components/LoadingOverlay.svelte";
+    import { fade } from "svelte/transition";
 
-    let appPath: string;
+    let appPath: string | undefined = undefined;
     let enableAdvancedOptions: boolean = false;
 
     let noSandbox: boolean = false;
@@ -29,6 +30,9 @@
     const installApp = async () => {
         isLoading = true;
         try {
+            if (!appPath) {
+                throw new Error("No app path selected");
+            }
             const res = await installAppImage(
                 appPath,
                 noSandbox
@@ -42,17 +46,15 @@
             modalOpen = true;
             modalTitle = $t("install_file.error_modal_title");
             modalMessage = $t("install_file.error_modal_install");
-        }
-        finally {
+        } finally {
             isLoading = false;
+            appPath = undefined;
         }
     }
 
 </script>
 
-
-<div class="flex flex-col bg-base-200 rounded-box mx-10 mt-10 p-5">
-
+<div class="flex flex-col bg-base-200 rounded-box mx-10 mt-10 p-5" in:fade={{duration: 500}}>
     {#if !!appPath}
         <div class="mt-3">
             <div class="container mx-auto px-4 py-4">
@@ -69,12 +71,16 @@
             </div>
 
             {#if enableAdvancedOptions}
-                <div class="mx-auto px-4 mt-3">
-                    <div class="flex flex-col justify-start items-start mt-4">
-                        <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.no_sandbox_des")}>
-                            <p class="text-xl">{$t("install_file.advanced_options.no_sandbox")}</p>
+                <div class="container mx-auto px-4 mt-3">
+                    <div class="flex flex-col justify-start items-start mt-4 space-y-2">
+                        <div class="tooltip tooltip-right"
+                             data-tip={$t("install_file.advanced_options.no_sandbox_des")}>
+                            <p class="mb-1">{$t("install_file.advanced_options.title")}</p>
                         </div>
-                        <input bind:checked={noSandbox} type="checkbox" class="checkbox"/>
+                        <label class="inline-flex items-center">
+                            <input bind:checked={noSandbox} type="checkbox" class="checkbox"/>
+                            <span class="ml-2">{$t("install_file.advanced_options.no_sandbox")}</span>
+                        </label>
                     </div>
                 </div>
             {/if}

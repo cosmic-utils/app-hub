@@ -1,5 +1,4 @@
 <script lang="ts">
-
     import {t, locales, locale} from "$lib/i18n/i18n";
     import {themes} from "$lib/themes";
     import {onMount} from "svelte";
@@ -10,6 +9,7 @@
     import {pickDirectory} from "$lib/helpers/tauriCommands/dialogCommands";
     import Modal from "$lib/components/Modal.svelte";
     import LoadingOverlay from "$lib/components/LoadingOverlay.svelte";
+    import { fade } from "svelte/transition";
 
     let activeMenuIndex = 0;
     let settings: AppSettings;
@@ -76,7 +76,7 @@
 </script>
 
 {#if !!settings}
-    <div class="flex flex-row bg-base-200 rounded-box mx-10 mt-10 p-5">
+    <div class="flex flex-row bg-base-200 rounded-box mx-10 mt-10 p-5" in:fade={{duration: 500}}>
         <div class={`flex flex-col w-[20%] rounded-lg shadow-lg p-3 my-3 ${settings.theme !== 'dark' ? 'bg-white' : ''}`}>
             <button class={"btn " + (activeMenuIndex === 0 ? "font-bold text-xl" : " ")} on:click={()=>{activeMenuIndex = 0}}>
                 {$t("settings.menu.general_label")}
@@ -91,7 +91,7 @@
                 <div class={`rounded-lg shadow-lg p-6 ${settings.theme !== 'dark' ? 'bg-white' : ''}`}>
                     <p class="font-bold text-xl mb-3">{$t("settings.theme.theme_label")}</p>
                     <div class="my-3">
-                        <select data-choose-theme class="select select-bordered max-w-3xl text-xl capitalize" bind:value={settings.theme} on:change={changeTheme}>
+                        <select data-choose-theme class="select select-bordered max-w-3xl capitalize" bind:value={settings.theme} on:change={changeTheme}>
                             <option disabled selected>{$t("settings.theme.choose_theme")}</option>
                             {#each themes as theme}
                                 <option value={theme} class="capitalize">{theme}</option>
@@ -101,7 +101,6 @@
                     <div class="mt-6">
                         <p class="font-bold text-xl mb-3">{$t("settings.language.language_label")}</p>
                         <div class="flex flex-col">
-                            <p class="mt-3">{$t("settings.language.app_lang")}:</p>
                             <select class="select select-bordered w-full max-w-xs mt-1" bind:value={$locale}>
                                 {#each locales as l}
                                     <option value={l}>{l}</option>

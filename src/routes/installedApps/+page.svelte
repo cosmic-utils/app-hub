@@ -7,6 +7,7 @@
     import Modal from "$lib/components/Modal.svelte";
     import {cloneDeep} from "lodash";
     import TrashIcon from "$lib/icons/TrashIcon.svelte";
+    import { fade } from "svelte/transition";
 
     let appList: AppList = {
         apps: []
@@ -82,7 +83,7 @@
 
 </script>
 
-<div class="flex flex-col bg-base-200 rounded-box mx-10 mt-10 p-5">
+<div class="flex flex-col bg-base-200 rounded-box mx-10 mt-10 p-5" in:fade={{duration: 500}}>
     <div class="mb-5 flex flex-row justify-between items-center">
         <p class="font-bold text-3xl">{$t("applist.title")}</p>
         <input on:input={(e)=>{ filterApps(e.target.value) }}

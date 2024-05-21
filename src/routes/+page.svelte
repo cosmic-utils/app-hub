@@ -42,8 +42,7 @@
             modalOpen = true;
             modalTitle = $t("install_file.error_modal_title");
             modalMessage = $t("install_file.error_modal_install");
-        }
-        finally {
+        } finally {
             isLoading = false;
         }
     }
@@ -69,12 +68,16 @@
             </div>
 
             {#if enableAdvancedOptions}
-                <div class="mx-auto px-4 mt-3">
-                    <div class="flex flex-col justify-start items-start mt-4">
-                        <div class="tooltip tooltip-right" data-tip={$t("install_file.advanced_options.no_sandbox_des")}>
-                            <p class="text-xl">{$t("install_file.advanced_options.no_sandbox")}</p>
+                <div class="container mx-auto px-4 mt-3">
+                    <div class="flex flex-col justify-start items-start mt-4 space-y-2">
+                        <div class="tooltip tooltip-right"
+                             data-tip={$t("install_file.advanced_options.no_sandbox_des")}>
+                            <p class="mb-1">{$t("install_file.advanced_options.title")}</p>
                         </div>
-                        <input bind:checked={noSandbox} type="checkbox" class="checkbox"/>
+                        <label class="inline-flex items-center">
+                            <input bind:checked={noSandbox} type="checkbox" class="checkbox"/>
+                            <span class="ml-2">{$t("install_file.advanced_options.no_sandbox")}</span>
+                        </label>
                     </div>
                 </div>
             {/if}

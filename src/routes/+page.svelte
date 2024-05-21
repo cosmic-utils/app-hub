@@ -5,7 +5,7 @@
     import Modal from "$lib/components/Modal.svelte";
     import LoadingOverlay from "$lib/components/LoadingOverlay.svelte";
 
-    let appPath: string;
+    let appPath: string | undefined = undefined;
     let enableAdvancedOptions: boolean = false;
 
     let noSandbox: boolean = false;
@@ -29,6 +29,9 @@
     const installApp = async () => {
         isLoading = true;
         try {
+            if (!appPath) {
+                throw new Error("No app path selected");
+            }
             const res = await installAppImage(
                 appPath,
                 noSandbox
@@ -44,14 +47,13 @@
             modalMessage = $t("install_file.error_modal_install");
         } finally {
             isLoading = false;
+            appPath = undefined;
         }
     }
 
 </script>
 
-
 <div class="flex flex-col bg-base-200 rounded-box mx-10 mt-10 p-5">
-
     {#if !!appPath}
         <div class="mt-3">
             <div class="container mx-auto px-4 py-4">

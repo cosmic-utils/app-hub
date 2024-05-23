@@ -55,9 +55,6 @@ pub fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
     // Try to deserialize the settings
     let deserialized = serde_json::from_value::<AppSettings>(res).map_err(|e| e.to_string())?;
 
-    // Print the deserialized settings for debugging
-    println!("{:?}", deserialized);
-
     // Return the deserialized settings
     Ok(deserialized)
 }

@@ -20,8 +20,8 @@ tauri-build = { version = "2.0.0-beta.13", features = [] }
 common_utils = { path = "./common_utils" }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "2.0.0-beta.17", features = [] }
-tauri-plugin-shell = "2.0.0-beta.4"
+tauri = { version = "2.0.0-beta.20", features = [] }
+tauri-plugin-shell = "2.0.0-beta.5"
 tauri-plugin-dialog = "2.0.0-beta.7"
 tauri-plugin-store = "2.0.0-beta.6"
 log = "0.4.21"

@@ -2,10 +2,11 @@
     import {t} from "$lib/i18n/i18n";
     import BoxIcon from "$lib/icons/BoxIcon.svelte";
     import SettingsIcon from "$lib/icons/SettingsIcon.svelte";
-    import AppStoreIcon from "$lib/icons/AppStoreIcon.svelte";
     import InfoIcon from "$lib/icons/InfoIcon.svelte";
     import {settingsState} from "../../stores/settingsState";
     import {onMount} from "svelte";
+    import InstallIcon from "$lib/icons/InstallIcon.svelte";
+    import AppStoreIcon from "$lib/icons/AppStoreIcon.svelte";
 
     let theme: string = "light";
     let isDrawerOpen: boolean = false;
@@ -55,8 +56,14 @@
             </li>
             <li>
                 <a href="/installedApps" class="flex flex-row py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out" on:click={closeDrawer}>
-                    <AppStoreIcon height="20px" width="20px" isWhite={theme === "dark"}/>
+                    <InstallIcon height="20px" width="20px" isWhite={theme === "dark"}/>
                     {$t("header.installed")}
+                </a>
+            </li>
+            <li>
+                <a href="/marketplace" class="flex flex-row py-2 px-4 hover:bg-green-400 transition duration-300 ease-in-out" on:click={closeDrawer}>
+                    <AppStoreIcon height="20px" width="20px" isWhite={theme === "dark"}/>
+                    {$t("header.app_store")}
                 </a>
             </li>
             <li>

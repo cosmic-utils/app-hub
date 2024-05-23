@@ -5,6 +5,8 @@
     import Modal from "$lib/components/Modal.svelte";
     import LoadingOverlay from "$lib/components/LoadingOverlay.svelte";
     import { fade } from "svelte/transition";
+    import {onMount} from "svelte";
+    import {readAppsDatabase, updateAppsDatabase} from "$lib/helpers/tauriCommands/appDatabaseCommands";
 
     let appPath: string | undefined = undefined;
     let enableAdvancedOptions: boolean = false;
@@ -51,6 +53,15 @@
             appPath = undefined;
         }
     }
+
+    onMount(() => {
+        console.log("Page mounted");
+        updateAppsDatabase().then((res)=>{
+            readAppsDatabase().then((res)=>{
+                console.log("Apps database", res);
+            })
+        })
+    });
 
 </script>
 

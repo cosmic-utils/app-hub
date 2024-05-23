@@ -2,7 +2,6 @@
     import "../app.css";
     import Navbar from "$lib/components/Navbar.svelte";
     import {settingsState} from "../stores/settingsState.js";
-    import {invoke} from "@tauri-apps/api/core";
     import type {AppSettings} from "$lib/models/Settings";
     import {onMount} from "svelte";
     import {set_theme} from "$lib/helpers/themeController";

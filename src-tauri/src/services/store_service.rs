@@ -22,7 +22,6 @@ pub async fn update_app_database(app: AppHandle) -> Result<(), String> {
 
     let database = match fetch_all_apps_from_app_hub().await {
         Ok(data) => {
-            debug!("Fetched data from AppHub: {:?}", &data);
             data
         }
         Err(err) => {

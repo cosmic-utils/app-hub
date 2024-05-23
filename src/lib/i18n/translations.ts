@@ -7,6 +7,7 @@ export default {
         "header.settings": "Settings",
         "header.installed": "Installed apps",
         "header.app_info": "App info",
+        "header.app_store": "App store",
 
         "settings.menu.general_label": "General",
         "settings.menu.advanced": "Advanced",
@@ -70,6 +71,7 @@ export default {
         "header.settings": "Impostazioni",
         "header.installed": "App installate",
         "header.app_info": "Informazioni sull'app",
+        "header.app_store": "App store",
 
         "settings.menu.general_label": "Generale",
         "settings.menu.advanced": "Avanzate",

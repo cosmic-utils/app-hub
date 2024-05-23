@@ -62,6 +62,11 @@ export default {
         "appInfo.acknowledgment": "Acknowledgment",
         "appInfo.legal_notes": "Legal notes",
         "appInfo.author": "Author",
+
+        "marketplace.title": "App store",
+        "marketplace.not_found": "No apps found",
+        "marketplace.search": "Search app",
+
     },
     it: {
         "yes_label": "Si",
@@ -127,5 +132,9 @@ export default {
         "appInfo.acknowledgment": "Riconoscimenti",
         "appInfo.legal_notes": "Note legali",
         "appInfo.author": "Autore",
+
+        "marketplace.title": "App store",
+        "marketplace.not_found": "Nessuna app trovata",
+        "marketplace.search": "Cerca app",
     },
 };

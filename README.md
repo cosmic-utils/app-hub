@@ -5,6 +5,7 @@
 # 🚀 AppHub
 
 AppHub is a Linux desktop application that simplifies the installation and management of .appImage packages through an intuitive graphical interface. Additionally, it provides the ability to easily uninstall applications installed via AppImage.
+Is also available an app store to download and install new applications based on official AppImageHub.
 
 ## 📸 Screenshots
 <p align="center">
@@ -33,11 +34,16 @@ The project supports three installation modes:
 - **pnpm**: The project uses pnpm as the package manager.
 - **Tauri**: The project uses Tauri as the framework for building the desktop application.
 
+Note: Tauir requires the installation of additional dependencies. Please refer to the Tauri documentation for more information.
+
 #### Steps
 
 To install the application from source, follow these steps:
 
 ```bash
+# Install cargo make
+cargo install cargo-make
+
 # Clone the repository
 git clone https://github.com/francesco-gaglione/AppHub.git
 
@@ -59,6 +65,7 @@ Note: Replace `<version>` with the version number of the application.
 - Simplified installation of .appImage packages.
 - Management of applications installed via AppImage.
 - Intuitive graphical interface for easy navigation.
+- App store to download and install new applications based on official AppImageHub.
 
 ## 📖 Usage
 Currently, the usage of the application is not documented. However, detailed guides will be provided once the project is more stable and structured.

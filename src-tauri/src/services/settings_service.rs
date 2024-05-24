@@ -49,18 +49,19 @@ pub fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
             with_store(app_clone, stores, path, |store| {
                 store.insert("app_settings".to_string(), serialized_settings.clone())
             }).expect("error saving default settings");
-            // create the default path
-            let default_path = default_settings.install_path.clone().unwrap();
-            if !Path::new(&default_path).exists() {
-                info!("Creating default path: {}", default_path);
-                fs::create_dir_all(&default_path).expect("error creating default path");
-            }
             serialized_settings
         }
     };
 
     // Try to deserialize the settings
     let deserialized = serde_json::from_value::<AppSettings>(res).map_err(|e| e.to_string())?;
+
+    // Check if the install path exists
+    let install_path = deserialized.install_path.clone().unwrap();
+    if !Path::new(&install_path).exists() {
+        info!("Creating install path: {}", install_path);
+        fs::create_dir_all(&install_path).expect("error creating install path");
+    }
 
     // Print the deserialized settings for debugging
     println!("{:?}", deserialized);

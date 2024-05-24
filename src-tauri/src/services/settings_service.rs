@@ -50,10 +50,10 @@ pub fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
                 store.insert("app_settings".to_string(), serialized_settings.clone())
             }).expect("error saving default settings");
             // create the default path
-            let default_path = default_settings.install_path.clone().unwrap().as_str();
-            if !Path::new(default_path).exists() {
+            let default_path = default_settings.install_path.clone().unwrap();
+            if !Path::new(&default_path).exists() {
                 info!("Creating default path: {}", default_path);
-                fs::create_dir_all(default_path).expect("error creating default path");
+                fs::create_dir_all(&default_path).expect("error creating default path");
             }
             serialized_settings
         }

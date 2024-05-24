@@ -12,9 +12,9 @@ export class RemoteAppInfo {
     sha: string;
     size: number;
     url: string;
-    htmlUrl: string;
-    gitUrl: string;
-    downloadUrl: string;
+    html_url: string;
+    git_url: string;
+    download_url: string;
     typeField: string;
     links: Links;
 
@@ -24,9 +24,9 @@ export class RemoteAppInfo {
         this.sha = '';
         this.size = 0;
         this.url = '';
-        this.htmlUrl = '';
-        this.gitUrl = '';
-        this.downloadUrl = '';
+        this.html_url = '';
+        this.git_url = '';
+        this.download_url = '';
         this.typeField = '';
         this.links = new Links();
     }

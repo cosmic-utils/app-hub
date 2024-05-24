@@ -22,7 +22,18 @@ async function readAppsDatabase(): Promise<AppDatabase> {
     }
 }
 
+async function installAppFromRemote(download_url: string, appName: string): Promise<string> {
+    try {
+        return await invoke<string>('install_app_from_remote_command', {downloadUrl: download_url, appName: appName});
+    }
+    catch (e) {
+        console.error(e);
+        throw new Error('Failed to install app image');
+    }
+}
+
 export {
     updateAppsDatabase,
-    readAppsDatabase
+    readAppsDatabase,
+    installAppFromRemote
 }

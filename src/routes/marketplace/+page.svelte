@@ -1,6 +1,6 @@
 <script lang="ts">
     import {onMount} from "svelte";
-    import {readAppsDatabase} from "$lib/helpers/tauriCommands/appDatabaseCommands";
+    import {installAppFromRemote, readAppsDatabase} from "$lib/helpers/tauriCommands/appDatabaseCommands";
     import {RemoteAppInfo} from "$lib/models/AppDatabase";
     import {t} from "$lib/i18n/i18n";
 
@@ -25,8 +25,17 @@
         );
     }
 
-    const installApp = (app: RemoteAppInfo) => {
+    const installApp = async (app: RemoteAppInfo) => {
         console.log("Installing app ", app);
+        try {
+            let res = await installAppFromRemote(app.download_url, app.name);
+            //TODO: Show success message with modal success
+            console.log("App installed ", res);
+        }
+        catch (e) {
+            console.error("Error installing app ", e);
+            //TODO: Show error message with modal error
+        }
     }
 
 </script>

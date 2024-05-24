@@ -1,6 +1,7 @@
+use std::fs;
 use std::fs::{File, OpenOptions, remove_dir_all};
 use std::io::{BufRead, BufReader, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use log::{debug, error, info, warn};
 use tauri::{AppHandle, Manager, Wry};
@@ -46,9 +47,15 @@ pub fn read_settings(app: AppHandle) -> Result<AppSettings, String> {
             };
             let serialized_settings = serde_json::to_value(default_settings.clone()).map_err(|e| e.to_string())?;
             with_store(app_clone, stores, path, |store| {
-                store.insert("app_settings".to_string(), serialized_settings)
+                store.insert("app_settings".to_string(), serialized_settings.clone())
             }).expect("error saving default settings");
-            serde_json::to_value(default_settings).map_err(|e| e.to_string())?
+            // create the default path
+            let default_path = default_settings.install_path.clone().unwrap().as_str();
+            if !Path::new(default_path).exists() {
+                info!("Creating default path: {}", default_path);
+                fs::create_dir_all(default_path).expect("error creating default path");
+            }
+            serialized_settings
         }
     };
 

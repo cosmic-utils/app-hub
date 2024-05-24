@@ -3,9 +3,17 @@
     import {installAppFromRemote, readAppsDatabase} from "$lib/helpers/tauriCommands/appDatabaseCommands";
     import {RemoteAppInfo} from "$lib/models/AppDatabase";
     import {t} from "$lib/i18n/i18n";
+    import Modal from "$lib/components/Modal.svelte";
+    import LoadingOverlay from "$lib/components/LoadingOverlay.svelte";
 
     let database: RemoteAppInfo[];
     let filteredDatabase: RemoteAppInfo[];
+
+    let modalOpen = false;
+    let modalTitle = "";
+    let modalMessage = "";
+
+    let isLoading = false;
 
     onMount(() => {
         console.log("Page mounted");
@@ -27,14 +35,20 @@
 
     const installApp = async (app: RemoteAppInfo) => {
         console.log("Installing app ", app);
+        isLoading = true;
         try {
             let res = await installAppFromRemote(app.download_url, app.name);
-            //TODO: Show success message with modal success
-            console.log("App installed ", res);
+            modalOpen = true;
+            modalTitle = "Success";
+            modalMessage = "App installed successfully";
         }
         catch (e) {
-            console.error("Error installing app ", e);
-            //TODO: Show error message with modal error
+            modalOpen = true;
+            modalTitle = "Error";
+            modalMessage = "Error installing app";
+        }
+        finally {
+            isLoading = false;
         }
     }
 
@@ -68,3 +82,12 @@
         </div>
     </div>
 {/if}
+
+<Modal bind:modalOpen={modalOpen} closeCallback="{()=>modalOpen = false}">
+    <div class="flex flex-col">
+        <p class="font-bold text-2xl">{modalTitle}</p>
+        <p>{modalMessage}</p>
+    </div>
+</Modal>
+
+<LoadingOverlay bind:loading={isLoading}/>

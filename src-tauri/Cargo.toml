@@ -20,16 +20,16 @@ tauri-build = { version = "2.0.0-beta.13", features = [] }
 common_utils = { path = "./common_utils" }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "2.0.0-beta.17", features = [] }
-tauri-plugin-shell = "2.0.0-beta.4"
-tauri-plugin-dialog = "2.0.0-beta.7"
-tauri-plugin-store = "2.0.0-beta.6"
-log = "0.4.21"
+tauri = { version = "2.0.0-beta.22", features = [] }
+tauri-plugin-shell = "2.0.0-beta.7"
+tauri-plugin-dialog = "2.0.0-beta.9"
+tauri-plugin-store = "2.0.0-beta.8"
+log = "0.4.22"
 env_logger = "0.11.3"
-regex = "1.10.4"
-tauri-plugin-log = { version = "2.0.0-beta.4", features = ["colored"] }
-tauri-plugin-persisted-scope = "2.0.0-beta.7"
-tauri-plugin-single-instance = "2.0.0-beta.7"
+regex = "1.10.5"
+tauri-plugin-log = { version = "2.0.0-beta.6", features = ["colored"] }
+tauri-plugin-persisted-scope = "2.0.0-beta.9"
+tauri-plugin-single-instance = "2.0.0-beta.9"
 dirs = "5.0.1"
 
 [features]

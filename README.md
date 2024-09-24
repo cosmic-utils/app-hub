@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./src-tauri/icons/appHubLogo.png" alt="Logo">
+  <img src="./res/icons/hicolor/scalable/apps/icon.png" alt="Logo">
 </p>
 
 # 🚀 AppHub

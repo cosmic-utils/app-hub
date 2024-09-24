@@ -17,7 +17,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 const REPOSITORY: &str = "https://github.com/francesco-gaglione/app_hub";
-const APP_ICON: &[u8] = include_bytes!("../res/icons/hicolor/scalable/apps/icon.svg");
+const APP_ICON: &[u8] = include_bytes!("../res/icons/hicolor/scalable/apps/icon.png");
 
 /// The application model stores app-specific state used to describe its interface and
 /// drive its logic.

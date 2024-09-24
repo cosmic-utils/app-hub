@@ -16,8 +16,8 @@ desktop-dst := clean(rootdir / prefix) / 'share' / 'applications' / desktop
 icons-src := 'res' / 'icons' / 'hicolor'
 icons-dst := clean(rootdir / prefix) / 'share' / 'icons' / 'hicolor'
 
-icon-svg-src := icons-src / 'scalable' / 'apps' / 'icon.svg'
-icon-svg-dst := icons-dst / 'scalable' / 'apps' / appid + '.svg'
+icon-svg-src := icons-src / 'scalable' / 'apps' / 'icon.png'
+icon-svg-dst := icons-dst / 'scalable' / 'apps' / appid + '.png'
 
 # Default recipe which runs `just build-release`
 default: build-release

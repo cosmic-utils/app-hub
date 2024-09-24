@@ -1,0 +1,1 @@
+pub mod installed_app;

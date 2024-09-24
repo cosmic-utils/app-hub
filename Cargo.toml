@@ -1,0 +1,41 @@
+[package]
+name = "app-hub"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = ["app_hub_backend"]
+
+[features]
+default = ["xdg-portal"]
+rfd = ["libcosmic/rfd"]
+xdg-portal = ["libcosmic/xdg-portal"]
+
+[dependencies]
+common_utils = { path = "./common_utils" }
+backend = { path = "./backend" }
+futures-util = "0.3.30"
+i18n-embed-fl = "0.9.1"
+once_cell = "1.19.0"
+open = "5.3.0"
+rust-embed = "8.5.0"
+tokio = { version = "1.40.0", features = ["full"] }
+env_logger = "0.11"
+log = "0.4"
+dirs = "5.0.1"
+serde = { version = "1", features = ["serde_derive"] }
+
+[dependencies.i18n-embed]
+version = "0.15"
+features = ["fluent-system", "desktop-requester"]
+
+[dependencies.libcosmic]
+git = "https://github.com/pop-os/libcosmic.git"
+default-features = false
+features = ["dbus-config", "tokio", "winit", "wgpu"]
+
+# Uncomment to test a locally-cloned libcosmic
+# [patch.'https://github.com/pop-os/libcosmic']
+# libcosmic = { path = "../libcosmic" }
+# cosmic-config = { path = "../libcosmic/cosmic-config" }
+# cosmic-theme = { path = "../libcosmic/cosmic-theme" }

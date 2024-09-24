@@ -1,5 +1,6 @@
 name := 'app-hub'
 appid := 'com.AppHub.AppHub'
+version := '1.0.0-alpha.1'
 
 rootdir := ''
 prefix := '/usr'
@@ -64,7 +65,7 @@ install:
 # Uninstalls installed files
 uninstall:
     rm {{bin-dst}} {{desktop-dst}} {{icon-svg-dst}}
-    
+
 package-deb:
     mkdir -p debian/usr/bin
     mkdir -p debian/usr/share/applications
@@ -76,19 +77,19 @@ package-deb:
     install -Dm0644 {{icon-svg-src}} debian{{icon-svg-dst}}
 
     echo "Package: {{name}}" > debian/DEBIAN/control
-    echo "Version: 1.0" >> debian/DEBIAN/control
+    echo "Version: {{version}}" >> debian/DEBIAN/control
     echo "Section: utils" >> debian/DEBIAN/control
     echo "Priority: optional" >> debian/DEBIAN/control
     echo "Architecture: amd64" >> debian/DEBIAN/control
-    echo "Maintainer: Your Name <youremail@example.com>" >> debian/DEBIAN/control
-    echo "Description: Your app description here" >> debian/DEBIAN/control
+    echo "Maintainer: Francesco Pio Gaglione <francesco.gaglione.p@gmail.com>" >> debian/DEBIAN/control
+    echo "Description: AppHub is a Linux desktop application that simplifies the installation and management of .appImage packages through an intuitive graphical interface. Additionally, it provides the ability to easily uninstall applications installed via AppImage. " >> debian/DEBIAN/control
 
     chmod 755 debian/DEBIAN
     chmod 644 debian/DEBIAN/control
 
     dpkg-deb --build debian
 
-    mv debian.deb {{name}}_1.0_amd64.deb
+    mv debian.deb {{name}}_{{version}}_amd64.deb
 
     rm -rf debian
 

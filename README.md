@@ -5,7 +5,6 @@
 # 🚀 AppHub
 
 AppHub is a Linux desktop application that simplifies the installation and management of .appImage packages through an intuitive graphical interface. Additionally, it provides the ability to easily uninstall applications installed via AppImage.
-Is also available an app store to download and install new applications based on official AppImageHub.
 
 ## 📸 Screenshots
 <p align="center">
@@ -17,55 +16,35 @@ More screenshots available in the [screenshots](screenshots) folder.
 ## 💻 System Requirements
 - **Operating System:** Linux*
 
-Note*: The application is currently tested only on Fedora workstation. 
+Note*: The application is currently tested only on Ubuntu and PopOs workstation. 
 However, it should work on any Linux distribution that supports the AppImage format.
 Distribution-specific packages will be provided in the future.
 
 ## 💿 Installation Modes
 The project supports three installation modes:
-1. **.appImage**: Download the .appImage file from the GitHub repository and execute it directly.
-2. **.deb**: Download the .deb package from the GitHub repository and install it using your system's package manager.
-3. **.rpm**: Download the .rpm package from the GitHub repository and install it using your system's package manager.
+1. **.deb**: Download the .deb package from the GitHub repository and install it using your system's package manager.
 
 ### Installation from Source
-
-#### Prerequisites
-- **Node.js**: The project is built using Node.js, so you must have it installed on your system.
-- **pnpm**: The project uses pnpm as the package manager.
-- **Tauri**: The project uses Tauri as the framework for building the desktop application.
-
-Note: Tauir requires the installation of additional dependencies. Please refer to the Tauri documentation for more information.
 
 #### Steps
 
 To install the application from source, follow these steps:
 
 ```bash
-# Install cargo make
-cargo install cargo-make
-
 # Clone the repository
 git clone https://github.com/francesco-gaglione/AppHub.git
 
 # Change directory to the project folder
 cd AppHub
 
-# Install the required dependencies
-pnpm install
-
-# Build the project
-pnpm tauri:build
-
-# Install the application
-sudo dkpg -i ./target/release/bundle/apphub_<version>_amd64.deb
+# Install
+just install
 ```
-Note: Replace `<version>` with the version number of the application.
 
 ## 🌟 Key Features
 - Simplified installation of .appImage packages.
 - Management of applications installed via AppImage.
 - Intuitive graphical interface for easy navigation.
-- App store to download and install new applications based on official AppImageHub.
 
 ## 📖 Usage
 Currently, the usage of the application is not documented. However, detailed guides will be provided once the project is more stable and structured.
@@ -87,7 +66,6 @@ The project is currently in its initial development phase. There are still many 
 
 ## ⚠️ Experimental
 The project is in experimental mode and is not yet ready for production use. 
-We use Tauri 2.0, which is still in beta.
 Please use it at your own risk.
 
 ## 📌 Additional Notes

@@ -8,7 +8,10 @@
 ## v0.2
 - [x] Create an app store for AppImage applications
 
-# Road to v1
+## v1
+- [] libcomisc migration
+
+# Road to v2
 
 No matter how hard you try to create an app store that makes a little sense, you cannot do it effectively because in all the public collections there are not all apps (even and especially the most popular ones).
 

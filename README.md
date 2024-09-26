@@ -37,8 +37,11 @@ git clone https://github.com/francesco-gaglione/AppHub.git
 # Change directory to the project folder
 cd AppHub
 
+# Build Release version (for much better performance)
+just build-release
+
 # Install
-just install
+sudo just install
 ```
 
 ## 🌟 Key Features

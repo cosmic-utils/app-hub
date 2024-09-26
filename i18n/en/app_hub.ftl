@@ -11,6 +11,7 @@ installation-completed = Installation completed!
 
 installed-list = Installed app list
 uninstall = Uninstall
+run-app = Run
 
 settings = Settings
 installation-dir = Installation dir

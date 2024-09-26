@@ -14,6 +14,7 @@ pub enum InstalledListMessage {
     UninstallApp(InstalledApp),
     UninstallationComplete,
     LoadApps,
+    RunApp(InstalledApp),
 }
 
 pub struct InstalledList {
@@ -77,9 +78,20 @@ impl InstalledList {
                         .push(
                             widget::column()
                                 .push(
-                                    cosmic::widget::button::text(fl!("uninstall"))
-                                        .on_press(InstalledListMessage::UninstallApp(app.clone()))
-                                        .style(widget::button::Style::Destructive),
+                                    widget::row()
+                                        .push(
+                                            cosmic::widget::button::text(fl!("uninstall"))
+                                                .on_press(InstalledListMessage::UninstallApp(
+                                                    app.clone(),
+                                                ))
+                                                .style(widget::button::Style::Destructive),
+                                        )
+                                        .push(widget::horizontal_space(Length::from(10)))
+                                        .push(
+                                            cosmic::widget::button::text(fl!("run-app"))
+                                                .on_press(InstalledListMessage::RunApp(app.clone()))
+                                                .style(widget::button::Style::Suggested),
+                                        ),
                                 )
                                 .width(Length::Fill)
                                 .height(Length::Fill)
@@ -120,7 +132,6 @@ impl InstalledList {
                             .spawn();
                         match cmd {
                             Ok(mut res) => {
-                                // Leggi lo stdout
                                 if let Some(stdout) = res.stdout.take() {
                                     let reader = BufReader::new(stdout);
                                     for line in reader.lines() {
@@ -130,7 +141,6 @@ impl InstalledList {
                                     }
                                 }
 
-                                // Leggi lo stderr
                                 if let Some(stderr) = res.stderr.take() {
                                     let reader = BufReader::new(stderr);
                                     for line in reader.lines() {
@@ -163,6 +173,25 @@ impl InstalledList {
             }
             InstalledListMessage::UninstallationComplete | InstalledListMessage::LoadApps => {
                 self.load_apps();
+            }
+            InstalledListMessage::RunApp(installed_app) => {
+                log::info!("running app: {:?}", installed_app);
+                let cmd = std::process::Command::new(installed_app.app_path).spawn();
+                match cmd {
+                    Ok(mut res) => {
+                        if let Some(stderr) = res.stderr.take() {
+                            let reader = BufReader::new(stderr);
+                            for line in reader.lines() {
+                                if let Ok(line) = line {
+                                    log::error!("running app error: {}", line);
+                                }
+                            }
+                        }
+                    }
+                    Err(error) => {
+                        log::error!("error: {:?}", error);
+                    }
+                }
             }
         }
         Command::batch(commands)

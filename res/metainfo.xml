@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.github.francesco-gaglione.AppHub</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <project_group>COSMIC</project_group>
+  <developer_name>Francesco Pio Gaglione</developer_name>
+  <update_contact>francesco.gaglione.p@gmail.com</update_contact>
+  <url type="homepage"></url>
+  <url type="bugtracker"></url>
+  <name>AppHub</name>
+  <summary>AppHub is a Linux desktop application that simplifies the installation and management of .appImage packages through an intuitive graphical interface.</summary>
+  <description>
+    <p>AppHub is a Linux desktop application that simplifies the installation and management of .appImage packages through an intuitive graphical interface. </p>
+  </description>
+  <launchable type="desktop-id">com.github.francesco-gaglione.AppHub.desktop</launchable>
+  <icon type="remote" height="256" width="256"></icon>
+  <screenshots>
+  </screenshots>
+  <categories>
+    <category>Utility</category>
+    <category>COSMIC</category>
+  </categories>
+  <provides>
+    <mimetypes>
+      <mimetype>text/plain</mimetype>
+    </mimetypes>
+    <binaries>
+      <binary>app-hub</binary>
+    </binaries>
+  </provides>
+</component>

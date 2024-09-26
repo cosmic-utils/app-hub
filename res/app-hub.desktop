@@ -5,6 +5,6 @@ Terminal=false
 Type=Application
 StartupNotify=true
 Icon=com.app_hub.AppHub
-Categories=COSMIC;
+Categories=COSMIC;Utility;
 Keywords=
 MimeType=

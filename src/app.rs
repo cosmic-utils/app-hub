@@ -3,7 +3,7 @@
 use crate::config::Config;
 use crate::core::nav::NavPage;
 use crate::pages::install_from_file::InstallFromFileMessage;
-use crate::pages::installed_list::{InstalledList, InstalledListMessage};
+use crate::pages::installed_list::InstalledListMessage;
 use crate::{fl, pages};
 use cosmic::app::{Command, Core};
 use cosmic::cosmic_config::{self, CosmicConfigEntry};
@@ -17,7 +17,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 const REPOSITORY: &str = "https://github.com/francesco-gaglione/app_hub";
-const APP_ICON: &[u8] = include_bytes!("../res/icons/hicolor/scalable/apps/icon.png");
+const APP_ICON: &[u8] = include_bytes!("../res/icons/hicolor/scalable/apps/icon.svg");
 
 /// The application model stores app-specific state used to describe its interface and
 /// drive its logic.

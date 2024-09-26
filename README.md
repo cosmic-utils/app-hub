@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./res/icons/hicolor/scalable/apps/icon.png" alt="Logo">
+  <img src="./res/icons/hicolor/scalable/apps/icon.svg" alt="Logo">
 </p>
 
 # 🚀 AppHub

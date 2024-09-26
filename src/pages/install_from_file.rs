@@ -221,7 +221,10 @@ impl InstallFromFile {
             InstallFromFileMessage::Cancelled => {
                 self.loading = false;
             }
-            InstallFromFileMessage::OpenError(arc) => todo!(),
+            InstallFromFileMessage::OpenError(arc) => {
+                //TODO sho error message
+                self.loading = false;
+            },
             InstallFromFileMessage::InstallationSuccessful => {
                 self.loading = false;
             }

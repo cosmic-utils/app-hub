@@ -258,10 +258,11 @@ impl Application for AppModel {
                     .update(InstallFromFileMessage::FileSelected(message))
                     .map(cosmic::app::Message::App),
             ),
-            Message::Cancelled => {
-                log::info!("Not implemented yet");
-                //TODO show info message (a toast?)
-            }
+            Message::Cancelled => commands.push(
+                self.install_from_file
+                    .update(InstallFromFileMessage::Cancelled)
+                    .map(cosmic::app::Message::App),
+            ),
             Message::OpenError(arc_err) => {
                 log::error!("Error happened: {}", arc_err);
             }

@@ -1,6 +1,6 @@
 name := 'app-hub'
 appid := 'com.AppHub.AppHub'
-version := '1.0.0-alpha.1'
+version := '1.0.0-alpha.2'
 
 rootdir := ''
 prefix := '/usr'

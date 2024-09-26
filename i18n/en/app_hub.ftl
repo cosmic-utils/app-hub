@@ -5,7 +5,7 @@ welcome = Welcome to COSMIC! ✨
 page-id = Page { $num }
 
 install-from-file = Install from file
-choose-file = Chosse file
+choose-file = Choose file
 installing = Installing app...
 installation-completed = Installation completed!
 

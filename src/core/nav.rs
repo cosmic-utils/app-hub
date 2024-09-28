@@ -1,4 +1,4 @@
-use cosmic::Element;
+use cosmic::{widget::icon, Element};
 
 use crate::{app, fl, pages};
 
@@ -24,6 +24,13 @@ impl NavPage {
             Self::Settings => fl!("settings"),
         }
     }
+    pub fn icon(&self) -> cosmic::widget::Icon {
+        match self {
+            Self::InstallFromFile => icon::from_name("system-software-install-symbolic").into(),
+            Self::InstalledList => icon::from_name("view-list-symbolic").into(),
+            Self::Settings => icon::from_name("application-default-symbolic").into(),
+        }
+    }
 
     pub fn view<'a>(&self, app: &'a app::AppModel) -> Element<'a, app::Message> {
         match self {
@@ -35,7 +42,7 @@ impl NavPage {
             NavPage::Settings => app.settings.view().map(app::Message::Settings),
         }
     }
-    
+
     pub fn all() -> &'static [Self] {
         &[Self::InstallFromFile, Self::InstalledList, Self::Settings]
     }

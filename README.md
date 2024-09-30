@@ -32,7 +32,7 @@ To install the application from source, follow these steps:
 
 ```bash
 # Clone the repository
-git clone https://github.com/francesco-gaglione/AppHub.git
+git clone https://github.com/cosmic-utils/AppHub
 
 # Change directory to the project folder
 cd AppHub

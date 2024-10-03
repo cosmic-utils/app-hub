@@ -1,5 +1,5 @@
 name := 'app-hub'
-appid := 'com.AppHub.AppHub'
+appid := 'com.github.francesco_gaglione.AppHub'
 version := '1.0.0-alpha.2'
 
 rootdir := ''
@@ -17,8 +17,8 @@ desktop-dst := clean(rootdir / prefix) / 'share' / 'applications' / desktop
 icons-src := 'res' / 'icons' / 'hicolor'
 icons-dst := clean(rootdir / prefix) / 'share' / 'icons' / 'hicolor'
 
-icon-svg-src := icons-src / 'scalable' / 'apps' / 'icon.svg'
-icon-svg-dst := icons-dst / 'scalable' / 'apps' / appid + '.svg'
+icon-svg-src := icons-src / 'scalable' / 'apps' / 'AppHub.png'
+icon-svg-dst := icons-dst / 'scalable' / 'apps' / 'AppHub.png'
 
 # Default recipe which runs `just build-release`
 default: build-release

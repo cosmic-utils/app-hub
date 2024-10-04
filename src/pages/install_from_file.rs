@@ -58,14 +58,17 @@ impl InstallFromFile {
                     .align_x(iced::alignment::Horizontal::Center),
             );
         } else {
+            col = col.push(widget::vertical_space(Length::from(30)));
             col = col.push(
                 widget::container(
                     cosmic::widget::button::text(fl!("choose-file"))
+                        .style(widget::button::Style::Suggested)
                         .on_press(InstallFromFileMessage::ChooseFile),
                 )
                 .width(iced::Length::Fill)
                 .align_x(iced::alignment::Horizontal::Center),
             );
+            col = col.push(widget::vertical_space(Length::from(30)));
             col = col.push(
                 widget::container(cosmic::widget::checkbox(
                     "No sandbox",
@@ -78,7 +81,7 @@ impl InstallFromFile {
         }
 
         if self.successful {
-            col = col.push(vertical_space(Length::from(10))).push(
+            col = col.push(vertical_space(Length::from(30))).push(
                 widget::container(cosmic::widget::text::text(fl!("installation-completed")))
                     .width(iced::Length::Fill)
                     .align_x(iced::alignment::Horizontal::Center),
@@ -224,7 +227,7 @@ impl InstallFromFile {
             InstallFromFileMessage::OpenError(arc) => {
                 //TODO sho error message
                 self.loading = false;
-            },
+            }
             InstallFromFileMessage::InstallationSuccessful => {
                 self.loading = false;
             }

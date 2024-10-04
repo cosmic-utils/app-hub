@@ -65,6 +65,7 @@ impl InstalledList {
                                             )
                                             .width(Length::from(50)),
                                         )
+                                        .push(widget::horizontal_space(Length::from(10)))
                                         .push(
                                             widget::text::title3(&app.name)
                                                 .vertical_alignment(

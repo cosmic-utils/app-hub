@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./res/icons/hicolor/scalable/apps/AppHub.png" alt="Logo" height="250px" width="250px">
+  <img src="./res/icons/hicolor/scalable/apps/com.francescogaglione.apphub.png" alt="Logo" height="250px" width="250px">
 </p>
 
 # 🚀 AppHub

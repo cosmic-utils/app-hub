@@ -1,6 +1,6 @@
 name := 'apphub'
 appid := 'com.francescogaglione.apphub'
-version := '1.0.0-alpha.2'
+version := '1.0.0'
 
 rootdir := ''
 prefix := '/usr'

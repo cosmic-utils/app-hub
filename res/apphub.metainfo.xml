@@ -11,13 +11,13 @@
   <url type="homepage">https://github.com/cosmic-utils/app-hub</url>
   <url type="bugtracker">https://github.com/cosmic-utils/app-hub/issues</url>
   <name>App Hub</name>
-  <summary>App Hub is a simple and intuitive Pomodoro timer for Linux</summary>
+  <summary>App Hub simplifies the installation and management of .appImage packages</summary>
   <description>
-    <p>App Hub is a simple and intuitive Pomodoro timer for Linux that helps users manage their time efficiently and effectively, making it easier to focus on tasks and take breaks at regular intervals.</p>
+    <p>App Hub is a simple and intuitive Pomodoro timer for Linux</p>
   </description>
   <launchable type="desktop-id">com.francescogaglione.apphub.desktop</launchable>
-  <icon type="remote" height="256" width="256">placelink here</icon>
-  <icon type="stock">com.francescogaglione.apphub.svg</icon>
+  <icon type="remote" height="256" width="256">https://raw.githubusercontent.com/cosmic-utils/app-hub/main/res/icons/hicolor/scalable/apps/com.francescogaglione.apphub.png</icon>
+  <icon type="stock">com.francescogaglione.apphub.png</icon>
   <screenshots>
      <screenshot type="default">
        <image>screenshot link</image>
@@ -33,7 +33,7 @@
   </provides>
   <content_rating type="oars-1.1" />
   <releases>
-   <release version="0.1.0" date="2024-09-30">
+   <release version="1.0.0" date="2024-09-30">
       <url type="details">https://github.com/cosmic-utils/app-hub/releases</url>
       <description>
         <p>v0.1.0</p>

@@ -1,10 +1,10 @@
 [Desktop Entry]
 Name=App hub
-Exec=app-hub %F
+Exec=apphub %F
 Terminal=false
 Type=Application
 StartupNotify=true
-Icon=AppHub
+Icon=com.francescogaglione.apphub
 Categories=COSMIC;Utility;
 Keywords=
 MimeType=

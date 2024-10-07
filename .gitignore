@@ -12,3 +12,7 @@ debian/*
 !debian/install
 !debian/rules
 !debian/source
+.flatpak
+.flatpak-builder
+build-dir
+repo

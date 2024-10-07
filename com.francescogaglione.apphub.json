@@ -1,0 +1,46 @@
+{
+  "id": "com.francescogaglione.apphub",
+  "runtime": "org.freedesktop.Platform",
+  "runtime-version": "24.08",
+  "sdk": "org.freedesktop.Sdk",
+  "sdk-extensions": ["org.freedesktop.Sdk.Extension.rust-stable"],
+  "command": "app-hub",
+  "finish-args": [
+    "--share=ipc",
+    "--share=network",
+    "--socket=fallback-x11",
+    "--socket=wayland",
+    "--device=dri",
+    "--talk-name=com.system76.CosmicSettingsDaemon",
+    "--filesystem=xdg-config/cosmic:ro"
+  ],
+  "build-options": {
+    "append-path": "/usr/lib/sdk/rust-stable/bin"
+  },
+  "modules": [
+    {
+      "name": "apphub",
+      "buildsystem": "simple",
+      "build-options": {
+        "env": {
+          "CARGO_HOME": "/run/build/apphub/cargo"
+        }
+      },
+      "build-commands": [
+        "cargo --offline fetch --manifest-path Cargo.toml --verbose",
+        "cargo --offline build --release --verbose",
+        "install -Dm0755 ./target/release/apphub /app/bin/apphub",
+        "install -Dm0644 ./res/apphub.desktop /app/share/applications/com.francescogaglione.apphub.desktop",
+        "install -Dm0644 ./res/apphub.metainfo.xml /app/share/metainfo/com.francescogaglione.apphub.metainfo.xml",
+        "install -Dm0644 ./res/icons/hicolor/scalable/apps/com.francescogaglione.apphub.png /app/share/icons/hicolor/scalable/apps/com.francescogaglione.apphub.png"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "."
+        },
+        "cargo-sources.json"
+      ]
+    }
+  ]
+}

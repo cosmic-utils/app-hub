@@ -1,5 +1,5 @@
-name := 'app-hub'
-appid := 'com.github.francesco_gaglione.AppHub'
+name := 'apphub'
+appid := 'com.francescogaglione.apphub'
 version := '1.0.0-alpha.2'
 
 rootdir := ''
@@ -17,8 +17,8 @@ desktop-dst := clean(rootdir / prefix) / 'share' / 'applications' / desktop
 icons-src := 'res' / 'icons' / 'hicolor'
 icons-dst := clean(rootdir / prefix) / 'share' / 'icons' / 'hicolor'
 
-icon-svg-src := icons-src / 'scalable' / 'apps' / 'AppHub.png'
-icon-svg-dst := icons-dst / 'scalable' / 'apps' / 'AppHub.png'
+icon-svg-src := icons-src / 'scalable' / 'apps' / 'com.francescogaglione.apphub.png'
+icon-svg-dst := icons-dst / 'scalable' / 'apps' / 'com.francescogaglione.apphub.png'
 
 # Default recipe which runs `just build-release`
 default: build-release
@@ -92,6 +92,14 @@ package-deb:
     mv debian.deb {{name}}_{{version}}_amd64.deb
 
     rm -rf debian
+
+package-flatpak:
+    flatpak-builder --force-clean --user --install-deps-from=flathub --repo=repo --install builddir com.francescogaglione.apphub.json
+    flatpak build-bundle repo com.francescogaglione.apphub.flatpak com.francescogaglione.apphub --runtime-repo=https://github.com/cosmic-utils/apphub
+
+flatpak-lint:
+    flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest com.francescogaglione.apphub.json
+    flatpak run --command=flatpak-builder-lint org.flatpak.Builder repo repo
 
 # Vendor dependencies locally
 vendor:

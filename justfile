@@ -10,6 +10,10 @@ base-dir := absolute_path(clean(rootdir / prefix))
 bin-src := 'target' / 'release' / name
 bin-dst := base-dir / 'bin' / name
 
+backend-name := 'app_hub_backend'
+backend-src := 'target' / 'release' / backend-name
+backend-dst := base-dir / 'bin' / backend-name
+
 desktop := appid + '.desktop'
 desktop-src := 'res' / desktop
 desktop-dst := clean(rootdir / prefix) / 'share' / 'applications' / desktop
@@ -59,6 +63,7 @@ run *args:
 # Installs files
 install:
     install -Dm0755 {{bin-src}} {{bin-dst}}
+    install -Dm0755 {{backend-src}} {{backend-dst}}
     install -Dm0644 res/{{name}}.desktop {{desktop-dst}}
     install -Dm0644 {{icon-svg-src}} {{icon-svg-dst}}
 
